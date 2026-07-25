@@ -26,7 +26,10 @@ button { cursor: pointer; }
 .app-shell { min-height: 100vh; display: grid; grid-template-columns: 248px minmax(0, 1fr); }
 .sidebar { background: #292a28; color: white; padding: 24px 16px; display: flex; flex-direction: column; min-height: 100vh; }
 .brand { display: flex; gap: 12px; align-items: center; padding: 0 8px 25px; border-bottom: 1px solid #284763; }
-.brand-mark { width: 38px; height: 38px; border-radius: 0; display: grid; place-items: center; font-family: "Muli"; font-weight: 800; background: #f6f3ee; color: #292a28; border: 1px solid #a56145; }
+.brand-lockup, .full-brand { display: flex; align-items: baseline; gap: 5px; white-space: nowrap; }
+.brand-lockup strong, .full-brand strong { font-family: Georgia, serif; font-size: 21px; letter-spacing: .02em; }
+.brand-lockup i, .full-brand i { color: #b96b4e; font-style: normal; font-size: 11px; }
+.brand-lockup b, .full-brand b { font-family: "Muli"; font-size: 12px; letter-spacing: .02em; }
 .brand strong { display: block; font-size: 14px; letter-spacing: .01em; }
 .brand span { display: block; font-family: "Muli"; font-size: 10px; color: #b8b2a8; margin-top: 3px; }
 .nav-label { font-family: "Muli"; font-size: 10px; font-weight: 700; letter-spacing: .12em; color: #b99584; padding: 18px 12px 7px; margin: 0; }
@@ -175,6 +178,19 @@ nav button.active span { color: #a56145; }
 .decision-actions .primary { border: 1px solid #2f75b5; background: #2f75b5; color: white; box-shadow: 0 3px 8px #2f75b533; }
 .decision-actions .primary:disabled { background: #c5cfd8; border-color: #c5cfd8; box-shadow: none; cursor: not-allowed; }
 
+.full-document { position: fixed; inset: 0; z-index: 1000; display: grid; grid-template-rows: 76px minmax(0, 1fr); background: #e8e5df; }
+.full-document > header { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 24px; padding: 10px 22px; color: white; background: #292a28; border-bottom: 3px solid #a56145; box-shadow: 0 2px 12px #0003; }
+.full-document header > div:nth-child(2) { min-width: 0; }
+.full-document header span, .full-document header h2, .full-document header p { display: block; margin: 0; }
+.full-document header span { color: #d9c7bd; font-size: 9px; }
+.full-document header h2 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; font-weight: 500; }
+.full-document header p { margin-top: 2px; color: #b8b2a8; font-size: 8px; }
+.full-document iframe { width: 100%; height: 100%; border: 0; background: #d9d6d0; }
+.full-actions { display: flex; align-items: center; gap: 8px; }
+.full-actions a, .full-actions button { border: 1px solid #77736b; padding: 8px 12px; color: white; background: transparent; text-decoration: none; font-size: 10px; }
+.full-actions a { background: #a56145; border-color: #a56145; }
+.full-actions button:hover, .full-actions a:hover { filter: brightness(1.08); }
+
 @media (max-width: 1000px) {
   .app-shell { grid-template-columns: 74px 1fr; }
   .brand > div:last-child, nav button:not(.active), .nav-label, .security-card div { display: none; }
@@ -203,4 +219,9 @@ nav button.active span { color: #a56145; }
   .decision-bar { align-items: start; flex-direction: column; }
   .decision-actions { width: 100%; flex-wrap: wrap; }
   .decision-actions button { flex: 1; }
+  .full-document { grid-template-rows: 96px minmax(0, 1fr); }
+  .full-document > header { grid-template-columns: auto 1fr; gap: 10px; padding: 9px 12px; }
+  .full-document header > div:nth-child(2) { display: none; }
+  .full-actions { justify-self: end; }
+  .full-actions a, .full-actions button { padding: 7px 9px; font-size: 9px; }
 }

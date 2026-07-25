@@ -2,17 +2,17 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "BIB Commercial Health",
-  description: "Role-based commercial review and approval center for BIB.",
+  title: "BIB | ศูนย์ตรวจทานและอนุมัติเอกสาร",
+  description: "ศูนย์ตรวจทาน แสดงความคิดเห็น และอนุมัติเอกสารเชิงพาณิชย์ของ BIB",
   openGraph: {
-    title: "BIB Commercial Health",
-    description: "Review · Approve · E‑Signature",
+    title: "BIB | ศูนย์ตรวจทานและอนุมัติเอกสาร",
+    description: "ตรวจทาน · แสดงความคิดเห็น · อนุมัติ · ลงนาม",
     images: ["/og.png"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "BIB Commercial Health",
-    description: "Review · Approve · E‑Signature",
+    title: "BIB | ศูนย์ตรวจทานและอนุมัติเอกสาร",
+    description: "ตรวจทาน · แสดงความคิดเห็น · อนุมัติ · ลงนาม",
     images: ["/og.png"],
   },
 };

@@ -12,9 +12,11 @@ test("ships the controlled review workflow", async () => {
     readFile(pageUrl, "utf8"),
     readFile(routeUrl, "utf8"),
   ]);
-  assert.match(page, /My Review Queue/);
-  assert.match(page, /Request changes/);
-  assert.match(page, /Approve for E‑Signature/);
+  assert.match(page, /เอกสารที่รอตรวจทาน/);
+  assert.match(page, /ส่งกลับเพื่อแก้ไข/);
+  assert.match(page, /ยืนยันเพื่อดำเนินการลงนาม/);
+  assert.match(page, /เปิดอ่านแบบเต็มพื้นที่/);
+  assert.match(page, /full-document/);
   assert.match(page, /\/api\/reviews/);
   assert.match(route, /DECISION_RECORDED/);
   assert.match(route, /COMMENT_CREATED/);
