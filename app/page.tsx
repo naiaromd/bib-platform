@@ -309,18 +309,18 @@ export default function Home() {
             <div><strong>คุณผู้รับผิดชอบ</strong><small>บริษัท ซีเคแอล เฮลท์ แอนด์ บิวตี้ อินเตอร์เนชั่นแนล จำกัด</small></div>
           </div>
           <nav>
-            <a title="ภาพรวมบัญชี" className={clientView === "overview" ? "active" : ""} href="/linna?view=overview"><i>⌂</i><span>ภาพรวมบัญชี</span></a>
-            <a title="บริการตามแผน D2" className={clientView === "plan" ? "active" : ""} href="/linna?view=plan"><i>◇</i><span>บริการตามแผน D2</span></a>
+            <a title="ภาพรวมบัญชี" className={clientView === "overview" ? "active" : ""} href="/linna?view=overview"><i>⌂</i><span>ภาพรวม</span></a>
+            <a title="บริการตามแผน D2" className={clientView === "plan" ? "active" : ""} href="/linna?view=plan"><i>D2</i><span>แผนบริการ</span></a>
             <a title="เมนูบริการ" className={clientView === "treatments" ? "active" : ""} href="/linna?view=treatments"><i>◉</i><span>เมนูบริการ</span></a>
-            <a title="แนวทางการให้บริการ" className={clientView === "protocols" ? "active" : ""} href="/linna?view=protocols"><i>⌁</i><span>แนวทางการให้บริการ</span></a>
-            <a title="การสั่งซื้อ" className={clientView === "orders" ? "active" : ""} href="/linna?view=orders"><i>▣</i><span>การสั่งซื้อ</span></a>
-            <a title="การฝึกอบรม" className={clientView === "training" ? "active" : ""} href="/linna?view=training"><i>✓</i><span>การฝึกอบรม</span></a>
-            <a title="บริการและซ่อมบำรุง" className={clientView === "service" ? "active" : ""} href="/linna?view=service"><i>⚙</i><span>บริการและซ่อมบำรุง</span></a>
-            <a title="การรับประกัน" className={clientView === "warranty" ? "active" : ""} href="/linna?view=warranty"><i>◷</i><span>การรับประกัน</span></a>
-            <a title="ฐานความรู้" className={clientView === "knowledge" ? "active" : ""} href="/linna?view=knowledge"><i>▤</i><span>ฐานความรู้</span></a>
-            <a title="เครื่องมือหลังการขาย" className={clientView === "toolkit" ? "active" : ""} href="/linna?view=toolkit"><i>▦</i><span>เครื่องมือหลังการขาย</span></a>
-            <a title="เอกสารของฉัน" className={clientView === "documents" ? "active" : ""} href="/linna?view=documents"><i>≡</i><span>เอกสารของฉัน</span></a>
-            <a title="ข้อมูลส่วนตัว" className={clientView === "profile" ? "active" : ""} href="/linna?view=profile"><i>●</i><span>ข้อมูลส่วนตัว</span></a>
+            <a title="แนวทางการให้บริการ" className={clientView === "protocols" ? "active" : ""} href="/linna?view=protocols"><i>⌁</i><span>แนวทาง</span></a>
+            <a title="การสั่งซื้อ" className={clientView === "orders" ? "active" : ""} href="/linna?view=orders"><i>▣</i><span>สั่งซื้อ</span></a>
+            <a title="การฝึกอบรม" className={clientView === "training" ? "active" : ""} href="/linna?view=training"><i>✓</i><span>ฝึกอบรม</span></a>
+            <a title="บริการและซ่อมบำรุง" className={clientView === "service" ? "active" : ""} href="/linna?view=service"><i>⚙</i><span>บริการ</span></a>
+            <a title="การรับประกัน" className={clientView === "warranty" ? "active" : ""} href="/linna?view=warranty"><i>◷</i><span>รับประกัน</span></a>
+            <a title="ฐานความรู้" className={clientView === "knowledge" ? "active" : ""} href="/linna?view=knowledge"><i>▤</i><span>ความรู้</span></a>
+            <a title="ชุดเริ่มให้บริการ" className={clientView === "toolkit" ? "active" : ""} href="/linna?view=toolkit"><i>▦</i><span>ชุดเริ่มงาน</span></a>
+            <a title="เอกสารของฉัน" className={clientView === "documents" ? "active" : ""} href="/linna?view=documents"><i>≡</i><span>เอกสาร</span></a>
+            <a title="ข้อมูลส่วนตัว" className={clientView === "profile" ? "active" : ""} href="/linna?view=profile"><i>●</i><span>ข้อมูลฉัน</span></a>
           </nav>
           <div className="plan-identity"><span>รูปแบบความร่วมมือ</span><strong>D2 · แบ่งรายได้ระยะยาว</strong><small>40/60 · ไม่มีรายได้ขั้นต่ำ</small></div>
         </aside>}
@@ -375,6 +375,22 @@ export default function Home() {
                 </div>
                 <div className="approval-strip"><span>สิ่งที่แก้ไขได้</span><strong>ชื่อ ราคา ระยะเวลา และคำอธิบาย</strong><small>ข้อความกล่าวอ้างต้องส่งให้ BIB ตรวจอนุมัติก่อนเผยแพร่</small></div>
                 <footer><button className="secondary">ดูตัวอย่างเมนู</button><button onClick={() => setSystemMessage("ส่งเมนูบริการให้ BIB ตรวจทานแล้ว")}>ส่งให้ BIB ตรวจทาน</button></footer>
+              </div>
+              <div className="launch-menu-list">
+                <header><div><span>รายการจาก LINNA Launch Toolkit</span><h3>เมนูบริการที่เคยออกแบบไว้</h3></div><em>8 รายการ</em></header>
+                {[
+                  ["P-01", "Post-Procedure Recovery", "30 นาที", "4,500 บาท"],
+                  ["P-02", "Scarless", "20 นาที", "3,500 บาท"],
+                  ["P-03", "Intensive Facial Lifting", "30 นาที", "5,500 บาท"],
+                  ["P-04", "Age Reversal Facial", "30 นาที", "5,500 บาท"],
+                  ["P-05", "De-puffing Eye / Vogue", "20 นาที", "4,500 บาท"],
+                  ["P-06", "LINNA Body Detox by icoone", "60 นาที", "8,500 บาท"],
+                  ["P-07", "LINNA Body Rebalance", "60 นาที", "8,500 บาท"],
+                  ["P-08", "Hand Young Touch", "10 นาที", "1,800 บาท"],
+                ].map(([code, name, duration, price]) => (
+                  <article key={code}><b>{code}</b><div><strong>{name}</strong><span>{duration}</span></div><em>{price}</em><button>เปิดแก้ไข</button></article>
+                ))}
+                <p>ราคาและถ้อยคำเป็นข้อมูลจากชุดที่เคยออกแบบไว้ ต้องให้ LINNA ยืนยันและส่ง BIB ตรวจข้อความก่อนเผยแพร่จริง</p>
               </div>
             </section>
 
@@ -528,6 +544,30 @@ export default function Home() {
                 <article className="toolkit-resource" id="toolkit"><i>▦</i><b>เครื่องมือหลังการขาย</b><h4>เอกสารพร้อมใช้</h4><p>แบบบันทึก · แบบตรวจรับ · รายการตรวจ · สื่อที่อนุมัติ</p><button>เปิดชุดเครื่องมือ</button></article>
                 <article className="plan-resource"><i>D2</i><b>บริการเฉพาะแผน D2</b><h4>ติดตามผลร่วมกัน</h4><p>รายงานรายเดือน · ทบทวนวันที่ 90 · ทบทวนรายไตรมาส</p><button onClick={() => setShowReportForm(true)}>ส่งรายงานเดือนนี้</button></article>
               </div>
+            </section>
+
+            <section className="launch-toolkit portal-module toolkit-module">
+              <header>
+                <div><span>ประยุกต์จาก LINNA × icoone Patient Flow Toolkit</span><h3>ชุดเริ่มให้บริการสำหรับทีม LINNA</h3></div>
+                <em>เรียงตามขั้นตอนใช้งานจริง</em>
+              </header>
+              <div className="launch-flow">
+                {[
+                  ["01", "ก่อนเข้าคลินิก", "แบบประเมินเบื้องต้น", "ข้อมูลติดต่อ · เป้าหมาย · การคัดกรอง · ความยินยอม", "เปิดแบบประเมิน"],
+                  ["02", "วันที่เข้าปรึกษา", "แบบปรึกษาในคลินิก", "ยืนยันข้อมูล · ประเมินโดยแพทย์ · เลือกโปรแกรม · ลงนาม", "เปิดแบบปรึกษา"],
+                  ["03", "ออกแบบแผนบริการ", "ตารางแนะนำโปรแกรม", "เชื่อมเป้าหมาย พื้นที่ดูแล ความถี่ และชุดบริการ", "เปิดตารางแนะนำ"],
+                  ["04", "เริ่มให้บริการ", "ทะเบียนผู้รับบริการ", "เลขผู้รับบริการ · นัดหมาย · ผู้ดูแล · สถานะโปรแกรม", "เปิดทะเบียน"],
+                  ["05", "ติดตามผล", "ข้อความติดตามทางไลน์", "ยืนยันนัด · ดูแลหลังบริการ · นัดประเมินกลางและปลายโปรแกรม", "เปิดข้อความพร้อมใช้"],
+                ].map(([step, phase, title, detail, action]) => (
+                  <article key={step}>
+                    <b>{step}</b><div><span>{phase}</span><h4>{title}</h4><p>{detail}</p></div><button>{action}</button>
+                  </article>
+                ))}
+              </div>
+              <footer>
+                <strong>ขอบเขตข้อมูล</strong>
+                <span>Portal นี้แสดงเครื่องมือดำเนินงานเท่านั้น ข้อมูลสุขภาพและภาพผู้รับบริการต้องอยู่ในพื้นที่จำกัดสิทธิ์ของ LINNA และแยกจากข้อมูลรายได้ตามสัญญา</span>
+              </footer>
             </section>
 
             <section className="reorder-catalog portal-module orders-module">
