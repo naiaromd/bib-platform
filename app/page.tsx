@@ -337,11 +337,18 @@ export default function Home() {
               <button onClick={() => setShowReportForm(true)}>เริ่มกรอกข้อมูล</button>
             </div>
 
+            <div className="client-action-grid" aria-label="งานที่ใช้บ่อย">
+              <button onClick={() => setShowReportForm(true)}><i>↗</i><span><strong>ส่งยอดเดือนนี้</strong><small>รายได้ · จำนวนครั้ง · ชั่วโมงเครื่อง</small></span></button>
+              <a href="#orders"><i>＋</i><span><strong>สั่งซื้อวัสดุ</strong><small>ดูรูป ราคา และรายการที่ควรเติม</small></span></a>
+              <a href="#service"><i>⚙</i><span><strong>ขอรับบริการ</strong><small>แจ้งปัญหาและติดตามการบำรุงรักษา</small></span></a>
+              <a href="#knowledge"><i>▤</i><span><strong>เปิดฐานความรู้</strong><small>คู่มือ ข้อห้าม และเครื่องมือทำงาน</small></span></a>
+            </div>
+
             <div className="client-metrics">
-              <article><span>รายได้จากบริการ</span><strong>฿227,500</strong><small>ข้อมูลที่ LINNA กำลังจัดเตรียม</small></article>
-              <article><span>ส่วนแบ่ง LINNA</span><strong>฿106,500</strong><small>ร้อยละ 60 ของรายได้สุทธิ</small></article>
-              <article><span>ส่วนแบ่ง IPQ</span><strong>฿75,970</strong><small>รวมภาษีมูลค่าเพิ่มแล้ว</small></article>
-              <article><span>จำนวนครั้งที่ให้บริการ</span><strong>63 ครั้ง</strong><small>ชำระเงิน 42 · ใช้ชุดบริการ 18 · ไม่มีค่าใช้จ่าย 3</small></article>
+              <article><i>฿</i><span>รายได้จากบริการ</span><strong>฿227,500</strong><small>รอยืนยันรอบเดือนนี้</small></article>
+              <article><i>60</i><span>ส่วนแบ่ง LINNA</span><strong>฿106,500</strong><small>ร้อยละ 60 ของรายได้สุทธิ</small></article>
+              <article><i>40</i><span>ส่วนแบ่ง IPQ</span><strong>฿75,970</strong><small>รวมภาษีมูลค่าเพิ่ม</small></article>
+              <article><i>63</i><span>จำนวนครั้งที่ให้บริการ</span><strong>63 ครั้ง</strong><small>ชำระเงิน 42 · ชุดบริการ 18 · ฟรี 3</small></article>
             </div>
 
             <div className="client-grid" id="plan-services">
@@ -394,19 +401,19 @@ export default function Home() {
               <div className="service-hub-grid">
                 <article>
                   <b>01</b>
-                  <div><span>รับประกันเครื่อง</span><h4>12 เดือนนับจากวันที่ติดตั้ง</h4><p>ครอบคลุมการตรวจและซ่อมตามเงื่อนไขผู้ผลิต ไม่ครอบคลุมความเสียหายจากการตกหล่น ไฟฟ้าไม่เหมาะสม การใช้ผิดคู่มือ หรือการซ่อมโดยผู้ที่ไม่ได้รับอนุญาต</p></div>
+                  <div><span>รับประกันเครื่อง</span><h4>12 เดือนหลังติดตั้ง</h4><p>ซ่อมตามเงื่อนไขผู้ผลิต · ใช้ไฟฟ้าและเครื่องตามคู่มือ</p></div>
                 </article>
                 <article>
                   <b>02</b>
-                  <div><span>การบำรุงรักษา</span><h4>ตรวจเชิงป้องกันทุก 6 เดือน</h4><p>ระบบจะแจ้งเตือนล่วงหน้า บันทึกผลตรวจ ประวัติอะไหล่ และรายการแก้ไขที่ต้องติดตามไว้กับหมายเลขเครื่อง</p></div>
+                  <div><span>การบำรุงรักษา</span><h4>ตรวจทุก 6 เดือน</h4><p>แจ้งเตือนล่วงหน้า · เก็บผลตรวจและประวัติอะไหล่</p></div>
                 </article>
                 <article>
                   <b>03</b>
-                  <div><span>การฝึกอบรมเริ่มต้น</span><h4>รวม 18 ชั่วโมง</h4><p>ครอบคลุมหลักการทำงาน การประเมิน โปรแกรม การดูแลเครื่อง ข้อห้าม และการฝึกปฏิบัติ โดยสิทธิอบรมสุดท้ายให้ยึดสัญญา LINNA ฉบับลงนาม</p></div>
+                  <div><span>การฝึกอบรมเริ่มต้น</span><h4>รวม 18 ชั่วโมง</h4><p>ความรู้ · การประเมิน · โปรแกรม · ข้อห้าม · ฝึกปฏิบัติ</p></div>
                 </article>
                 <article>
                   <b>04</b>
-                  <div><span>การรับมอบอุปกรณ์</span><h4>ตรวจรายการและสภาพในวันส่งมอบ</h4><p>บันทึกเครื่อง หัวใช้งาน อุปกรณ์ประกอบ วัสดุสิ้นเปลือง และอุปกรณ์ส่งเสริมการตลาด พร้อมลงนามรับมอบในระบบ</p></div>
+                  <div><span>การรับมอบอุปกรณ์</span><h4>ตรวจและลงนามในระบบ</h4><p>เครื่อง · หัวใช้งาน · อุปกรณ์ · วัสดุเริ่มต้น</p></div>
                 </article>
               </div>
               <p className="service-source-note">ข้อมูลส่วนนี้สรุปจากชุดเอกสาร “Sales Contract &amp; Warranty” ที่ BIB ใช้อ้างอิง ข้อความที่มีผลผูกพันให้ยึดสัญญาและใบรับประกันของ LINNA ที่ลงนามครบถ้วนแล้วเท่านั้น</p>
@@ -445,9 +452,9 @@ export default function Home() {
             <section className="support-resources">
               <header><div><span>ข้อมูลและเครื่องมือสนับสนุน</span><h3>พร้อมใช้เมื่อเริ่มให้บริการ</h3></div></header>
               <div>
-                <article id="knowledge"><b>ฐานความรู้</b><h4>คู่มือและความรู้สำหรับทีม LINNA</h4><p>คู่มือการใช้งาน ข้อห้าม การดูแลเครื่อง แนวทางคัดกรอง และคำตอบสำหรับคำถามที่พบบ่อย โดยแสดงเฉพาะฉบับปัจจุบัน</p><button>เปิดฐานความรู้</button></article>
-                <article id="toolkit"><b>เครื่องมือหลังการขาย</b><h4>เอกสารสำหรับเปิดและดูแลบริการ</h4><p>แบบบันทึกผล แบบตรวจรับเครื่อง รายการตรวจประจำวัน สื่อที่ผ่านการอนุมัติ และแบบฟอร์มขอรับบริการ</p><button>เปิดชุดเครื่องมือ</button></article>
-                <article><b>บริการเฉพาะแผน D2</b><h4>ติดตามผลการดำเนินงานร่วมกัน</h4><p>รายงานรายได้และชั่วโมงใช้งานรายเดือน การทบทวนวันที่ 90 การทบทวนรายไตรมาส และการแจ้งเตือนเมื่อไม่มีบริการที่ชำระเงินจริง</p><button onClick={() => setShowReportForm(true)}>ส่งรายงานเดือนนี้</button></article>
+                <article id="knowledge"><i>▤</i><b>ฐานความรู้</b><h4>คู่มือสำหรับทีม LINNA</h4><p>การใช้งาน · ข้อห้าม · ดูแลเครื่อง · คำถามที่พบบ่อย</p><button>เปิดฐานความรู้</button></article>
+                <article id="toolkit"><i>▦</i><b>เครื่องมือหลังการขาย</b><h4>เอกสารพร้อมใช้</h4><p>แบบบันทึก · แบบตรวจรับ · รายการตรวจ · สื่อที่อนุมัติ</p><button>เปิดชุดเครื่องมือ</button></article>
+                <article><i>D2</i><b>บริการเฉพาะแผน D2</b><h4>ติดตามผลร่วมกัน</h4><p>รายงานรายเดือน · ทบทวนวันที่ 90 · ทบทวนรายไตรมาส</p><button onClick={() => setShowReportForm(true)}>ส่งรายงานเดือนนี้</button></article>
               </div>
             </section>
 

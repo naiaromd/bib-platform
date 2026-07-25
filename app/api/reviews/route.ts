@@ -62,6 +62,38 @@ async function initialize() {
       opening_hours REAL NOT NULL DEFAULT 0, closing_hours REAL NOT NULL DEFAULT 0,
       consumable_note TEXT NOT NULL DEFAULT '', status TEXT NOT NULL DEFAULT 'Submitted',
       submitted_by TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS client_accounts (
+      id TEXT PRIMARY KEY, legal_name TEXT NOT NULL, display_name TEXT NOT NULL,
+      business_segment TEXT NOT NULL, commercial_model TEXT NOT NULL,
+      account_status TEXT NOT NULL DEFAULT 'Active', created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS client_contacts (
+      id TEXT PRIMARY KEY, account_id TEXT NOT NULL, email TEXT NOT NULL,
+      display_name TEXT NOT NULL, buying_role TEXT NOT NULL, portal_role TEXT NOT NULL,
+      active INTEGER NOT NULL DEFAULT 1)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS device_deployments (
+      id TEXT PRIMARY KEY, account_id TEXT NOT NULL, model TEXT NOT NULL,
+      serial_number TEXT NOT NULL DEFAULT '', installed_at TEXT NOT NULL DEFAULT '',
+      cumulative_hours REAL NOT NULL DEFAULT 0, status TEXT NOT NULL DEFAULT 'Pending delivery')`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS warranties (
+      id TEXT PRIMARY KEY, deployment_id TEXT NOT NULL, starts_at TEXT NOT NULL,
+      ends_at TEXT NOT NULL, status TEXT NOT NULL, document_version_id TEXT NOT NULL)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS training_records (
+      id TEXT PRIMARY KEY, account_id TEXT NOT NULL, contact_id TEXT NOT NULL,
+      course_code TEXT NOT NULL, completed_at TEXT NOT NULL DEFAULT '',
+      competency_status TEXT NOT NULL DEFAULT 'Scheduled',
+      certificate_document_id TEXT NOT NULL DEFAULT '')`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS service_events (
+      id TEXT PRIMARY KEY, deployment_id TEXT NOT NULL, event_type TEXT NOT NULL,
+      status TEXT NOT NULL, scheduled_at TEXT NOT NULL DEFAULT '',
+      completed_at TEXT NOT NULL DEFAULT '', summary TEXT NOT NULL DEFAULT '')`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS customer_orders (
+      id TEXT PRIMARY KEY, account_id TEXT NOT NULL, order_type TEXT NOT NULL,
+      status TEXT NOT NULL, total_amount REAL NOT NULL DEFAULT 0,
+      quotation_document_id TEXT NOT NULL DEFAULT '',
+      ordered_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS knowledge_entitlements (
+      id TEXT PRIMARY KEY, account_id TEXT NOT NULL, commercial_model TEXT NOT NULL,
+      resource_code TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1)`),
   ]);
   for (const row of documents) {
     await d1.prepare(`INSERT OR IGNORE INTO review_documents
