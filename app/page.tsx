@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 type Role = "Executive" | "Finance" | "Legal" | "Sales" | "Customer";
 type ItemId = "linna" | "drj" | "memo";
@@ -73,7 +73,10 @@ function StatusDot({ color }: { color: "green" | "amber" | "blue" | "gray" }) {
 
 export default function Home() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const dedicatedClient = pathname === "/linna";
+  const requestedView = searchParams.get("view") || "overview";
+  const clientView = ["overview", "plan", "orders", "training", "service", "warranty", "knowledge", "toolkit", "documents"].includes(requestedView) ? requestedView : "overview";
   const [role, setRole] = useState<Role>(dedicatedClient ? "Customer" : "Executive");
   const [active, setActive] = useState<ItemId>("linna");
   const [tab, setTab] = useState<"summary" | "history">("summary");
@@ -303,15 +306,15 @@ export default function Home() {
             <div><strong>คุณผู้รับผิดชอบ</strong><small>บริษัท ซีเคแอล เฮลท์ แอนด์ บิวตี้ อินเตอร์เนชั่นแนล จำกัด</small></div>
           </div>
           <nav>
-            <a className="active" href="#overview"><i>⌂</i>ภาพรวมบัญชี</a>
-            <a href="#plan-services"><i>◇</i>บริการตามแผน D2</a>
-            <a href="#orders"><i>▣</i>ประวัติการสั่งซื้อ</a>
-            <a href="#training"><i>✓</i>ประวัติการฝึกอบรม</a>
-            <a href="#service"><i>⚙</i>ประวัติการบริการ</a>
-            <a href="#warranty"><i>◷</i>การรับประกัน</a>
-            <a href="#knowledge"><i>▤</i>ฐานความรู้</a>
-            <a href="#toolkit"><i>▦</i>เครื่องมือหลังการขาย</a>
-            <a href="#documents"><i>≡</i>เอกสารของฉัน</a>
+            <a className={clientView === "overview" ? "active" : ""} href="/linna?view=overview"><i>⌂</i>ภาพรวมบัญชี</a>
+            <a className={clientView === "plan" ? "active" : ""} href="/linna?view=plan"><i>◇</i>บริการตามแผน D2</a>
+            <a className={clientView === "orders" ? "active" : ""} href="/linna?view=orders"><i>▣</i>การสั่งซื้อ</a>
+            <a className={clientView === "training" ? "active" : ""} href="/linna?view=training"><i>✓</i>การฝึกอบรม</a>
+            <a className={clientView === "service" ? "active" : ""} href="/linna?view=service"><i>⚙</i>บริการและซ่อมบำรุง</a>
+            <a className={clientView === "warranty" ? "active" : ""} href="/linna?view=warranty"><i>◷</i>การรับประกัน</a>
+            <a className={clientView === "knowledge" ? "active" : ""} href="/linna?view=knowledge"><i>▤</i>ฐานความรู้</a>
+            <a className={clientView === "toolkit" ? "active" : ""} href="/linna?view=toolkit"><i>▦</i>เครื่องมือหลังการขาย</a>
+            <a className={clientView === "documents" ? "active" : ""} href="/linna?view=documents"><i>≡</i>เอกสารของฉัน</a>
           </nav>
           <div className="plan-identity"><span>รูปแบบความร่วมมือ</span><strong>D2 · แบ่งรายได้ระยะยาว</strong><small>40/60 · ไม่มีรายได้ขั้นต่ำ</small></div>
         </aside>}
@@ -321,8 +324,25 @@ export default function Home() {
         </div>
 
         {isCustomer && (
-          <section className="client-dashboard" id="overview">
-            <header className="client-welcome">
+          <section className={`client-dashboard view-${clientView}`} id="overview">
+            {clientView !== "overview" && <header className="client-view-title">
+              <a href="/linna?view=overview">← ภาพรวม</a>
+              <div>
+                <span>LINNA Clinic · พื้นที่ทำงานส่วนบุคคล</span>
+                <h2>{({
+                  plan: "บริการตามแผน D2",
+                  orders: "การสั่งซื้อและวัสดุ",
+                  training: "การฝึกอบรมและความพร้อม",
+                  service: "บริการและซ่อมบำรุง",
+                  warranty: "การรับประกันเครื่อง",
+                  knowledge: "ฐานความรู้",
+                  toolkit: "เครื่องมือหลังการขาย",
+                  documents: "เอกสารของฉัน",
+                } as Record<string, string>)[clientView]}</h2>
+              </div>
+              <span className="view-status">ข้อมูลของ LINNA เท่านั้น</span>
+            </header>}
+            <header className="client-welcome portal-module overview-module">
               <div>
                 <p>สวัสดี ผู้รับผิดชอบ</p>
                 <h2>ยินดีต้อนรับสู่พื้นที่ดูแล LINNA Clinic</h2>
@@ -331,27 +351,27 @@ export default function Home() {
               <button onClick={() => setShowReportForm(true)}>ส่งรายงานประจำเดือน</button>
             </header>
 
-            <div className="client-alert">
+            <div className="client-alert portal-module overview-module">
               <div><span>กำหนดส่งรายงาน</span><strong>5 ส.ค. 2569</strong></div>
               <p>กรุณาส่งยอดบริการ รายได้ และภาพชั่วโมงสะสมของเครื่องเพื่อให้ BIB ตรวจสอบส่วนแบ่งรายได้</p>
               <button onClick={() => setShowReportForm(true)}>เริ่มกรอกข้อมูล</button>
             </div>
 
-            <div className="client-action-grid" aria-label="งานที่ใช้บ่อย">
+            <div className="client-action-grid portal-module overview-module" aria-label="งานที่ใช้บ่อย">
               <button onClick={() => setShowReportForm(true)}><i>↗</i><span><strong>ส่งยอดเดือนนี้</strong><small>รายได้ · จำนวนครั้ง · ชั่วโมงเครื่อง</small></span></button>
-              <a href="#orders"><i>＋</i><span><strong>สั่งซื้อวัสดุ</strong><small>ดูรูป ราคา และรายการที่ควรเติม</small></span></a>
-              <a href="#service"><i>⚙</i><span><strong>ขอรับบริการ</strong><small>แจ้งปัญหาและติดตามการบำรุงรักษา</small></span></a>
-              <a href="#knowledge"><i>▤</i><span><strong>เปิดฐานความรู้</strong><small>คู่มือ ข้อห้าม และเครื่องมือทำงาน</small></span></a>
+              <a href="/linna?view=orders"><i>＋</i><span><strong>สั่งซื้อวัสดุ</strong><small>ดูรูป ราคา และรายการที่ควรเติม</small></span></a>
+              <a href="/linna?view=service"><i>⚙</i><span><strong>ขอรับบริการ</strong><small>แจ้งปัญหาและติดตามการบำรุงรักษา</small></span></a>
+              <a href="/linna?view=knowledge"><i>▤</i><span><strong>เปิดฐานความรู้</strong><small>คู่มือ ข้อห้าม และเครื่องมือทำงาน</small></span></a>
             </div>
 
-            <div className="client-metrics">
+            <div className="client-metrics portal-module overview-module">
               <article><i>฿</i><span>รายได้จากบริการ</span><strong>฿227,500</strong><small>รอยืนยันรอบเดือนนี้</small></article>
               <article><i>60</i><span>ส่วนแบ่ง LINNA</span><strong>฿106,500</strong><small>ร้อยละ 60 ของรายได้สุทธิ</small></article>
               <article><i>40</i><span>ส่วนแบ่ง IPQ</span><strong>฿75,970</strong><small>รวมภาษีมูลค่าเพิ่ม</small></article>
               <article><i>63</i><span>จำนวนครั้งที่ให้บริการ</span><strong>63 ครั้ง</strong><small>ชำระเงิน 42 · ชุดบริการ 18 · ฟรี 3</small></article>
             </div>
 
-            <div className="client-grid" id="plan-services">
+            <div className="client-grid portal-module overview-module plan-module" id="plan-services">
               <article className="client-card machine-card">
                 <header><div><span>การใช้งานเครื่อง</span><h3>icoone Laser Med</h3></div><em>ทำงานปกติ</em></header>
                 <div className="hour-reading">
@@ -393,7 +413,7 @@ export default function Home() {
               </article>
             </div>
 
-            <section className="client-service-hub" id="service">
+            <section className="client-service-hub portal-module service-module warranty-module" id="service">
               <header>
                 <div><span>ข้อมูลจากชุดสัญญาและการรับประกันของ BIB</span><h3>การส่งมอบ การฝึกอบรม และบริการหลังการขาย</h3></div>
                 <em>ปรับให้ตรงกับ LINNA ก่อนลงนาม</em>
@@ -419,10 +439,10 @@ export default function Home() {
               <p className="service-source-note">ข้อมูลส่วนนี้สรุปจากชุดเอกสาร “Sales Contract &amp; Warranty” ที่ BIB ใช้อ้างอิง ข้อความที่มีผลผูกพันให้ยึดสัญญาและใบรับประกันของ LINNA ที่ลงนามครบถ้วนแล้วเท่านั้น</p>
             </section>
 
-            <section className="account-history">
+            <section className="account-history portal-module orders-module training-module service-module">
               <header><div><span>ข้อมูลร่วมสำหรับทุกแผน</span><h3>ประวัติการดูแลบัญชี</h3></div><em>เชื่อมกับเครื่องและสัญญาของ LINNA</em></header>
               <div className="history-columns">
-                <article id="orders">
+                <article className="orders-history" id="orders">
                   <header><span>01</span><div><small>ประวัติการสั่งซื้อ</small><h4>สินค้าและวัสดุ</h4></div></header>
                   <ul>
                     <li><time>รอวันส่งมอบ</time><strong>icoone Laser Med และอุปกรณ์ตามสัญญา</strong><span>กำลังตรวจรายการก่อนส่งมอบ</span></li>
@@ -430,7 +450,7 @@ export default function Home() {
                   </ul>
                   <button>ดูประวัติทั้งหมด</button>
                 </article>
-                <article id="training">
+                <article className="training-history" id="training">
                   <header><span>02</span><div><small>ประวัติการฝึกอบรม</small><h4>ผู้ปฏิบัติงานและความพร้อม</h4></div></header>
                   <ul>
                     <li><time>หลักสูตรเริ่มต้น</time><strong>การฝึกอบรมรวม 18 ชั่วโมง</strong><span>รอยืนยันวันอบรมและรายชื่อผู้เข้าอบรม</span></li>
@@ -438,7 +458,7 @@ export default function Home() {
                   </ul>
                   <button>จัดการรายชื่อผู้เข้าอบรม</button>
                 </article>
-                <article>
+                <article className="service-history">
                   <header><span>03</span><div><small>ประวัติการบริการ</small><h4>บำรุงรักษาและแก้ไขปัญหา</h4></div></header>
                   <ul>
                     <li><time>ทุก 6 เดือน</time><strong>การตรวจบำรุงรักษาเชิงป้องกัน</strong><span>ครั้งถัดไปจะแจ้งเมื่อยืนยันวันที่ติดตั้ง</span></li>
@@ -449,16 +469,16 @@ export default function Home() {
               </div>
             </section>
 
-            <section className="support-resources">
+            <section className="support-resources portal-module knowledge-module toolkit-module plan-module">
               <header><div><span>ข้อมูลและเครื่องมือสนับสนุน</span><h3>พร้อมใช้เมื่อเริ่มให้บริการ</h3></div></header>
               <div>
-                <article id="knowledge"><i>▤</i><b>ฐานความรู้</b><h4>คู่มือสำหรับทีม LINNA</h4><p>การใช้งาน · ข้อห้าม · ดูแลเครื่อง · คำถามที่พบบ่อย</p><button>เปิดฐานความรู้</button></article>
-                <article id="toolkit"><i>▦</i><b>เครื่องมือหลังการขาย</b><h4>เอกสารพร้อมใช้</h4><p>แบบบันทึก · แบบตรวจรับ · รายการตรวจ · สื่อที่อนุมัติ</p><button>เปิดชุดเครื่องมือ</button></article>
-                <article><i>D2</i><b>บริการเฉพาะแผน D2</b><h4>ติดตามผลร่วมกัน</h4><p>รายงานรายเดือน · ทบทวนวันที่ 90 · ทบทวนรายไตรมาส</p><button onClick={() => setShowReportForm(true)}>ส่งรายงานเดือนนี้</button></article>
+                <article className="knowledge-resource" id="knowledge"><i>▤</i><b>ฐานความรู้</b><h4>คู่มือสำหรับทีม LINNA</h4><p>การใช้งาน · ข้อห้าม · ดูแลเครื่อง · คำถามที่พบบ่อย</p><button>เปิดฐานความรู้</button></article>
+                <article className="toolkit-resource" id="toolkit"><i>▦</i><b>เครื่องมือหลังการขาย</b><h4>เอกสารพร้อมใช้</h4><p>แบบบันทึก · แบบตรวจรับ · รายการตรวจ · สื่อที่อนุมัติ</p><button>เปิดชุดเครื่องมือ</button></article>
+                <article className="plan-resource"><i>D2</i><b>บริการเฉพาะแผน D2</b><h4>ติดตามผลร่วมกัน</h4><p>รายงานรายเดือน · ทบทวนวันที่ 90 · ทบทวนรายไตรมาส</p><button onClick={() => setShowReportForm(true)}>ส่งรายงานเดือนนี้</button></article>
               </div>
             </section>
 
-            <section className="reorder-catalog">
+            <section className="reorder-catalog portal-module orders-module">
               <header>
                 <div><span>รายการสำหรับสั่งซื้อเพิ่ม</span><h3>วัสดุสิ้นเปลืองที่ใช้ประจำ</h3></div>
                 <button>สร้างคำขอสั่งซื้อ</button>
@@ -476,7 +496,7 @@ export default function Home() {
               <p>ราคาข้างต้นรวมภาษีมูลค่าเพิ่มตามบัญชีราคาที่นำเข้าระบบ และต้องยืนยันราคาและจำนวนสินค้าก่อนออกใบเสนอราคา</p>
             </section>
 
-            <section className="client-documents" id="documents">
+            <section className="client-documents portal-module documents-module warranty-module" id="documents">
               <header><div><span>เอกสารของ LINNA</span><h3>เอกสารล่าสุด</h3></div><button onClick={() => { setActive("linna"); setFullView(true); }}>ดูเอกสารทั้งหมด</button></header>
               <div><span>สัญญาแบ่งรายได้</span><strong>ฉบับรอทบทวน</strong><button onClick={() => { setActive("linna"); setFullView(true); }}>เปิดอ่าน</button></div>
               <div><span>หนังสือรับรองนิติบุคคล</span><strong>รับเอกสารแล้ว · ออกวันที่ 26 มี.ค. 2569</strong><button onClick={() => {
@@ -487,7 +507,7 @@ export default function Home() {
               <div><span>ใบรับรองการฝึกอบรม</span><strong>มี 2 รายการ</strong><button>เปิดดู</button></div>
             </section>
 
-            <section className="company-profile-card">
+            <section className="company-profile-card portal-module documents-module">
               <header>
                 <div><span>ข้อมูลนิติบุคคลตามหนังสือรับรอง</span><h3>บริษัท ซีเคแอล เฮลท์ แอนด์ บิวตี้ อินเตอร์เนชั่นแนล จำกัด</h3></div>
                 <em>รับเอกสารแล้ว</em>

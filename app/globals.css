@@ -228,6 +228,35 @@ nav button.active span { color: #a56145; }
 .full-actions button:hover, .full-actions a:hover { filter: brightness(1.08); }
 
 .client-dashboard { padding: 20px 30px 40px; }
+.client-dashboard > .portal-module { display: none; }
+.view-overview > .overview-module,
+.view-plan > .plan-module,
+.view-orders > .orders-module,
+.view-training > .training-module,
+.view-service > .service-module,
+.view-warranty > .warranty-module,
+.view-knowledge > .knowledge-module,
+.view-toolkit > .toolkit-module,
+.view-documents > .documents-module { display: grid; }
+.view-plan > .client-grid, .view-overview > .client-grid { display: grid; }
+.view-orders > .account-history, .view-training > .account-history, .view-service > .account-history,
+.view-knowledge > .support-resources, .view-toolkit > .support-resources, .view-plan > .support-resources,
+.view-warranty > .client-service-hub, .view-service > .client-service-hub,
+.view-documents > .client-documents, .view-warranty > .client-documents,
+.view-documents > .company-profile-card { display: block; }
+.view-orders .history-columns > article:not(.orders-history),
+.view-training .history-columns > article:not(.training-history),
+.view-service .history-columns > article:not(.service-history) { display: none; }
+.view-orders .history-columns, .view-training .history-columns, .view-service .history-columns { grid-template-columns: 1fr; }
+.view-knowledge .support-resources article:not(.knowledge-resource),
+.view-toolkit .support-resources article:not(.toolkit-resource),
+.view-plan .support-resources article:not(.plan-resource) { display: none; }
+.view-knowledge .support-resources > div, .view-toolkit .support-resources > div, .view-plan .support-resources > div { grid-template-columns: 1fr; }
+.client-view-title { display: grid; grid-template-columns: 100px minmax(0,1fr) auto; align-items: center; gap: 18px; margin-bottom: 14px; padding: 18px 21px; border: 1px solid var(--line); background: white; }
+.client-view-title a { color: #8a4f36; text-decoration: none; font-size: 8px; }
+.client-view-title span, .client-view-title h2 { display: block; margin: 0; }
+.client-view-title div > span { color: var(--muted); font-size: 7px; }.client-view-title h2 { margin-top: 2px; font-size: 20px; font-weight: 500; }
+.client-view-title .view-status { padding: 5px 8px; color: #3d735d; border: 1px solid #a8c6b8; background: #edf7f1; font-size: 7px; }
 .client-welcome { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px 26px; color: white; background: #292a28; border-left: 4px solid #b99584; }
 .client-welcome p, .client-welcome h2, .client-welcome span { margin: 0; }
 .client-welcome p { color: #cfb8aa; font-size: 10px; }
@@ -401,6 +430,8 @@ nav button.active span { color: #a56145; }
   .full-actions { justify-self: end; }
   .full-actions a, .full-actions button { padding: 7px 9px; font-size: 9px; }
   .client-dashboard { padding: 12px; }
+  .client-view-title { grid-template-columns: 1fr auto; padding: 14px; }
+  .client-view-title > a { grid-column: 1 / -1; }
   .client-topbar { height: 68px; grid-template-columns: auto 1fr auto; gap: 10px; padding: 0 12px; }
   .client-brand-pair { gap: 5px; padding-right: 10px; }
   .client-brand-pair img:first-child { width: 38px; height: 28px; }
