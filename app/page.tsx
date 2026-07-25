@@ -78,6 +78,7 @@ export default function Home() {
   const [active, setActive] = useState<ItemId>("linna");
   const [tab, setTab] = useState<"summary" | "history">("summary");
   const [fullView, setFullView] = useState(false);
+  const [fullDocumentOverride, setFullDocumentOverride] = useState<{ file: string; title: string; version: string } | null>(null);
   const [comment, setComment] = useState("");
   const [showReportForm, setShowReportForm] = useState(false);
   const [reportForm, setReportForm] = useState({
@@ -369,8 +370,32 @@ export default function Home() {
             <section className="client-documents">
               <header><div><span>เอกสารของ LINNA</span><h3>เอกสารล่าสุด</h3></div><button onClick={() => { setActive("linna"); setFullView(true); }}>ดูเอกสารทั้งหมด</button></header>
               <div><span>สัญญาแบ่งรายได้</span><strong>ฉบับรอทบทวน</strong><button onClick={() => { setActive("linna"); setFullView(true); }}>เปิดอ่าน</button></div>
+              <div><span>หนังสือรับรองนิติบุคคล</span><strong>รับเอกสารแล้ว · ออกวันที่ 26 มี.ค. 2569</strong><button onClick={() => {
+                setFullDocumentOverride({ file: "/documents/linna-company-certificate.pdf", title: "หนังสือรับรองบริษัท ซีเคแอล เฮลท์ แอนด์ บิวตี้ อินเตอร์เนชั่นแนล จำกัด", version: "เลขอ้างอิง E10091220326545" });
+                setFullView(true);
+              }}>เปิดอ่าน</button></div>
               <div><span>เงื่อนไขการรับประกัน</span><strong>รอลงนามรับทราบ</strong><button>เปิดอ่าน</button></div>
               <div><span>ใบรับรองการฝึกอบรม</span><strong>มี 2 รายการ</strong><button>เปิดดู</button></div>
+            </section>
+
+            <section className="company-profile-card">
+              <header>
+                <div><span>ข้อมูลนิติบุคคลตามหนังสือรับรอง</span><h3>บริษัท ซีเคแอล เฮลท์ แอนด์ บิวตี้ อินเตอร์เนชั่นแนล จำกัด</h3></div>
+                <em>รับเอกสารแล้ว</em>
+              </header>
+              <div className="company-profile-grid">
+                <div><span>เลขทะเบียนนิติบุคคล</span><strong>[IDENTIFIER OMITTED]</strong></div>
+                <div><span>วันที่จดทะเบียน</span><strong>11 เมษายน 2559</strong></div>
+                <div><span>ทุนจดทะเบียน</span><strong>5,000,000 บาท</strong></div>
+                <div><span>วันที่ออกหนังสือรับรอง</span><strong>26 มีนาคม 2569</strong></div>
+                <div className="wide"><span>กรรมการ</span><strong>นางสาวผู้รับผิดชอบ และนายผู้รับผิดชอบ</strong></div>
+                <div className="wide"><span>อำนาจลงนาม</span><strong>กรรมการหนึ่งคนลงลายมือชื่อและประทับตราสำคัญของบริษัท</strong></div>
+                <div className="wide"><span>สำนักงานใหญ่</span><strong>[ADDRESS OMITTED]</strong></div>
+              </div>
+              <div className="company-review-note">
+                <strong>รายการที่ต้องตรวจเพิ่มเติมก่อนลงนาม</strong>
+                <p>ตรวจสอบเอกสารผ่านรหัสคิวอาร์ของกรมพัฒนาธุรกิจการค้า และขอใบอนุญาตสถานพยาบาลหรือหลักฐานสิทธิใช้สถานที่แยกต่างหาก เนื่องจากหนังสือรับรองนิติบุคคลไม่ใช่ใบอนุญาตประกอบสถานพยาบาล</p>
+              </div>
             </section>
           </section>
         )}
@@ -545,16 +570,16 @@ export default function Home() {
         </div>
       )}
       {fullView && (
-        <div className="full-document" role="dialog" aria-modal="true" aria-label={`เอกสารฉบับเต็ม ${current.title}`}>
+        <div className="full-document" role="dialog" aria-modal="true" aria-label={`เอกสารฉบับเต็ม ${fullDocumentOverride?.title || current.title}`}>
           <header>
             <div className="full-brand"><img src="/logos/bib-logo.png" alt="BIB" /><i>×</i><img src="/logos/icoone-laser-med.png" alt="icoone Laser Med" /></div>
-            <div><span>{current.account}</span><h2>{current.title}</h2><p>{current.version} · เอกสารสำหรับตรวจทาน</p></div>
+            <div><span>{current.account}</span><h2>{fullDocumentOverride?.title || current.title}</h2><p>{fullDocumentOverride?.version || current.version} · เอกสารสำหรับตรวจทาน</p></div>
             <div className="full-actions">
-              <a href={documentFiles[active]} download>ดาวน์โหลดเอกสาร</a>
-              <button onClick={() => setFullView(false)} aria-label="ปิดเอกสารฉบับเต็ม">ปิด</button>
+              <a href={fullDocumentOverride?.file || documentFiles[active]} download>ดาวน์โหลดเอกสาร</a>
+              <button onClick={() => { setFullView(false); setFullDocumentOverride(null); }} aria-label="ปิดเอกสารฉบับเต็ม">ปิด</button>
             </div>
           </header>
-          <iframe src={`${documentFiles[active]}#view=FitH&toolbar=1&navpanes=0`} title={`เอกสารฉบับเต็ม ${current.title}`} />
+          <iframe src={`${fullDocumentOverride?.file || documentFiles[active]}#view=FitH&toolbar=1&navpanes=0`} title={`เอกสารฉบับเต็ม ${fullDocumentOverride?.title || current.title}`} />
         </div>
       )}
     </main>

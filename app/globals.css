@@ -257,6 +257,22 @@ nav button.active span { color: #a56145; }
 .client-documents header span, .client-documents header h3 { display: block; margin: 0; }.client-documents header span { font-size: 8px; color: var(--muted); }.client-documents header h3 { font-size: 14px; }
 .client-documents > div { display: grid; grid-template-columns: 1fr 220px auto; align-items: center; padding: 11px 16px; border-top: 1px solid var(--line); font-size: 9px; }
 .client-documents > div strong { color: var(--muted); font-size: 8px; font-weight: 400; }
+.company-profile-card { margin-top: 12px; border: 1px solid var(--line); background: #fcfaf6; }
+.company-profile-card > header { display: flex; align-items: start; justify-content: space-between; gap: 20px; padding: 16px 18px; background: #292a28; color: white; }
+.company-profile-card header span, .company-profile-card header h3 { display: block; margin: 0; }
+.company-profile-card header span { color: #cfb8aa; font-size: 8px; }
+.company-profile-card header h3 { margin-top: 3px; font-size: 14px; font-weight: 500; }
+.company-profile-card header em { padding: 4px 7px; border: 1px solid #86aa99; color: #e4f1eb; background: #3d735d; font-size: 7px; font-style: normal; white-space: nowrap; }
+.company-profile-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); }
+.company-profile-grid > div { min-height: 72px; padding: 13px 16px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.company-profile-grid > div:nth-child(4) { border-right: 0; }
+.company-profile-grid > .wide { grid-column: span 2; }
+.company-profile-grid span, .company-profile-grid strong { display: block; }
+.company-profile-grid span { color: var(--muted); font-size: 8px; }
+.company-profile-grid strong { margin-top: 4px; font-size: 9px; line-height: 1.5; font-weight: 500; }
+.company-review-note { margin: 14px 16px 16px; padding: 12px 14px; border-left: 3px solid #a87822; background: #fff8e9; }
+.company-review-note strong { color: #755017; font-size: 9px; }
+.company-review-note p { margin: 4px 0 0; color: #725d39; font-size: 8px; line-height: 1.6; }
 
 .report-modal { position: fixed; inset: 0; z-index: 1100; display: grid; place-items: center; padding: 20px; background: #242424bd; }
 .report-sheet { width: min(940px, 96vw); max-height: 94vh; display: grid; grid-template-rows: auto minmax(0,1fr) auto; overflow: hidden; background: #fcfaf6; box-shadow: 0 24px 70px #0006; }
@@ -324,5 +340,7 @@ nav button.active span { color: #a56145; }
   .client-documents > div { grid-template-columns: 1fr auto; gap: 5px; }
   .client-documents > div strong { grid-column: 1; }
   .client-documents > div button { grid-column: 2; grid-row: 1 / span 2; }
+  .company-profile-grid { grid-template-columns: 1fr; }
+  .company-profile-grid > div, .company-profile-grid > .wide { grid-column: 1; border-right: 0; }
   .form-row, .calculation-preview { grid-template-columns: 1fr; }
 }
