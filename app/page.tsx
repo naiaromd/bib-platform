@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Role = "Executive" | "Finance" | "Legal" | "Sales" | "Customer";
 type ItemId = "linna" | "drj" | "memo";
@@ -62,14 +62,55 @@ export default function Home() {
   const [tab, setTab] = useState<"document" | "comments" | "history">("document");
   const [comment, setComment] = useState("");
   const [notes, setNotes] = useState([
-    { author: "Finance · Pim", text: "ขอระบุ Deposit Waiver Approval ID ใน Schedule 1", visibility: "Internal", time: "09:42" },
-    { author: "LINNA · Reviewer", text: "ยืนยันส่วนแบ่ง 60/40 และไม่มี Minimum Guarantee", visibility: "Customer-visible", time: "10:18" },
+    { documentId: "linna", author: "Finance · Pim", text: "ขอระบุ Deposit Waiver Approval ID ใน Schedule 1", visibility: "Internal", time: "09:42" },
+    { documentId: "linna", author: "LINNA · Reviewer", text: "ยืนยันส่วนแบ่ง 60/40 และไม่มี Minimum Guarantee", visibility: "Customer-visible", time: "10:18" },
   ]);
   const [decisions, setDecisions] = useState<Record<ItemId, string>>({
     linna: "Pending",
     drj: "Blocked",
     memo: "Pending",
   });
+  const [saveState, setSaveState] = useState<"loading" | "ready" | "saving" | "saved" | "error">("loading");
+  const [systemMessage, setSystemMessage] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      setSaveState("loading");
+      try {
+        const response = await fetch(`/api/reviews?role=${encodeURIComponent(role)}`, { cache: "no-store" });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "โหลดข้อมูลไม่สำเร็จ");
+        if (cancelled) return;
+        const incomingNotes = (data.comments || []).map((n: {
+          document_id: ItemId; author_label: string; body: string; visibility: string; created_at: string;
+        }) => ({
+          documentId: n.document_id,
+          author: n.author_label,
+          text: n.body,
+          visibility: n.visibility,
+          time: new Date(n.created_at).toLocaleString("th-TH", { hour: "2-digit", minute: "2-digit" }),
+        }));
+        if (incomingNotes.length) setNotes(incomingNotes);
+        const incomingDecisions = { ...decisions };
+        for (const d of data.documents || []) {
+          if (d.id in items) incomingDecisions[d.id as ItemId] = d.decision;
+        }
+        setDecisions(incomingDecisions);
+        setSaveState("ready");
+        setSystemMessage("");
+      } catch (error) {
+        if (!cancelled) {
+          setSaveState("error");
+          setSystemMessage(error instanceof Error ? error.message : "ไม่สามารถเชื่อมระบบบันทึกข้อมูลได้");
+        }
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+    // Role changes intentionally refresh server-filtered records.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role]);
 
   const visibleItems = useMemo(
     () => (Object.keys(items) as ItemId[]).filter((id) => items[id].allowed.includes(role as never)),
@@ -83,23 +124,51 @@ export default function Home() {
   const blocked = active === "drj" && ["Executive", "Finance"].includes(role);
   const isCustomer = role === "Customer";
 
-  function addComment() {
+  async function addComment() {
     if (!comment.trim()) return;
-    setNotes((n) => [
-      ...n,
-      {
+    setSaveState("saving");
+    try {
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          type: "comment", documentId: active, role, body: comment.trim(),
+          visibility: isCustomer ? "Customer-visible" : "Internal",
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "บันทึก Comment ไม่สำเร็จ");
+      setNotes((n) => [...n, {
+        documentId: active,
         author: role === "Customer" ? `${current.account} · Reviewer` : `${role} · Current user`,
         text: comment.trim(),
         visibility: isCustomer ? "Customer-visible" : "Internal",
         time: "เมื่อสักครู่",
-      },
-    ]);
-    setComment("");
-    setTab("comments");
+      }]);
+      setComment(""); setTab("comments"); setSaveState("saved"); setSystemMessage("บันทึก Comment และ Audit Trail แล้ว");
+    } catch (error) {
+      setSaveState("error");
+      setSystemMessage(error instanceof Error ? error.message : "บันทึก Comment ไม่สำเร็จ");
+    }
   }
 
-  function decide(value: string) {
-    setDecisions((d) => ({ ...d, [active]: value }));
+  async function decide(value: string) {
+    setSaveState("saving");
+    try {
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ type: "decision", documentId: active, role, decision: value, version: current.version }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "บันทึก Decision ไม่สำเร็จ");
+      setDecisions((d) => ({ ...d, [active]: value }));
+      setSaveState("saved");
+      setSystemMessage(`${value} ถูกบันทึกพร้อมผู้ดำเนินการ เวลา และ Document Version แล้ว`);
+    } catch (error) {
+      setSaveState("error");
+      setSystemMessage(error instanceof Error ? error.message : "บันทึก Decision ไม่สำเร็จ");
+    }
   }
 
   return (
@@ -153,6 +222,10 @@ export default function Home() {
           <span>Viewing as <strong>{role}</strong></span>
           <p>{roleCopy[role]}</p>
           <em>Permission preview</em>
+        </div>
+        <div className={`system-state ${saveState}`}>
+          <span>{saveState === "loading" ? "กำลังเชื่อมข้อมูล…" : saveState === "saving" ? "กำลังบันทึก…" : saveState === "error" ? "ต้องตรวจสอบ" : "Audit-ready"}</span>
+          <p>{systemMessage || "ทุก Comment และ Decision จะถูกผูกกับ Document Version"}</p>
         </div>
 
         <div className="content-grid">
@@ -241,7 +314,7 @@ export default function Home() {
               )}
               {tab === "comments" && (
                 <div className="comments-view">
-                  {notes.filter((n) => !isCustomer || n.visibility === "Customer-visible").map((n, i) => (
+                  {notes.filter((n) => n.documentId === active && (!isCustomer || n.visibility === "Customer-visible")).map((n, i) => (
                     <div className="comment-card" key={i}><div><strong>{n.author}</strong><time>{n.time}</time></div><p>{n.text}</p><span>{n.visibility}</span></div>
                   ))}
                 </div>
@@ -257,15 +330,15 @@ export default function Home() {
 
             <div className="comment-compose">
               <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder={isCustomer ? "พิมพ์ Comment หรือจุดที่ต้องการแก้ไข…" : "เพิ่ม Internal comment หรือคำแนะนำ…"} />
-              <div><span>Visibility: <strong>{isCustomer ? "Customer-visible" : "Internal only"}</strong></span><button onClick={addComment}>Save comment</button></div>
+              <div><span>Visibility: <strong>{isCustomer ? "Customer-visible" : "Internal only"}</strong></span><button disabled={saveState === "saving"} onClick={addComment}>Save comment</button></div>
             </div>
 
             <footer className="decision-bar">
               <div><span>Decision</span><strong>{decisions[active]}</strong><small>Document ID · {active.toUpperCase()}-{current.version}</small></div>
               <div className="decision-actions">
-                <button className="ghost" onClick={() => decide("Changes requested")}>Request changes</button>
-                {!isCustomer && <button className="conditional" onClick={() => decide("Conditional")}>Approve with conditions</button>}
-                <button className="primary" disabled={!canApprove || blocked} onClick={() => decide(isCustomer ? "Ready for E‑Signature" : "Approved")}>
+                <button className="ghost" disabled={saveState === "saving"} onClick={() => decide("Changes requested")}>Request changes</button>
+                {!isCustomer && <button className="conditional" disabled={saveState === "saving"} onClick={() => decide("Conditional")}>Approve with conditions</button>}
+                <button className="primary" disabled={!canApprove || blocked || saveState === "saving"} onClick={() => decide(isCustomer ? "Ready for E‑Signature" : "Approved")}>
                   {blocked ? "Blocked by open items" : isCustomer ? "Approve for E‑Signature" : active === "memo" ? "Approve memo" : "Approve"}
                 </button>
               </div>
