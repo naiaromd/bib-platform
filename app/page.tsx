@@ -400,14 +400,14 @@ export default function Home() {
                 <button>สร้างคำขอสั่งซื้อ</button>
               </header>
               <div className="reorder-table">
-                <div className="reorder-head"><span>รหัสสินค้า</span><span>รายการ</span><span>ราคาต่อหน่วย</span><span>สถานะ</span></div>
-                <div><span>BIB002-540051002</span><strong>ไส้กรองสีขาว icoone</strong><span>350 บาท</span><em>ควรตรวจทุกเดือน</em></div>
-                <div><span>BIB002-585200002</span><strong>แผ่นยาง Robosolo</strong><span>150 บาท</span><em>พร้อมสั่ง</em></div>
-                <div><span>BIB002-585200001</span><strong>แผ่นยาง Robomini</strong><span>150 บาท</span><em>พร้อมสั่ง</em></div>
-                <div><span>BIB002-585200003</span><strong>แผ่นยาง Robotwin</strong><span>150 บาท</span><em>พร้อมสั่ง</em></div>
-                <div><span>BIB002-504085009</span><strong>ชุดสวมตัวผู้หญิง ขนาด M</strong><span>900 บาท</span><em>พร้อมสั่ง</em></div>
-                <div><span>BIB002-504085114</span><strong>ชุดสวมตัวผู้หญิง ขนาด L</strong><span>900 บาท</span><em>พร้อมสั่ง</em></div>
-                <div><span>BIB002-090067002</span><strong>กระเป๋าสำหรับชุดสวมตัว</strong><span>500 บาท</span><em>พร้อมสั่ง</em></div>
+                <div className="reorder-head"><span>รูป</span><span>รหัสสินค้า</span><span>รายการ</span><span>ราคาต่อหน่วย</span><span>สถานะ</span></div>
+                <div><figure><img src="/catalog/icoone-filter.png" alt="ไส้กรองสีขาว icoone" /></figure><span>BIB002-540051002</span><strong>ไส้กรองสีขาว icoone</strong><span>350 บาท</span><em>ควรตรวจทุกเดือน</em></div>
+                <div><figure><img src="/catalog/icoone-robosolo-flaps.png" alt="แผ่นยาง Robosolo" /></figure><span>BIB002-585200002</span><strong>แผ่นยาง Robosolo</strong><span>150 บาท</span><em>พร้อมสั่ง</em></div>
+                <div><figure><img src="/catalog/icoone-robomini-flaps.png" alt="แผ่นยาง Robomini" /></figure><span>BIB002-585200001</span><strong>แผ่นยาง Robomini</strong><span>150 บาท</span><em>พร้อมสั่ง</em></div>
+                <div><figure><img src="/catalog/icoone-robotwin-flaps.png" alt="แผ่นยาง Robotwin" /></figure><span>BIB002-585200003</span><strong>แผ่นยาง Robotwin</strong><span>150 บาท</span><em>พร้อมสั่ง</em></div>
+                <div><figure><img src="/catalog/icoone-bodysuit.png" alt="ชุดสวมตัว icoone" /></figure><span>BIB002-504085009</span><strong>ชุดสวมตัวผู้หญิง ขนาด M</strong><span>900 บาท</span><em>พร้อมสั่ง</em></div>
+                <div><figure><img src="/catalog/icoone-bodysuit.png" alt="ชุดสวมตัว icoone" /></figure><span>BIB002-504085114</span><strong>ชุดสวมตัวผู้หญิง ขนาด L</strong><span>900 บาท</span><em>พร้อมสั่ง</em></div>
+                <div><figure><img src="/catalog/icoone-bag.png" alt="กระเป๋าสำหรับชุดสวมตัว icoone" /></figure><span>BIB002-090067002</span><strong>กระเป๋าสำหรับชุดสวมตัว</strong><span>500 บาท</span><em>พร้อมสั่ง</em></div>
               </div>
               <p>ราคาข้างต้นรวมภาษีมูลค่าเพิ่มตามบัญชีราคาที่นำเข้าระบบ และต้องยืนยันราคาและจำนวนสินค้าก่อนออกใบเสนอราคา</p>
             </section>
