@@ -352,6 +352,7 @@ export default function Home() {
                 <header><div><span>การรับประกันและบริการ</span><h3>สถานะเครื่อง</h3></div><em>ปกติ</em></header>
                 <dl className="service-list">
                   <div><dt>หมายเลขเครื่อง</dt><dd>รอยืนยันหลังส่งมอบ</dd></div>
+                  <div><dt>ระยะเวลารับประกัน</dt><dd>12 เดือนนับจากวันที่ติดตั้ง</dd></div>
                   <div><dt>ตรวจบำรุงรักษาครั้งถัดไป</dt><dd>15 ต.ค. 2569</dd></div>
                   <div><dt>รายการแจ้งปัญหาที่เปิดอยู่</dt><dd>ไม่มี</dd></div>
                   <div><dt>ผู้ปฏิบัติงานที่ผ่านการรับรอง</dt><dd>2 คน</dd></div>
@@ -367,6 +368,50 @@ export default function Home() {
               </article>
             </div>
 
+            <section className="client-service-hub">
+              <header>
+                <div><span>ข้อมูลจากชุดสัญญาและการรับประกันของ BIB</span><h3>การส่งมอบ การฝึกอบรม และบริการหลังการขาย</h3></div>
+                <em>ปรับให้ตรงกับ LINNA ก่อนลงนาม</em>
+              </header>
+              <div className="service-hub-grid">
+                <article>
+                  <b>01</b>
+                  <div><span>รับประกันเครื่อง</span><h4>12 เดือนนับจากวันที่ติดตั้ง</h4><p>ครอบคลุมการตรวจและซ่อมตามเงื่อนไขผู้ผลิต ไม่ครอบคลุมความเสียหายจากการตกหล่น ไฟฟ้าไม่เหมาะสม การใช้ผิดคู่มือ หรือการซ่อมโดยผู้ที่ไม่ได้รับอนุญาต</p></div>
+                </article>
+                <article>
+                  <b>02</b>
+                  <div><span>การบำรุงรักษา</span><h4>ตรวจเชิงป้องกันทุก 6 เดือน</h4><p>ระบบจะแจ้งเตือนล่วงหน้า บันทึกผลตรวจ ประวัติอะไหล่ และรายการแก้ไขที่ต้องติดตามไว้กับหมายเลขเครื่อง</p></div>
+                </article>
+                <article>
+                  <b>03</b>
+                  <div><span>การฝึกอบรมเริ่มต้น</span><h4>รวม 18 ชั่วโมง</h4><p>ครอบคลุมหลักการทำงาน การประเมิน โปรแกรม การดูแลเครื่อง ข้อห้าม และการฝึกปฏิบัติ โดยสิทธิอบรมสุดท้ายให้ยึดสัญญา LINNA ฉบับลงนาม</p></div>
+                </article>
+                <article>
+                  <b>04</b>
+                  <div><span>การรับมอบอุปกรณ์</span><h4>ตรวจรายการและสภาพในวันส่งมอบ</h4><p>บันทึกเครื่อง หัวใช้งาน อุปกรณ์ประกอบ วัสดุสิ้นเปลือง และอุปกรณ์ส่งเสริมการตลาด พร้อมลงนามรับมอบในระบบ</p></div>
+                </article>
+              </div>
+              <p className="service-source-note">ข้อมูลส่วนนี้สรุปจากชุดเอกสาร “Sales Contract &amp; Warranty” ที่ BIB ใช้อ้างอิง ข้อความที่มีผลผูกพันให้ยึดสัญญาและใบรับประกันของ LINNA ที่ลงนามครบถ้วนแล้วเท่านั้น</p>
+            </section>
+
+            <section className="reorder-catalog">
+              <header>
+                <div><span>รายการสำหรับสั่งซื้อเพิ่ม</span><h3>วัสดุสิ้นเปลืองที่ใช้ประจำ</h3></div>
+                <button>สร้างคำขอสั่งซื้อ</button>
+              </header>
+              <div className="reorder-table">
+                <div className="reorder-head"><span>รหัสสินค้า</span><span>รายการ</span><span>ราคาต่อหน่วย</span><span>สถานะ</span></div>
+                <div><span>BIB002-540051002</span><strong>ไส้กรองสีขาว icoone</strong><span>350 บาท</span><em>ควรตรวจทุกเดือน</em></div>
+                <div><span>BIB002-585200002</span><strong>แผ่นยาง Robosolo</strong><span>150 บาท</span><em>พร้อมสั่ง</em></div>
+                <div><span>BIB002-585200001</span><strong>แผ่นยาง Robomini</strong><span>150 บาท</span><em>พร้อมสั่ง</em></div>
+                <div><span>BIB002-585200003</span><strong>แผ่นยาง Robotwin</strong><span>150 บาท</span><em>พร้อมสั่ง</em></div>
+                <div><span>BIB002-504085009</span><strong>ชุดสวมตัวผู้หญิง ขนาด M</strong><span>900 บาท</span><em>พร้อมสั่ง</em></div>
+                <div><span>BIB002-504085114</span><strong>ชุดสวมตัวผู้หญิง ขนาด L</strong><span>900 บาท</span><em>พร้อมสั่ง</em></div>
+                <div><span>BIB002-090067002</span><strong>กระเป๋าสำหรับชุดสวมตัว</strong><span>500 บาท</span><em>พร้อมสั่ง</em></div>
+              </div>
+              <p>ราคาข้างต้นรวมภาษีมูลค่าเพิ่มตามบัญชีราคาที่นำเข้าระบบ และต้องยืนยันราคาและจำนวนสินค้าก่อนออกใบเสนอราคา</p>
+            </section>
+
             <section className="client-documents">
               <header><div><span>เอกสารของ LINNA</span><h3>เอกสารล่าสุด</h3></div><button onClick={() => { setActive("linna"); setFullView(true); }}>ดูเอกสารทั้งหมด</button></header>
               <div><span>สัญญาแบ่งรายได้</span><strong>ฉบับรอทบทวน</strong><button onClick={() => { setActive("linna"); setFullView(true); }}>เปิดอ่าน</button></div>
@@ -374,7 +419,7 @@ export default function Home() {
                 setFullDocumentOverride({ file: "/documents/linna-company-certificate.pdf", title: "หนังสือรับรองบริษัท ซีเคแอล เฮลท์ แอนด์ บิวตี้ อินเตอร์เนชั่นแนล จำกัด", version: "เลขอ้างอิง E10091220326545" });
                 setFullView(true);
               }}>เปิดอ่าน</button></div>
-              <div><span>เงื่อนไขการรับประกัน</span><strong>รอลงนามรับทราบ</strong><button>เปิดอ่าน</button></div>
+              <div><span>เงื่อนไขการรับประกัน</span><strong>รอยืนยันเลขเครื่องและวันที่ติดตั้งก่อนลงนาม</strong><button>เปิดอ่าน</button></div>
               <div><span>ใบรับรองการฝึกอบรม</span><strong>มี 2 รายการ</strong><button>เปิดดู</button></div>
             </section>
 

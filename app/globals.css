@@ -252,6 +252,29 @@ nav button.active span { color: #a56145; }
 .reorder-item strong, .reorder-item span { display: block; }.reorder-item strong { font-size: 9px; }.reorder-item span { margin-top: 2px; color: var(--muted); font-size: 7px; }
 .reorder-item b { align-self: center; color: #9b641d; font-size: 7px; }.reorder-item b.ok { color: #3d735d; }
 .client-card .reorder-item + button { margin-top: 14px; }
+.client-service-hub, .reorder-catalog { margin-top: 12px; border: 1px solid var(--line); background: #fcfaf6; }
+.client-service-hub > header, .reorder-catalog > header { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 16px 18px; border-bottom: 1px solid var(--line); background: #f1ede6; }
+.client-service-hub header span, .client-service-hub header h3, .reorder-catalog header span, .reorder-catalog header h3 { display: block; margin: 0; }
+.client-service-hub header span, .reorder-catalog header span { color: var(--muted); font-size: 8px; }
+.client-service-hub header h3, .reorder-catalog header h3 { margin-top: 2px; font-size: 15px; font-weight: 500; }
+.client-service-hub header em { padding: 5px 8px; border: 1px solid #d7b88d; color: #8a5d20; background: #fff8e9; font-size: 7px; font-style: normal; }
+.service-hub-grid { display: grid; grid-template-columns: 1fr 1fr; }
+.service-hub-grid article { min-height: 134px; display: grid; grid-template-columns: 34px 1fr; gap: 12px; padding: 18px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.service-hub-grid article:nth-child(2n) { border-right: 0; }
+.service-hub-grid article:nth-last-child(-n+2) { border-bottom: 0; }
+.service-hub-grid article > b { width: 28px; height: 28px; display: grid; place-items: center; color: white; background: #a56145; font-family: "Muli"; font-size: 8px; }
+.service-hub-grid span, .service-hub-grid h4 { display: block; margin: 0; }
+.service-hub-grid span { color: #8a4f36; font-size: 8px; }
+.service-hub-grid h4 { margin-top: 3px; font-size: 12px; font-weight: 500; }
+.service-hub-grid p { margin: 7px 0 0; color: var(--muted); font-size: 8px; line-height: 1.6; }
+.service-source-note { margin: 0; padding: 11px 18px; border-top: 1px solid var(--line); color: #756f66; background: #faf7f1; font-size: 7px; line-height: 1.55; }
+.reorder-catalog > header button { border: 1px solid #a56145; padding: 8px 11px; color: white; background: #a56145; font-size: 8px; font-weight: 600; }
+.reorder-table { width: 100%; }
+.reorder-table > div { display: grid; grid-template-columns: 170px minmax(220px, 1fr) 120px 120px; align-items: center; min-height: 42px; padding: 0 18px; border-bottom: 1px solid var(--line); font-size: 8px; }
+.reorder-table .reorder-head { min-height: 32px; color: #f5eee8; background: #292a28; font-family: "Muli"; font-size: 7px; text-transform: uppercase; letter-spacing: .06em; }
+.reorder-table strong { font-weight: 500; }
+.reorder-table em { color: #3d735d; font-size: 7px; font-style: normal; }
+.reorder-catalog > p { margin: 0; padding: 10px 18px; color: var(--muted); font-size: 7px; }
 .client-documents { margin-top: 12px; border: 1px solid var(--line); background: white; }
 .client-documents > header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: #f1ede6; }
 .client-documents header span, .client-documents header h3 { display: block; margin: 0; }.client-documents header span { font-size: 8px; color: var(--muted); }.client-documents header h3 { font-size: 14px; }
@@ -337,6 +360,11 @@ nav button.active span { color: #a56145; }
   .client-welcome { align-items: start; flex-direction: column; padding: 18px; }
   .client-alert { grid-template-columns: 1fr; gap: 8px; }
   .client-metrics, .client-grid { grid-template-columns: 1fr; }
+  .service-hub-grid { grid-template-columns: 1fr; }
+  .service-hub-grid article, .service-hub-grid article:nth-child(2n), .service-hub-grid article:nth-last-child(-n+2) { border-right: 0; border-bottom: 1px solid var(--line); }
+  .service-hub-grid article:last-child { border-bottom: 0; }
+  .reorder-table { overflow-x: auto; }
+  .reorder-table > div { min-width: 720px; }
   .client-documents > div { grid-template-columns: 1fr auto; gap: 5px; }
   .client-documents > div strong { grid-column: 1; }
   .client-documents > div button { grid-column: 2; grid-row: 1 / span 2; }
