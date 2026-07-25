@@ -65,3 +65,21 @@ export const auditEvents = sqliteTable("audit_events", {
   eventData: text("event_data").notNull().default("{}"),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const partnerMonthlyReports = sqliteTable("partner_monthly_reports", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  accountId: text("account_id").notNull(),
+  reportMonth: text("report_month").notNull(),
+  paidSessions: integer("paid_sessions").notNull().default(0),
+  packageSessions: integer("package_sessions").notNull().default(0),
+  complimentarySessions: integer("complimentary_sessions").notNull().default(0),
+  grossRevenue: integer("gross_revenue").notNull().default(0),
+  approvedRefunds: integer("approved_refunds").notNull().default(0),
+  approvedMarketing: integer("approved_marketing").notNull().default(0),
+  openingHours: integer("opening_hours").notNull().default(0),
+  closingHours: integer("closing_hours").notNull().default(0),
+  consumableNote: text("consumable_note").notNull().default(""),
+  status: text("status").notNull().default("Submitted"),
+  submittedBy: text("submitted_by").notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});

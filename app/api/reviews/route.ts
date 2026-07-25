@@ -54,6 +54,14 @@ async function initialize() {
       id INTEGER PRIMARY KEY AUTOINCREMENT, document_id TEXT NOT NULL, actor_email TEXT NOT NULL,
       actor_role TEXT NOT NULL, event_type TEXT NOT NULL, event_data TEXT NOT NULL DEFAULT '{}',
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS partner_monthly_reports (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, account_id TEXT NOT NULL, report_month TEXT NOT NULL,
+      paid_sessions INTEGER NOT NULL DEFAULT 0, package_sessions INTEGER NOT NULL DEFAULT 0,
+      complimentary_sessions INTEGER NOT NULL DEFAULT 0, gross_revenue REAL NOT NULL DEFAULT 0,
+      approved_refunds REAL NOT NULL DEFAULT 0, approved_marketing REAL NOT NULL DEFAULT 0,
+      opening_hours REAL NOT NULL DEFAULT 0, closing_hours REAL NOT NULL DEFAULT 0,
+      consumable_note TEXT NOT NULL DEFAULT '', status TEXT NOT NULL DEFAULT 'Submitted',
+      submitted_by TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
   ]);
   for (const row of documents) {
     await d1.prepare(`INSERT OR IGNORE INTO review_documents
@@ -100,19 +108,60 @@ export async function POST(request: Request) {
   try {
     await initialize();
     const payload = await request.json() as {
-      type?: "comment" | "decision";
+      type?: "comment" | "decision" | "monthly_report";
       documentId?: DocumentId;
       role?: Role;
       body?: string;
       visibility?: "Internal" | "Customer-visible";
       decision?: string;
       version?: string;
+      reportMonth?: string;
+      paidSessions?: string;
+      packageSessions?: string;
+      complimentarySessions?: string;
+      grossRevenue?: string;
+      approvedRefunds?: string;
+      approvedMarketing?: string;
+      openingHours?: string;
+      closingHours?: string;
+      consumableNote?: string;
     };
     if (!payload.documentId || !["linna", "drj", "memo"].includes(payload.documentId)) {
       return Response.json({ error: "Valid documentId is required" }, { status: 400 });
     }
     const currentActor = actor(request, payload.role);
     const d1 = db();
+    if (payload.type === "monthly_report") {
+      if (currentActor.role !== "Customer" || payload.documentId !== "linna") {
+        return Response.json({ error: "ไม่มีสิทธิ์ส่งรายงานสำหรับบัญชีนี้" }, { status: 403 });
+      }
+      if (!payload.reportMonth) {
+        return Response.json({ error: "กรุณาระบุเดือนที่รายงาน" }, { status: 400 });
+      }
+      const values = [
+        Number(payload.paidSessions || 0), Number(payload.packageSessions || 0),
+        Number(payload.complimentarySessions || 0), Number(payload.grossRevenue || 0),
+        Number(payload.approvedRefunds || 0), Number(payload.approvedMarketing || 0),
+        Number(payload.openingHours || 0), Number(payload.closingHours || 0),
+      ];
+      if (values.some((value) => !Number.isFinite(value) || value < 0) || values[7] < values[6]) {
+        return Response.json({ error: "กรุณาตรวจสอบตัวเลขรายได้และชั่วโมงเครื่อง" }, { status: 400 });
+      }
+      const info = await d1.prepare(`INSERT INTO partner_monthly_reports
+        (account_id, report_month, paid_sessions, package_sessions, complimentary_sessions,
+         gross_revenue, approved_refunds, approved_marketing, opening_hours, closing_hours,
+         consumable_note, submitted_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
+          "linna", payload.reportMonth, ...values, payload.consumableNote || "", currentActor.email
+        ).run();
+      await d1.prepare(`INSERT INTO audit_events
+        (document_id, actor_email, actor_role, event_type, event_data)
+        VALUES (?, ?, ?, ?, ?)`).bind(
+          "linna", currentActor.email, currentActor.role, "MONTHLY_REPORT_SUBMITTED",
+          JSON.stringify({ reportMonth: payload.reportMonth, reportId: info.meta.last_row_id })
+        ).run();
+      return Response.json({ ok: true, id: info.meta.last_row_id }, { status: 201 });
+    }
     if (payload.type === "comment") {
       const body = payload.body?.trim();
       if (!body) return Response.json({ error: "Comment is required" }, { status: 400 });

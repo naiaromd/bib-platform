@@ -76,6 +76,19 @@ export default function Home() {
   const [tab, setTab] = useState<"summary" | "history">("summary");
   const [fullView, setFullView] = useState(false);
   const [comment, setComment] = useState("");
+  const [showReportForm, setShowReportForm] = useState(false);
+  const [reportForm, setReportForm] = useState({
+    reportMonth: "2026-07",
+    paidSessions: "42",
+    packageSessions: "18",
+    complimentarySessions: "3",
+    grossRevenue: "227500",
+    approvedRefunds: "0",
+    approvedMarketing: "50000",
+    openingHours: "1248",
+    closingHours: "1289",
+    consumableNote: "",
+  });
   const [notes, setNotes] = useState([
     { documentId: "linna", author: "ฝ่ายการเงิน · พิม", text: "กรุณาระบุเลขที่อนุมัติการยกเว้นเงินประกันในเอกสารแนบท้ายฉบับที่ 1", visibility: "ภายใน", time: "09:42" },
     { documentId: "linna", author: "LINNA · ผู้ตรวจทาน", text: "ยืนยันส่วนแบ่ง 60/40 และไม่มีรายได้ขั้นต่ำ", visibility: "ลูกค้าเห็นได้", time: "10:18" },
@@ -186,11 +199,39 @@ export default function Home() {
     }
   }
 
+  async function submitMonthlyReport() {
+    setSaveState("saving");
+    try {
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          type: "monthly_report",
+          documentId: "linna",
+          role: "Customer",
+          ...reportForm,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "ส่งรายงานไม่สำเร็จ");
+      setSaveState("saved");
+      setSystemMessage("ส่งรายงานประจำเดือนให้ BIB ตรวจสอบแล้ว");
+      setShowReportForm(false);
+    } catch (error) {
+      setSaveState("error");
+      setSystemMessage(error instanceof Error ? error.message : "ส่งรายงานไม่สำเร็จ");
+    }
+  }
+
   return (
     <main className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <div className="brand-lockup"><strong>BIB</strong><i>×</i><b>icoone</b></div>
+          <div className="brand-lockup">
+            <img src="/logos/bib-logo.png" alt="BIB" className="bib-logo" />
+            <i>×</i>
+            <img src="/logos/icoone-laser-med.png" alt="icoone Laser Med" className="icoone-logo" />
+          </div>
           <div><strong>ศูนย์ข้อมูลและการอนุมัติ</strong><span>BIB PRACTICE INTELLIGENCE</span></div>
         </div>
         <nav>
@@ -218,6 +259,10 @@ export default function Home() {
             <h1>ศูนย์ตรวจทานและอนุมัติเอกสาร</h1>
           </div>
           <div className="top-actions">
+            <button className="client-preview-button" onClick={() => {
+              setRole(role === "Customer" ? "Executive" : "Customer");
+              setActive("linna");
+            }}>{role === "Customer" ? "กลับสู่หน้าทีม BIB" : "เปิดหน้าลูกค้า LINNA"}</button>
             <label className="role-switcher">
               <span>แสดงในฐานะ</span>
               <select value={role} onChange={(e) => {
@@ -243,7 +288,81 @@ export default function Home() {
           <p>{systemMessage || "ทุกความเห็นและผลการอนุมัติจะผูกกับฉบับเอกสารที่เกี่ยวข้อง"}</p>
         </div>
 
-        <div className="content-grid">
+        {isCustomer && (
+          <section className="client-dashboard">
+            <header className="client-welcome">
+              <div>
+                <p>พื้นที่ความร่วมมือเฉพาะของ LINNA Clinic</p>
+                <h2>สวัสดีค่ะ ทีม LINNA</h2>
+                <span>ข้อมูลรอบเดือนกรกฎาคม 2569 · ปรับปรุงล่าสุดเมื่อ 24 กรกฎาคม 2569</span>
+              </div>
+              <button onClick={() => setShowReportForm(true)}>ส่งรายงานประจำเดือน</button>
+            </header>
+
+            <div className="client-alert">
+              <div><span>กำหนดส่งรายงาน</span><strong>5 ส.ค. 2569</strong></div>
+              <p>กรุณาส่งยอดบริการ รายได้ และภาพชั่วโมงสะสมของเครื่องเพื่อให้ BIB ตรวจสอบส่วนแบ่งรายได้</p>
+              <button onClick={() => setShowReportForm(true)}>เริ่มกรอกข้อมูล</button>
+            </div>
+
+            <div className="client-metrics">
+              <article><span>รายได้จากบริการ</span><strong>฿227,500</strong><small>ข้อมูลที่ LINNA กำลังจัดเตรียม</small></article>
+              <article><span>ส่วนแบ่ง LINNA</span><strong>฿106,500</strong><small>ร้อยละ 60 ของรายได้สุทธิ</small></article>
+              <article><span>ส่วนแบ่ง IPQ</span><strong>฿75,970</strong><small>รวมภาษีมูลค่าเพิ่มแล้ว</small></article>
+              <article><span>จำนวนครั้งที่ให้บริการ</span><strong>63 ครั้ง</strong><small>ชำระเงิน 42 · ใช้ชุดบริการ 18 · ไม่มีค่าใช้จ่าย 3</small></article>
+            </div>
+
+            <div className="client-grid">
+              <article className="client-card machine-card">
+                <header><div><span>การใช้งานเครื่อง</span><h3>icoone Laser Med</h3></div><em>ทำงานปกติ</em></header>
+                <div className="hour-reading">
+                  <div><span>ชั่วโมงสะสมล่าสุด</span><strong>1,289.0</strong></div>
+                  <div><span>ใช้ในเดือนนี้</span><strong>41.0 ชม.</strong></div>
+                </div>
+                <div className="usage-bar"><i style={{ width: "68%" }} /></div>
+                <p>เหลือประมาณ 711 ชั่วโมงก่อนถึงเกณฑ์ตรวจตามชั่วโมงใช้งาน</p>
+                <button onClick={() => setShowReportForm(true)}>บันทึกชั่วโมงและแนบภาพ</button>
+              </article>
+
+              <article className="client-card">
+                <header><div><span>สถานะรายงาน</span><h3>รอบเดือนกรกฎาคม 2569</h3></div><em className="amber-label">รอ LINNA ส่ง</em></header>
+                <ol className="report-steps">
+                  <li className="done"><i>✓</i><div><strong>เปิดรอบรายงาน</strong><span>1 ก.ค. 2569</span></div></li>
+                  <li className="current"><i>2</i><div><strong>LINNA กรอกข้อมูล</strong><span>กำหนดส่ง 5 ส.ค. 2569</span></div></li>
+                  <li><i>3</i><div><strong>BIB ตรวจสอบและรับรองยอด</strong><span>ภายใน 5 วันทำการ</span></div></li>
+                  <li><i>4</i><div><strong>ชำระส่วนแบ่งและปิดรอบ</strong><span>ภายในวันที่ 10</span></div></li>
+                </ol>
+              </article>
+
+              <article className="client-card">
+                <header><div><span>การรับประกันและบริการ</span><h3>สถานะเครื่อง</h3></div><em>ปกติ</em></header>
+                <dl className="service-list">
+                  <div><dt>หมายเลขเครื่อง</dt><dd>รอยืนยันหลังส่งมอบ</dd></div>
+                  <div><dt>ตรวจบำรุงรักษาครั้งถัดไป</dt><dd>15 ต.ค. 2569</dd></div>
+                  <div><dt>รายการแจ้งปัญหาที่เปิดอยู่</dt><dd>ไม่มี</dd></div>
+                  <div><dt>ผู้ปฏิบัติงานที่ผ่านการรับรอง</dt><dd>2 คน</dd></div>
+                </dl>
+                <button>แจ้งปัญหาการใช้งาน</button>
+              </article>
+
+              <article className="client-card">
+                <header><div><span>วัสดุและการสั่งซื้อซ้ำ</span><h3>รายการที่ควรตรวจสอบ</h3></div><em className="amber-label">1 รายการ</em></header>
+                <div className="reorder-item"><div><strong>ชุดวัสดุสิ้นเปลือง icoone</strong><span>คงเหลือประมาณ 3 สัปดาห์</span></div><b>ควรสั่งเพิ่ม</b></div>
+                <div className="reorder-item"><div><strong>อุปกรณ์ทำความสะอาด</strong><span>ปริมาณเพียงพอ</span></div><b className="ok">ปกติ</b></div>
+                <button>ดูรายการและขอสั่งซื้อ</button>
+              </article>
+            </div>
+
+            <section className="client-documents">
+              <header><div><span>เอกสารของ LINNA</span><h3>เอกสารล่าสุด</h3></div><button onClick={() => { setActive("linna"); setFullView(true); }}>ดูเอกสารทั้งหมด</button></header>
+              <div><span>สัญญาแบ่งรายได้</span><strong>ฉบับรอทบทวน</strong><button onClick={() => { setActive("linna"); setFullView(true); }}>เปิดอ่าน</button></div>
+              <div><span>เงื่อนไขการรับประกัน</span><strong>รอลงนามรับทราบ</strong><button>เปิดอ่าน</button></div>
+              <div><span>ใบรับรองการฝึกอบรม</span><strong>มี 2 รายการ</strong><button>เปิดดู</button></div>
+            </section>
+          </section>
+        )}
+
+        {!isCustomer && <div className="content-grid">
           <section className="queue">
             <div className="queue-head">
               <div><h2>เอกสารที่รอตรวจทาน</h2><p>{visibleItems.length} รายการที่คุณมีสิทธิ์เข้าถึง</p></div>
@@ -382,12 +501,40 @@ export default function Home() {
               </div>
             </footer>
           </aside>
-        </div>
+        </div>}
       </section>
+      {showReportForm && (
+        <div className="report-modal" role="dialog" aria-modal="true" aria-label="ส่งรายงานประจำเดือน">
+          <div className="report-sheet">
+            <header><div><span>LINNA Clinic</span><h2>ส่งรายงานประจำเดือน</h2><p>ระบบจะคำนวณส่วนแบ่งและส่งให้ BIB ตรวจสอบ</p></div><button onClick={() => setShowReportForm(false)}>ปิด</button></header>
+            <div className="report-form">
+              <label><span>เดือนที่รายงาน</span><input type="month" value={reportForm.reportMonth} onChange={(e) => setReportForm({ ...reportForm, reportMonth: e.target.value })} /></label>
+              <div className="form-section"><h3>จำนวนครั้งที่ให้บริการ</h3><div className="form-row">
+                <label><span>ชำระเงินจริง</span><input type="number" value={reportForm.paidSessions} onChange={(e) => setReportForm({ ...reportForm, paidSessions: e.target.value })} /></label>
+                <label><span>ใช้สิทธิจากชุดบริการ</span><input type="number" value={reportForm.packageSessions} onChange={(e) => setReportForm({ ...reportForm, packageSessions: e.target.value })} /></label>
+                <label><span>ไม่มีค่าใช้จ่าย</span><input type="number" value={reportForm.complimentarySessions} onChange={(e) => setReportForm({ ...reportForm, complimentarySessions: e.target.value })} /></label>
+              </div></div>
+              <div className="form-section"><h3>รายได้และรายการหัก</h3><div className="form-row">
+                <label><span>รายได้รวม</span><input type="number" value={reportForm.grossRevenue} onChange={(e) => setReportForm({ ...reportForm, grossRevenue: e.target.value })} /></label>
+                <label><span>เงินคืนที่อนุมัติ</span><input type="number" value={reportForm.approvedRefunds} onChange={(e) => setReportForm({ ...reportForm, approvedRefunds: e.target.value })} /></label>
+                <label><span>ค่าโฆษณาที่อนุมัติให้หัก</span><input type="number" value={reportForm.approvedMarketing} onChange={(e) => setReportForm({ ...reportForm, approvedMarketing: e.target.value })} /></label>
+              </div></div>
+              <div className="form-section"><h3>ชั่วโมงการใช้งานเครื่อง</h3><div className="form-row">
+                <label><span>ชั่วโมงสะสมต้นงวด</span><input type="number" value={reportForm.openingHours} onChange={(e) => setReportForm({ ...reportForm, openingHours: e.target.value })} /></label>
+                <label><span>ชั่วโมงสะสมปลายงวด</span><input type="number" value={reportForm.closingHours} onChange={(e) => setReportForm({ ...reportForm, closingHours: e.target.value })} /></label>
+                <label className="file-field"><span>ภาพหน้าจอแสดงชั่วโมง</span><input type="file" accept="image/*,.pdf" /><small>รับภาพถ่ายหรือเอกสาร PDF</small></label>
+              </div></div>
+              <label><span>หมายเหตุเกี่ยวกับวัสดุหรือการใช้งาน</span><textarea value={reportForm.consumableNote} onChange={(e) => setReportForm({ ...reportForm, consumableNote: e.target.value })} /></label>
+              <div className="calculation-preview"><div><span>รายได้สุทธิเบื้องต้น</span><strong>฿177,500</strong></div><div><span>ส่วนแบ่ง LINNA</span><strong>฿106,500</strong></div><div><span>ส่วนแบ่ง IPQ รวมภาษี</span><strong>฿75,970</strong></div></div>
+            </div>
+            <footer><button onClick={() => setShowReportForm(false)}>บันทึกร่างไว้ก่อน</button><button className="submit-report" disabled={saveState === "saving"} onClick={submitMonthlyReport}>ยืนยันและส่งให้ BIB ตรวจสอบ</button></footer>
+          </div>
+        </div>
+      )}
       {fullView && (
         <div className="full-document" role="dialog" aria-modal="true" aria-label={`เอกสารฉบับเต็ม ${current.title}`}>
           <header>
-            <div className="full-brand"><strong>BIB</strong><i>×</i><b>icoone</b></div>
+            <div className="full-brand"><img src="/logos/bib-logo.png" alt="BIB" /><i>×</i><img src="/logos/icoone-laser-med.png" alt="icoone Laser Med" /></div>
             <div><span>{current.account}</span><h2>{current.title}</h2><p>{current.version} · เอกสารสำหรับตรวจทาน</p></div>
             <div className="full-actions">
               <a href={documentFiles[active]} download>ดาวน์โหลดเอกสาร</a>
