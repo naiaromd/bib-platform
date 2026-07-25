@@ -94,6 +94,16 @@ async function initialize() {
     d1.prepare(`CREATE TABLE IF NOT EXISTS knowledge_entitlements (
       id TEXT PRIMARY KEY, account_id TEXT NOT NULL, commercial_model TEXT NOT NULL,
       resource_code TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS treatment_menus (
+      id TEXT PRIMARY KEY, account_id TEXT NOT NULL, service_name TEXT NOT NULL,
+      duration_minutes INTEGER NOT NULL, price REAL NOT NULL,
+      customer_description TEXT NOT NULL DEFAULT '', protocol_id TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'Draft', version INTEGER NOT NULL DEFAULT 1)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS protocol_records (
+      id TEXT PRIMARY KEY, account_id TEXT NOT NULL, approved_protocol_code TEXT NOT NULL,
+      preparation_text TEXT NOT NULL DEFAULT '', follow_up_text TEXT NOT NULL DEFAULT '',
+      internal_note TEXT NOT NULL DEFAULT '', locked_clinical_data TEXT NOT NULL DEFAULT '{}',
+      status TEXT NOT NULL DEFAULT 'Draft', version INTEGER NOT NULL DEFAULT 1)`),
   ]);
   for (const row of documents) {
     await d1.prepare(`INSERT OR IGNORE INTO review_documents

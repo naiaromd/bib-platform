@@ -160,3 +160,27 @@ export const knowledgeEntitlements = sqliteTable("knowledge_entitlements", {
   resourceCode: text("resource_code").notNull(),
   active: integer("active", { mode: "boolean" }).notNull().default(true),
 });
+
+export const treatmentMenus = sqliteTable("treatment_menus", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull(),
+  serviceName: text("service_name").notNull(),
+  durationMinutes: integer("duration_minutes").notNull(),
+  price: integer("price").notNull(),
+  customerDescription: text("customer_description").notNull().default(""),
+  protocolId: text("protocol_id").notNull(),
+  status: text("status").notNull().default("Draft"),
+  version: integer("version").notNull().default(1),
+});
+
+export const protocolRecords = sqliteTable("protocol_records", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull(),
+  approvedProtocolCode: text("approved_protocol_code").notNull(),
+  preparationText: text("preparation_text").notNull().default(""),
+  followUpText: text("follow_up_text").notNull().default(""),
+  internalNote: text("internal_note").notNull().default(""),
+  lockedClinicalData: text("locked_clinical_data").notNull().default("{}"),
+  status: text("status").notNull().default("Draft"),
+  version: integer("version").notNull().default(1),
+});

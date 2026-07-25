@@ -65,20 +65,22 @@ nav button.active span { color: #a56145; }
 .client-account-menu > div strong, .client-account-menu > div small { display: block; }
 .client-account-menu > div strong { font-size: 9px; font-weight: 500; }
 .client-account-menu > div small { margin-top: 1px; color: var(--muted); font-size: 7px; }
-.client-account-menu button { border: 0; color: var(--muted); background: transparent; font-size: 17px; }
-.dedicated-client-shell .system-state { margin-left: 250px; margin-right: 30px; }
-.dedicated-client-shell .client-dashboard { max-width: 1400px; margin-left: 220px; }
-.client-navigation { position: fixed; z-index: 20; top: 78px; bottom: 0; left: 0; width: 220px; display: flex; flex-direction: column; overflow: auto; color: white; background: #292a28; border-top: 3px solid #a56145; }
-.client-profile { display: flex; gap: 10px; align-items: center; padding: 18px 16px; border-bottom: 1px solid #484842; }
+.client-account-menu > a { color: var(--muted); text-decoration: none; font-size: 14px; }
+.dedicated-client-shell .system-state { margin-left: 112px; margin-right: 30px; }
+.dedicated-client-shell .client-dashboard { max-width: 1480px; margin-left: 82px; }
+.client-navigation { position: fixed; z-index: 20; top: 78px; bottom: 0; left: 0; width: 82px; display: flex; flex-direction: column; overflow: visible; color: white; background: #292a28; border-top: 3px solid #a56145; }
+.client-profile { display: flex; justify-content: center; padding: 14px; border-bottom: 1px solid #484842; }
 .client-profile > span { flex: none; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: white; background: #a56145; font-size: 9px; }
-.client-profile strong, .client-profile small { display: block; }
+.client-profile > div { display: none; }
 .client-profile strong { font-size: 9px; font-weight: 500; }
 .client-profile small { margin-top: 2px; color: #aaa69e; font-size: 6px; line-height: 1.45; }
-.client-navigation nav { padding: 10px 9px; }
-.client-navigation nav a { display: flex; align-items: center; gap: 9px; min-height: 36px; padding: 8px 10px; color: #d6d2cb; border-left: 2px solid transparent; text-decoration: none; font-size: 8px; }
-.client-navigation nav a i { width: 15px; color: #b99584; font-style: normal; text-align: center; }
+.client-navigation nav { padding: 8px; }
+.client-navigation nav a { position: relative; display: grid; place-items: center; width: 54px; min-height: 44px; margin: 2px auto; color: #d6d2cb; border-left: 2px solid transparent; text-decoration: none; }
+.client-navigation nav a i { width: 32px; height: 32px; display: grid; place-items: center; color: #b99584; border-radius: 9px; font-style: normal; text-align: center; font-size: 13px; }
+.client-navigation nav a > span { position: absolute; left: 62px; top: 50%; z-index: 50; min-width: 140px; display: none; transform: translateY(-50%); padding: 8px 10px; color: white; background: #292a28; box-shadow: 0 5px 18px #0004; white-space: nowrap; font-size: 8px; }
+.client-navigation nav a:hover > span, .client-navigation nav a:focus > span { display: block; }
 .client-navigation nav a:hover, .client-navigation nav a.active { color: white; background: #363733; border-left-color: #a56145; }
-.plan-identity { margin: auto 12px 14px; padding: 12px; border: 1px solid #55544d; background: #343531; }
+.plan-identity { display: none; }
 .plan-identity span, .plan-identity strong, .plan-identity small { display: block; }
 .plan-identity span { color: #b99584; font-size: 7px; }
 .plan-identity strong { margin: 4px 0; font-size: 9px; }
@@ -244,6 +246,9 @@ nav button.active span { color: #a56145; }
 .view-warranty > .client-service-hub, .view-service > .client-service-hub,
 .view-documents > .client-documents, .view-warranty > .client-documents,
 .view-documents > .company-profile-card { display: block; }
+.view-profile > .profile-module,
+.view-treatments > .treatments-module,
+.view-protocols > .protocols-module { display: block; }
 .view-orders .history-columns > article:not(.orders-history),
 .view-training .history-columns > article:not(.training-history),
 .view-service .history-columns > article:not(.service-history) { display: none; }
@@ -257,6 +262,20 @@ nav button.active span { color: #a56145; }
 .client-view-title span, .client-view-title h2 { display: block; margin: 0; }
 .client-view-title div > span { color: var(--muted); font-size: 7px; }.client-view-title h2 { margin-top: 2px; font-size: 20px; font-weight: 500; }
 .client-view-title .view-status { padding: 5px 8px; color: #3d735d; border: 1px solid #a8c6b8; background: #edf7f1; font-size: 7px; }
+.profile-editor, .treatment-editor, .protocol-editor { max-width: 960px; }
+.editor-card { border: 1px solid var(--line); background: #fcfaf6; }
+.editor-card > header { display: flex; align-items: center; gap: 12px; padding: 18px 20px; color: white; background: #292a28; }
+.editor-card > header > i { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; color: white; background: #a56145; font-style: normal; font-size: 11px; }
+.editor-card header span, .editor-card header h3 { display: block; margin: 0; }.editor-card header span { color: #cfb8aa; font-size: 8px; }.editor-card header h3 { margin-top: 2px; font-size: 15px; font-weight: 500; }
+.editor-card header em { margin-left: auto; padding: 5px 8px; color: #f4e5dd; border: 1px solid #80614f; font-size: 7px; font-style: normal; }
+.editor-form { display: grid; gap: 14px; padding: 20px; }.editor-form.two-columns { grid-template-columns: 1fr 1fr; }
+.editor-form label { display: grid; gap: 5px; }.editor-form label > span { color: var(--muted); font-size: 8px; }.editor-form .wide { grid-column: 1 / -1; }
+.editor-form input, .editor-form textarea { width: 100%; border: 1px solid #d5cfc5; padding: 10px 11px; background: white; outline: 0; font: inherit; font-size: 10px; }
+.editor-form textarea { min-height: 78px; resize: vertical; }.editor-form input:focus, .editor-form textarea:focus { border-color: #a56145; box-shadow: 0 0 0 3px #f1e4da; }
+.editor-card > footer { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 13px 20px; border-top: 1px solid var(--line); background: #f1ede6; }
+.editor-card > footer span { margin-right: auto; color: var(--muted); font-size: 7px; }.editor-card > footer button { border: 1px solid #a56145; padding: 8px 12px; color: white; background: #a56145; font-size: 8px; }.editor-card > footer .secondary { color: #8a4f36; background: white; }
+.approval-strip { display: grid; grid-template-columns: 130px 1fr 1fr; gap: 12px; align-items: center; margin: 0 20px 20px; padding: 12px; border-left: 3px solid #a87822; background: #fff8e9; font-size: 8px; }.approval-strip span { color: #8a5d20; }.approval-strip small { color: var(--muted); }
+.protocol-locks { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); border-bottom: 1px solid var(--line); }.protocol-locks div { padding: 14px 18px; border-right: 1px solid var(--line); }.protocol-locks div:last-child { border-right: 0; }.protocol-locks span, .protocol-locks strong { display: block; }.protocol-locks span { color: var(--muted); font-size: 7px; }.protocol-locks strong { margin-top: 4px; color: #8a4f36; font-size: 9px; }
 .client-welcome { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px 26px; color: white; background: #292a28; border-left: 4px solid #b99584; }
 .client-welcome p, .client-welcome h2, .client-welcome span { margin: 0; }
 .client-welcome p { color: #cfb8aa; font-size: 10px; }
@@ -324,9 +343,9 @@ nav button.active span { color: #a56145; }
 .service-source-note { margin: 0; padding: 11px 18px; border-top: 1px solid var(--line); color: #756f66; background: #faf7f1; font-size: 7px; line-height: 1.55; }
 .reorder-catalog > header button { border: 1px solid #a56145; padding: 8px 11px; color: white; background: #a56145; font-size: 8px; font-weight: 600; }
 .reorder-table { width: 100%; }
-.reorder-table > div { display: grid; grid-template-columns: 74px 170px minmax(220px, 1fr) 120px 120px; align-items: center; min-height: 72px; padding: 0 18px; border-bottom: 1px solid var(--line); font-size: 8px; }
+.reorder-table > div { display: grid; grid-template-columns: 104px 170px minmax(220px, 1fr) 120px 120px; align-items: center; min-height: 104px; padding: 0 18px; border-bottom: 1px solid var(--line); font-size: 9px; }
 .reorder-table .reorder-head { min-height: 32px; color: #f5eee8; background: #292a28; font-family: "Muli"; font-size: 7px; text-transform: uppercase; letter-spacing: .06em; }
-.reorder-table figure { width: 58px; height: 58px; display: grid; place-items: center; overflow: hidden; margin: 0; border: 1px solid #e1dcd4; background: white; }
+.reorder-table figure { width: 86px; height: 86px; display: grid; place-items: center; overflow: hidden; margin: 0; border: 1px solid #e1dcd4; background: white; }
 .reorder-table figure img { display: block; max-width: 92%; max-height: 92%; object-fit: contain; }
 .reorder-table strong { font-weight: 500; }
 .reorder-table em { color: #3d735d; font-size: 7px; font-style: normal; }
@@ -441,7 +460,8 @@ nav button.active span { color: #a56145; }
   .client-navigation { position: sticky; top: 0; width: 100%; height: auto; display: block; border-top-width: 2px; overflow-x: auto; }
   .client-profile, .plan-identity { display: none; }
   .client-navigation nav { display: flex; width: max-content; padding: 5px 8px; }
-  .client-navigation nav a { min-height: 34px; border-left: 0; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .client-navigation nav a { width: 42px; min-height: 38px; margin: 0 2px; border-left: 0; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .client-navigation nav a > span { display: none !important; }
   .client-navigation nav a:hover, .client-navigation nav a.active { border-left-color: transparent; border-bottom-color: #a56145; }
   .dedicated-client-shell .system-state { margin-inline: 12px; }
   .dedicated-client-shell .client-dashboard { margin-left: 0; }
@@ -462,4 +482,5 @@ nav button.active span { color: #a56145; }
   .company-profile-grid { grid-template-columns: 1fr; }
   .company-profile-grid > div, .company-profile-grid > .wide { grid-column: 1; border-right: 0; }
   .form-row, .calculation-preview { grid-template-columns: 1fr; }
+  .editor-form.two-columns, .protocol-locks, .approval-strip { grid-template-columns: 1fr; }
 }

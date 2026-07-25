@@ -76,7 +76,7 @@ export default function Home() {
   const searchParams = useSearchParams();
   const dedicatedClient = pathname === "/linna";
   const requestedView = searchParams.get("view") || "overview";
-  const clientView = ["overview", "plan", "orders", "training", "service", "warranty", "knowledge", "toolkit", "documents"].includes(requestedView) ? requestedView : "overview";
+  const clientView = ["overview", "profile", "plan", "treatments", "protocols", "orders", "training", "service", "warranty", "knowledge", "toolkit", "documents"].includes(requestedView) ? requestedView : "overview";
   const [role, setRole] = useState<Role>(dedicatedClient ? "Customer" : "Executive");
   const [active, setActive] = useState<ItemId>("linna");
   const [tab, setTab] = useState<"summary" | "history">("summary");
@@ -84,6 +84,9 @@ export default function Home() {
   const [fullDocumentOverride, setFullDocumentOverride] = useState<{ file: string; title: string; version: string } | null>(null);
   const [comment, setComment] = useState("");
   const [showReportForm, setShowReportForm] = useState(false);
+  const [profileForm, setProfileForm] = useState({ name: "ผู้รับผิดชอบ", phone: "", position: "ผู้ดูแลบัญชี LINNA", notificationEmail: "" });
+  const [treatmentForm, setTreatmentForm] = useState({ name: "icoone Signature Body", duration: "40", price: "5000", description: "โปรแกรมดูแลรูปร่างและเนื้อเยื่อแบบไม่รุกล้ำ" });
+  const [protocolForm, setProtocolForm] = useState({ preparation: "ประเมินและคัดกรองก่อนรับบริการทุกครั้ง", followUp: "ติดตามความรู้สึกหลังรับบริการภายใน 24 ชั่วโมง", internalNote: "" });
   const [reportForm, setReportForm] = useState({
     reportMonth: "2026-07",
     paidSessions: "42",
@@ -268,7 +271,7 @@ export default function Home() {
               <img src="/logos/icoone-laser-med.png" alt="icoone Laser Med" />
             </div>
             <div className="client-account-title"><strong>LINNA Clinic</strong><span>พื้นที่ข้อมูลและบริการสำหรับลูกค้า</span></div>
-            <div className="client-account-menu"><span>กล</span><div><strong>ผู้รับผิดชอบ</strong><small>ผู้ดูแลบัญชี LINNA</small></div><button aria-label="เมนูบัญชี LINNA">⋮</button></div>
+            <div className="client-account-menu"><span>กล</span><div><strong>ผู้รับผิดชอบ</strong><small>ผู้ดูแลบัญชี LINNA</small></div><a href="/linna?view=profile" aria-label="แก้ไขข้อมูลส่วนตัว">⚙</a></div>
           </header>
         ) : <header className="topbar">
           <div>
@@ -306,15 +309,18 @@ export default function Home() {
             <div><strong>คุณผู้รับผิดชอบ</strong><small>บริษัท ซีเคแอล เฮลท์ แอนด์ บิวตี้ อินเตอร์เนชั่นแนล จำกัด</small></div>
           </div>
           <nav>
-            <a className={clientView === "overview" ? "active" : ""} href="/linna?view=overview"><i>⌂</i>ภาพรวมบัญชี</a>
-            <a className={clientView === "plan" ? "active" : ""} href="/linna?view=plan"><i>◇</i>บริการตามแผน D2</a>
-            <a className={clientView === "orders" ? "active" : ""} href="/linna?view=orders"><i>▣</i>การสั่งซื้อ</a>
-            <a className={clientView === "training" ? "active" : ""} href="/linna?view=training"><i>✓</i>การฝึกอบรม</a>
-            <a className={clientView === "service" ? "active" : ""} href="/linna?view=service"><i>⚙</i>บริการและซ่อมบำรุง</a>
-            <a className={clientView === "warranty" ? "active" : ""} href="/linna?view=warranty"><i>◷</i>การรับประกัน</a>
-            <a className={clientView === "knowledge" ? "active" : ""} href="/linna?view=knowledge"><i>▤</i>ฐานความรู้</a>
-            <a className={clientView === "toolkit" ? "active" : ""} href="/linna?view=toolkit"><i>▦</i>เครื่องมือหลังการขาย</a>
-            <a className={clientView === "documents" ? "active" : ""} href="/linna?view=documents"><i>≡</i>เอกสารของฉัน</a>
+            <a title="ภาพรวมบัญชี" className={clientView === "overview" ? "active" : ""} href="/linna?view=overview"><i>⌂</i><span>ภาพรวมบัญชี</span></a>
+            <a title="บริการตามแผน D2" className={clientView === "plan" ? "active" : ""} href="/linna?view=plan"><i>◇</i><span>บริการตามแผน D2</span></a>
+            <a title="เมนูบริการ" className={clientView === "treatments" ? "active" : ""} href="/linna?view=treatments"><i>◉</i><span>เมนูบริการ</span></a>
+            <a title="แนวทางการให้บริการ" className={clientView === "protocols" ? "active" : ""} href="/linna?view=protocols"><i>⌁</i><span>แนวทางการให้บริการ</span></a>
+            <a title="การสั่งซื้อ" className={clientView === "orders" ? "active" : ""} href="/linna?view=orders"><i>▣</i><span>การสั่งซื้อ</span></a>
+            <a title="การฝึกอบรม" className={clientView === "training" ? "active" : ""} href="/linna?view=training"><i>✓</i><span>การฝึกอบรม</span></a>
+            <a title="บริการและซ่อมบำรุง" className={clientView === "service" ? "active" : ""} href="/linna?view=service"><i>⚙</i><span>บริการและซ่อมบำรุง</span></a>
+            <a title="การรับประกัน" className={clientView === "warranty" ? "active" : ""} href="/linna?view=warranty"><i>◷</i><span>การรับประกัน</span></a>
+            <a title="ฐานความรู้" className={clientView === "knowledge" ? "active" : ""} href="/linna?view=knowledge"><i>▤</i><span>ฐานความรู้</span></a>
+            <a title="เครื่องมือหลังการขาย" className={clientView === "toolkit" ? "active" : ""} href="/linna?view=toolkit"><i>▦</i><span>เครื่องมือหลังการขาย</span></a>
+            <a title="เอกสารของฉัน" className={clientView === "documents" ? "active" : ""} href="/linna?view=documents"><i>≡</i><span>เอกสารของฉัน</span></a>
+            <a title="ข้อมูลส่วนตัว" className={clientView === "profile" ? "active" : ""} href="/linna?view=profile"><i>●</i><span>ข้อมูลส่วนตัว</span></a>
           </nav>
           <div className="plan-identity"><span>รูปแบบความร่วมมือ</span><strong>D2 · แบ่งรายได้ระยะยาว</strong><small>40/60 · ไม่มีรายได้ขั้นต่ำ</small></div>
         </aside>}
@@ -331,6 +337,9 @@ export default function Home() {
                 <span>LINNA Clinic · พื้นที่ทำงานส่วนบุคคล</span>
                 <h2>{({
                   plan: "บริการตามแผน D2",
+                  profile: "ข้อมูลส่วนตัวและการแจ้งเตือน",
+                  treatments: "เมนูบริการของ LINNA",
+                  protocols: "แนวทางการให้บริการ",
                   orders: "การสั่งซื้อและวัสดุ",
                   training: "การฝึกอบรมและความพร้อม",
                   service: "บริการและซ่อมบำรุง",
@@ -342,6 +351,49 @@ export default function Home() {
               </div>
               <span className="view-status">ข้อมูลของ LINNA เท่านั้น</span>
             </header>}
+            <section className="profile-editor portal-module profile-module">
+              <div className="editor-card">
+                <header><i>กล</i><div><span>บัญชีผู้ใช้งาน</span><h3>แก้ไขข้อมูลส่วนตัว</h3></div></header>
+                <div className="editor-form two-columns">
+                  <label><span>ชื่อที่แสดง</span><input value={profileForm.name} onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })} /></label>
+                  <label><span>ตำแหน่งหรือหน้าที่</span><input value={profileForm.position} onChange={(e) => setProfileForm({ ...profileForm, position: e.target.value })} /></label>
+                  <label><span>หมายเลขโทรศัพท์</span><input value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="กรอกหมายเลขโทรศัพท์" /></label>
+                  <label><span>อีเมลรับการแจ้งเตือน</span><input type="email" value={profileForm.notificationEmail} onChange={(e) => setProfileForm({ ...profileForm, notificationEmail: e.target.value })} placeholder="redacted-35d973d929@example.invalid" /></label>
+                </div>
+                <footer><span>อีเมลสำหรับเข้าสู่ระบบเปลี่ยนได้โดยผู้ดูแล BIB เท่านั้น</span><button onClick={() => setSystemMessage("บันทึกข้อมูลส่วนตัวฉบับทดลองแล้ว")}>บันทึกข้อมูล</button></footer>
+              </div>
+            </section>
+
+            <section className="treatment-editor portal-module treatments-module">
+              <div className="editor-card">
+                <header><i>◉</i><div><span>เมนูที่ลูกค้าเห็น</span><h3>{treatmentForm.name}</h3></div><em>ฉบับร่าง</em></header>
+                <div className="editor-form two-columns">
+                  <label><span>ชื่อเมนูบริการ</span><input value={treatmentForm.name} onChange={(e) => setTreatmentForm({ ...treatmentForm, name: e.target.value })} /></label>
+                  <label><span>ราคาเสนอขายต่อครั้ง</span><input type="number" value={treatmentForm.price} onChange={(e) => setTreatmentForm({ ...treatmentForm, price: e.target.value })} /></label>
+                  <label><span>ระยะเวลาโดยประมาณ (นาที)</span><input type="number" value={treatmentForm.duration} onChange={(e) => setTreatmentForm({ ...treatmentForm, duration: e.target.value })} /></label>
+                  <label className="wide"><span>คำอธิบายสำหรับลูกค้า</span><textarea value={treatmentForm.description} onChange={(e) => setTreatmentForm({ ...treatmentForm, description: e.target.value })} /></label>
+                </div>
+                <div className="approval-strip"><span>สิ่งที่แก้ไขได้</span><strong>ชื่อ ราคา ระยะเวลา และคำอธิบาย</strong><small>ข้อความกล่าวอ้างต้องส่งให้ BIB ตรวจอนุมัติก่อนเผยแพร่</small></div>
+                <footer><button className="secondary">ดูตัวอย่างเมนู</button><button onClick={() => setSystemMessage("ส่งเมนูบริการให้ BIB ตรวจทานแล้ว")}>ส่งให้ BIB ตรวจทาน</button></footer>
+              </div>
+            </section>
+
+            <section className="protocol-editor portal-module protocols-module">
+              <div className="editor-card">
+                <header><i>⌁</i><div><span>แนวทางที่เชื่อมกับเมนู icoone Signature Body</span><h3>แก้ไขเฉพาะส่วนที่ LINNA กำหนดเองได้</h3></div><em>ควบคุมฉบับ</em></header>
+                <div className="protocol-locks">
+                  <div><span>โปรแกรมและค่าการทำงาน</span><strong>ล็อกโดย BIB</strong></div>
+                  <div><span>ข้อห้ามและเกณฑ์หยุดบริการ</span><strong>ล็อกโดย BIB</strong></div>
+                  <div><span>คุณสมบัติผู้ปฏิบัติงาน</span><strong>ล็อกโดย BIB</strong></div>
+                </div>
+                <div className="editor-form">
+                  <label><span>การเตรียมผู้รับบริการ</span><textarea value={protocolForm.preparation} onChange={(e) => setProtocolForm({ ...protocolForm, preparation: e.target.value })} /></label>
+                  <label><span>การติดตามหลังรับบริการ</span><textarea value={protocolForm.followUp} onChange={(e) => setProtocolForm({ ...protocolForm, followUp: e.target.value })} /></label>
+                  <label><span>หมายเหตุการดำเนินงานภายใน LINNA</span><textarea value={protocolForm.internalNote} onChange={(e) => setProtocolForm({ ...protocolForm, internalNote: e.target.value })} /></label>
+                </div>
+                <footer><span>การแก้ไขจะสร้างฉบับใหม่และไม่เปลี่ยนต้นฉบับที่อนุมัติแล้ว</span><button onClick={() => setSystemMessage("ส่งคำขอแก้ไขแนวทางให้ BIB ตรวจทานแล้ว")}>ส่งคำขอแก้ไข</button></footer>
+              </div>
+            </section>
             <header className="client-welcome portal-module overview-module">
               <div>
                 <p>สวัสดี ผู้รับผิดชอบ</p>
