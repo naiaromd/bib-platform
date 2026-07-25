@@ -59,7 +59,7 @@ function StatusDot({ color }: { color: "green" | "amber" | "blue" | "gray" }) {
 export default function Home() {
   const [role, setRole] = useState<Role>("Executive");
   const [active, setActive] = useState<ItemId>("linna");
-  const [tab, setTab] = useState<"document" | "comments" | "history">("document");
+  const [tab, setTab] = useState<"summary" | "document" | "history">("summary");
   const [comment, setComment] = useState("");
   const [notes, setNotes] = useState([
     { documentId: "linna", author: "Finance · Pim", text: "ขอระบุ Deposit Waiver Approval ID ใน Schedule 1", visibility: "Internal", time: "09:42" },
@@ -145,7 +145,7 @@ export default function Home() {
         visibility: isCustomer ? "Customer-visible" : "Internal",
         time: "เมื่อสักครู่",
       }]);
-      setComment(""); setTab("comments"); setSaveState("saved"); setSystemMessage("บันทึก Comment และ Audit Trail แล้ว");
+      setComment(""); setSaveState("saved"); setSystemMessage("บันทึก Comment และ Audit Trail แล้ว");
     } catch (error) {
       setSaveState("error");
       setSystemMessage(error instanceof Error ? error.message : "บันทึก Comment ไม่สำเร็จ");
@@ -250,7 +250,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="review-panel">
+          <section className="review-panel document-panel">
             <div className="review-head">
               <div>
                 <div className="eyebrow">{current.account} · {current.version}</div>
@@ -272,12 +272,61 @@ export default function Home() {
             </div>
 
             <div className="review-tabs">
-              <button className={tab === "document" ? "on" : ""} onClick={() => setTab("document")}>Document</button>
-              <button className={tab === "comments" ? "on" : ""} onClick={() => setTab("comments")}>Comments <b>{notes.length}</b></button>
+              <button className={tab === "summary" ? "on" : ""} onClick={() => setTab("summary")}>Summary</button>
+              <button className={tab === "document" ? "on" : ""} onClick={() => setTab("document")}>อ่านฉบับเต็ม</button>
               <button className={tab === "history" ? "on" : ""} onClick={() => setTab("history")}>History</button>
             </div>
 
             <div className="review-body">
+              {tab === "summary" && (
+                <div className="summary-view">
+                  <div className="summary-intro">
+                    <p className="paper-kicker">{active === "memo" ? "POLICY DECISION BRIEF" : "DOCUMENT DECISION BRIEF"}</p>
+                    <h3>{current.title}</h3>
+                    <p>สรุปสาระสำคัญเพื่อใช้ Review และตัดสินใจก่อนเปิดอ่านเอกสารฉบับเต็ม</p>
+                    <button onClick={() => setTab("document")}>อ่านฉบับเต็ม →</button>
+                  </div>
+                  <div className="summary-grid">
+                    <div><span>Account</span><strong>{current.account}</strong></div>
+                    <div><span>Commercial model</span><strong>{current.model}</strong></div>
+                    <div><span>Document version</span><strong>{current.version}</strong></div>
+                    <div><span>Current stage</span><strong>{current.stage}</strong></div>
+                  </div>
+                  <section className="summary-section">
+                    <h4>สาระสำคัญ</h4>
+                    {active === "linna" && <ul>
+                      <li>Revenue Share: LINNA 60% / IPQ 40%</li>
+                      <li>ไม่มี Minimum Guarantee และส่วนแบ่ง IPQ เป็น VAT-inclusive</li>
+                      <li>Deposit Waiver ต้องมี Finance + Executive Approval ID</li>
+                      <li>Review วันที่ 90 และรายไตรมาส; ไม่มี Paid Session 3 เดือนเข้าสู่ Retrieval Review</li>
+                    </ul>}
+                    {active === "drj" && <ul>
+                      <li>Rent-to-Own 24 เดือน พร้อม Deposit และเงื่อนไขโอนกรรมสิทธิ์</li>
+                      <li>คู่สัญญาเป็นบุคคล จึงต้องตรวจ KYC และสิทธิใช้สถานที่ติดตั้ง</li>
+                      <li>ยังไม่พร้อม E-sign จนกว่า License, Site และ VAT Treatment จะครบ</li>
+                    </ul>}
+                    {active === "memo" && <ul>
+                      <li>Model A คง Commission ขั้นบันไดเดิมตามราคาขายก่อน VAT</li>
+                      <li>Allocation มาตรฐาน: Sales 3% + Referral 1% + Trainer 1%</li>
+                      <li>ไม่มี Referral ให้ส่วนดังกล่าวแก่ Sales; Trainer ขายเองรับ Pool ตามนโยบาย</li>
+                    </ul>}
+                  </section>
+                  <section className="summary-section attention">
+                    <h4>ประเด็นที่ต้องตัดสินใจ</h4>
+                    <p>{active === "linna" ? "อนุมัติ Deposit Waiver และยืนยัน VAT treatment ก่อนส่งลูกค้า E-sign"
+                      : active === "drj" ? "ขอเอกสาร KYC/License ให้ครบ หรือ Request Changes กลับไปยัง Sales"
+                      : "ยืนยันขั้นบันได Model A, effective date และผู้มีสิทธิ์ได้รับ Commission"}</p>
+                  </section>
+                  <section className="summary-section">
+                    <h4>Required attachments</h4>
+                    <div className="attachment-list">
+                      <span>✓ Approved Terms / Term Sheet</span>
+                      <span>✓ Contract Draft {current.version}</span>
+                      <span>{active === "drj" ? "○ KYC & Clinic License — Missing" : "✓ Warranty Schedule"}</span>
+                    </div>
+                  </section>
+                </div>
+              )}
               {tab === "document" && (
                 <div className="document-view">
                   <div className="doc-toolbar"><span>Page 1 of {active === "memo" ? 5 : 12}</span><span>− &nbsp; 100% &nbsp; +</span><button>Download</button></div>
@@ -312,13 +361,6 @@ export default function Home() {
                   </article>
                 </div>
               )}
-              {tab === "comments" && (
-                <div className="comments-view">
-                  {notes.filter((n) => n.documentId === active && (!isCustomer || n.visibility === "Customer-visible")).map((n, i) => (
-                    <div className="comment-card" key={i}><div><strong>{n.author}</strong><time>{n.time}</time></div><p>{n.text}</p><span>{n.visibility}</span></div>
-                  ))}
-                </div>
-              )}
               {tab === "history" && (
                 <div className="history-view">
                   <div><StatusDot color="green" /><p><strong>{current.version} created</strong><span>สร้างจาก Approved Terms และล็อก Document Version</span></p><time>วันนี้ 08:30</time></div>
@@ -327,14 +369,29 @@ export default function Home() {
                 </div>
               )}
             </div>
+          </section>
 
+          <aside className="decision-panel">
+            <header className="decision-head">
+              <div><p>REVIEW & DECISION</p><h2>Comment และอนุมัติ</h2></div>
+              <span>{notes.filter((n) => n.documentId === active && (!isCustomer || n.visibility === "Customer-visible")).length}</span>
+            </header>
+            <div className="decision-context">
+              <span>Current decision</span>
+              <strong>{decisions[active]}</strong>
+              <small>Document ID · {active.toUpperCase()}-{current.version}</small>
+            </div>
+            <div className="comments-stream">
+              {notes.filter((n) => n.documentId === active && (!isCustomer || n.visibility === "Customer-visible")).map((n, i) => (
+                <div className="comment-card" key={i}><div><strong>{n.author}</strong><time>{n.time}</time></div><p>{n.text}</p><span>{n.visibility}</span></div>
+              ))}
+            </div>
             <div className="comment-compose">
               <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder={isCustomer ? "พิมพ์ Comment หรือจุดที่ต้องการแก้ไข…" : "เพิ่ม Internal comment หรือคำแนะนำ…"} />
               <div><span>Visibility: <strong>{isCustomer ? "Customer-visible" : "Internal only"}</strong></span><button disabled={saveState === "saving"} onClick={addComment}>Save comment</button></div>
             </div>
 
             <footer className="decision-bar">
-              <div><span>Decision</span><strong>{decisions[active]}</strong><small>Document ID · {active.toUpperCase()}-{current.version}</small></div>
               <div className="decision-actions">
                 <button className="ghost" disabled={saveState === "saving"} onClick={() => decide("Changes requested")}>Request changes</button>
                 {!isCustomer && <button className="conditional" disabled={saveState === "saving"} onClick={() => decide("Conditional")}>Approve with conditions</button>}
@@ -343,7 +400,7 @@ export default function Home() {
                 </button>
               </div>
             </footer>
-          </section>
+          </aside>
         </div>
       </section>
     </main>
