@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 
 type Role = "Executive" | "Finance" | "Legal" | "Sales" | "Customer";
 type ItemId = "linna" | "drj" | "memo";
@@ -71,7 +72,9 @@ function StatusDot({ color }: { color: "green" | "amber" | "blue" | "gray" }) {
 }
 
 export default function Home() {
-  const [role, setRole] = useState<Role>("Executive");
+  const pathname = usePathname();
+  const dedicatedClient = pathname === "/linna";
+  const [role, setRole] = useState<Role>(dedicatedClient ? "Customer" : "Executive");
   const [active, setActive] = useState<ItemId>("linna");
   const [tab, setTab] = useState<"summary" | "history">("summary");
   const [fullView, setFullView] = useState(false);
@@ -224,8 +227,8 @@ export default function Home() {
   }
 
   return (
-    <main className="app-shell">
-      <aside className="sidebar">
+    <main className={`app-shell ${dedicatedClient ? "dedicated-client-shell" : ""}`}>
+      {!dedicatedClient && <aside className="sidebar">
         <div className="brand">
           <div className="brand-lockup">
             <img src="/logos/bib-logo.png" alt="BIB" className="bib-logo" />
@@ -250,10 +253,20 @@ export default function Home() {
           <span>🔒</span>
           <div><strong>เปิดใช้การควบคุมสิทธิ์แล้ว</strong><p>กำหนดตามบทบาท ลูกค้า เอกสาร และขั้นตอน</p></div>
         </div>
-      </aside>
+      </aside>}
 
       <section className="workspace">
-        <header className="topbar">
+        {dedicatedClient ? (
+          <header className="client-topbar">
+            <div className="client-brand-pair">
+              <img src="/logos/bib-logo.png" alt="BIB" />
+              <i>×</i>
+              <img src="/logos/icoone-laser-med.png" alt="icoone Laser Med" />
+            </div>
+            <div className="client-account-title"><strong>LINNA Clinic</strong><span>พื้นที่ข้อมูลและบริการสำหรับลูกค้า</span></div>
+            <div className="client-account-menu"><span>LINNA</span><button aria-label="เมนูบัญชี LINNA">⋮</button></div>
+          </header>
+        ) : <header className="topbar">
           <div>
             <div className="breadcrumbs">BIB / การอนุมัติเชิงพาณิชย์</div>
             <h1>ศูนย์ตรวจทานและอนุมัติเอกสาร</h1>
@@ -276,13 +289,13 @@ export default function Home() {
             </label>
             <div className="avatar">{role.slice(0, 2).toUpperCase()}</div>
           </div>
-        </header>
+        </header>}
 
-        <div className="role-banner">
+        {!dedicatedClient && <div className="role-banner">
           <span>กำลังแสดงสิทธิ์ของ <strong>{roleLabels[role]}</strong></span>
           <p>{roleCopy[role]}</p>
           <em>ตัวอย่างตามสิทธิ์ที่ได้รับ</em>
-        </div>
+        </div>}
         <div className={`system-state ${saveState}`}>
           <span>{saveState === "loading" ? "กำลังเชื่อมข้อมูล…" : saveState === "saving" ? "กำลังบันทึก…" : saveState === "error" ? "ต้องตรวจสอบ" : "พร้อมตรวจสอบย้อนหลัง"}</span>
           <p>{systemMessage || "ทุกความเห็นและผลการอนุมัติจะผูกกับฉบับเอกสารที่เกี่ยวข้อง"}</p>
@@ -292,8 +305,8 @@ export default function Home() {
           <section className="client-dashboard">
             <header className="client-welcome">
               <div>
-                <p>พื้นที่ความร่วมมือเฉพาะของ LINNA Clinic</p>
-                <h2>สวัสดีค่ะ ทีม LINNA</h2>
+                <p>พื้นที่ข้อมูลเฉพาะของ LINNA Clinic</p>
+                <h2>ภาพรวมการให้บริการ icoone</h2>
                 <span>ข้อมูลรอบเดือนกรกฎาคม 2569 · ปรับปรุงล่าสุดเมื่อ 24 กรกฎาคม 2569</span>
               </div>
               <button onClick={() => setShowReportForm(true)}>ส่งรายงานประจำเดือน</button>
