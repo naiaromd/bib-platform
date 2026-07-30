@@ -246,6 +246,7 @@ export default function Home() {
         </div>
         <nav>
           <p className="nav-label">พื้นที่ทำงาน</p>
+          <a className="template-nav-link" href="/platform"><span>⌂</span> BIB Practice Intelligence</a>
           <button><span>⌁</span> สุขภาพฐานความรู้</button>
           <button className="active"><span>✓</span> การอนุมัติเชิงพาณิชย์ <b>3</b></button>
           <a className="template-nav-link" href="/term-templates"><span>▦</span> แม่แบบข้อเสนอ</a>

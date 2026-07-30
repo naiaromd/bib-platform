@@ -85,13 +85,13 @@ export default function TermTemplatesPage() {
         <div className="brand">
           <div className="brand-lockup">
             <img src="/logos/bib-logo.png" alt="BIB" className="bib-logo" />
-            <i>×</i>
             <img src="/logos/icoone-laser-med.png" alt="icoone Laser Med" className="icoone-logo" />
           </div>
           <div><strong>ศูนย์ข้อมูลและการอนุมัติ</strong><span>BIB PRACTICE INTELLIGENCE</span></div>
         </div>
         <nav>
           <p className="nav-label">พื้นที่ทำงาน</p>
+          <a className="template-nav-link" href="/platform"><span>⌂</span> BIB Practice Intelligence</a>
           <a className="template-nav-link" href="/"><span>✓</span> การอนุมัติเชิงพาณิชย์</a>
           <a className="template-nav-link active" href="/term-templates"><span>▦</span> แม่แบบข้อเสนอ</a>
           <p className="nav-label">ทะเบียนกลาง</p>
@@ -133,14 +133,19 @@ export default function TermTemplatesPage() {
 
           <section className="template-preview-panel">
             <header><div><span>ตัวอย่างเอกสารแบบเรียลไทม์</span><strong>{quoteNo}</strong></div><em>{current.status}</em></header>
+            <div className="term-paper-stack">
             <article className="term-paper">
               <div className="term-paper-head">
                 <div><img src="/logos/bib-logo.png" alt="BIB" /><strong>IplusQ</strong><p>9/1 Rattanathibet Soi 10<br />Bangkrasor, Muang Nonthaburi 11000<br />[CONTACT OMITTED]· www.iplusq.com</p></div>
                 <div><h2>TERM SHEET</h2><strong>{quoteNo}</strong><p>Commercial Model {model}</p></div>
               </div>
-              <div className="term-bill">
-                <div><span>เสนอแก่</span><strong>{client.name || "กรอกชื่อนิติบุคคล"}</strong><p>{client.address || "กรอกที่อยู่"}</p><small>เลขประจำตัวผู้เสียภาษี {client.taxId || "-"}</small></div>
-                <div><span>วันที่จัดทำ</span><strong>30/07/2026</strong><span>ผู้รับผิดชอบ</span><strong>{client.salesperson}</strong></div>
+              <div className="term-form-grid">
+                <div className="term-field span-2"><span>เสนอแก่ / ชื่อนิติบุคคล</span><strong>{client.name || "กรอกชื่อนิติบุคคล"}</strong></div>
+                <div className="term-field"><span>เลขประจำตัวผู้เสียภาษี</span><strong>{client.taxId || "-"}</strong></div>
+                <div className="term-field"><span>วันที่จัดทำ</span><strong>30/07/2026</strong></div>
+                <div className="term-field span-2"><span>ที่อยู่ตามหนังสือรับรอง</span><p>{client.address || "กรอกที่อยู่"}</p></div>
+                <div className="term-field"><span>ผู้ประสานงาน</span><strong>{client.contact || "—"}</strong></div>
+                <div className="term-field"><span>ผู้รับผิดชอบของ BIB</span><strong>{client.salesperson}</strong></div>
               </div>
               <table className="term-price-table">
                 <thead><tr><th>#</th><th>รายการและรายละเอียด</th><th>จำนวน</th><th>เงื่อนไขหลัก</th></tr></thead>
@@ -149,18 +154,54 @@ export default function TermTemplatesPage() {
               </table>
               <div className="term-sections">
                 <section><h3>กำหนดการชำระและการแบ่งรายได้</h3><ul>{current.schedule.map((x) => <li key={x}>{x}</li>)}</ul></section>
-                <section><h3>เงื่อนไขกลางจากใบเสนอราคา</h3><ul>
-                  <li>รับประกัน 1 ปี นับจากวันที่รับมอบ</li>
-                  <li>ฝึกอบรม 3 วัน ทุก 6 เดือนในปีแรก</li>
-                  <li>ราคารวมภาษีมูลค่าเพิ่มในรายการที่กำหนด</li>
-                  <li>จัดส่งภายในประเทศโดยไม่มีค่าใช้จ่าย</li>
-                  <li>กำหนดผลิตและส่งมอบภายใน 45 วันหลังยืนยันการผลิต</li>
-                </ul></section>
                 <section><h3>การควบคุมความเสี่ยง</h3><ul>{current.controls.map((x) => <li key={x}>{x}</li>)}</ul></section>
               </div>
-              <div className="term-bank"><strong>ข้อมูลการชำระเงิน</strong><p>I Plus Q Co., Ltd. · Bangkok Bank Public Company Limited<br />บัญชี 2333013643 · SWIFT: BKKBTHBK</p></div>
-              <footer><span>ข้อเสนอฉบับนี้ใช้เพื่อประกอบการพิจารณา เงื่อนไขที่มีผลผูกพันให้เป็นไปตามสัญญาที่ลงนามครบถ้วน</span><strong>BIB · {quoteNo}</strong></footer>
+              <div className="term-page-note">ข้อเสนอฉบับนี้ใช้เพื่อประกอบการพิจารณา เงื่อนไขที่มีผลผูกพันให้เป็นไปตามสัญญาที่ลงนามครบถ้วน</div>
+              <footer><span>หน้า 1 จาก 2</span><strong>BIB · {quoteNo}</strong></footer>
             </article>
+
+            <article className="term-paper term-paper-page-two">
+              <div className="term-continuation-head">
+                <div className="term-continuation-brand"><img src="/logos/bib-logo.png" alt="BIB" /><img src="/logos/icoone-laser-med.png" alt="icoone Laser Med" /></div>
+                <div><span>รายละเอียดประกอบข้อเสนอ</span><strong>{quoteNo}</strong><p>Commercial Model {model} · {current.name}</p></div>
+              </div>
+
+              <div className="term-detail-grid">
+                <section>
+                  <h3>การส่งมอบและติดตั้ง</h3>
+                  <div className="term-clause-row"><span>สถานที่ติดตั้ง</span><strong>{client.address || "รอยืนยันสถานที่ติดตั้ง"}</strong></div>
+                  <div className="term-clause-row"><span>กำหนดส่งมอบ</span><strong>ภายใน 45 วันหลังยืนยันการผลิต เว้นแต่ตกลงเป็นหนังสืออย่างอื่น</strong></div>
+                  <div className="term-clause-row"><span>ค่าขนส่ง</span><strong>จัดส่งภายในประเทศไทยโดยไม่มีค่าใช้จ่าย</strong></div>
+                </section>
+                <section>
+                  <h3>การรับประกันและบริการ</h3>
+                  <div className="term-clause-row"><span>ระยะรับประกัน</span><strong>1 ปี นับจากวันที่ลงนามรับมอบเครื่อง</strong></div>
+                  <div className="term-clause-row"><span>การฝึกอบรม</span><strong>ฝึกอบรม 3 วัน และทบทวนทุก 6 เดือนในปีแรก</strong></div>
+                  <div className="term-clause-row"><span>เงื่อนไขรับประกัน</span><strong>เป็นไปตามหนังสือรับประกันและข้อกำหนดการใช้งานของผู้ผลิต</strong></div>
+                </section>
+                <section>
+                  <h3>ภาษีและการชำระเงิน</h3>
+                  <div className="term-clause-row"><span>ภาษีมูลค่าเพิ่ม</span><strong>รวมอยู่ในราคาหรือยอดที่ระบุ เว้นแต่ระบุเป็นอย่างอื่น</strong></div>
+                  <div className="term-clause-row"><span>ผู้รับชำระ</span><strong>I Plus Q Co., Ltd.</strong></div>
+                  <div className="term-clause-row"><span>บัญชีธนาคาร</span><strong>ธนาคารกรุงเทพ · 2333013643 · SWIFT BKKBTHBK</strong></div>
+                </section>
+                <section>
+                  <h3>เอกสารที่ใช้ประกอบ</h3>
+                  <ul>{current.documents.map((x) => <li key={x}>{x}</li>)}</ul>
+                </section>
+              </div>
+
+              <div className="term-acceptance">
+                <h3>การรับทราบและยืนยันข้อเสนอ</h3>
+                <p>ผู้รับข้อเสนอรับทราบว่าเอกสารนี้เป็นสรุปเงื่อนไขเบื้องต้น การซื้อขาย การเช่า การแบ่งรายได้ การรับประกัน และหน้าที่ของคู่สัญญาจะมีผลเมื่อคู่สัญญาลงนามในสัญญาฉบับสมบูรณ์แล้ว</p>
+                <div className="term-signature-grid">
+                  <div><span>สำหรับผู้รับข้อเสนอ</span><i /><strong>ชื่อ–นามสกุล / ผู้มีอำนาจลงนาม</strong><small>วันที่ ____________________</small></div>
+                  <div><span>สำหรับบริษัท ไอพลัสคิว จำกัด</span><i /><strong>ผู้มีอำนาจลงนาม</strong><small>วันที่ ____________________</small></div>
+                </div>
+              </div>
+              <footer><span>หน้า 2 จาก 2</span><strong>BIB · {quoteNo}</strong></footer>
+            </article>
+            </div>
           </section>
 
           <aside className="template-package">
