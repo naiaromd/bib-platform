@@ -649,6 +649,23 @@ nav button.active span { color: #a56145; }
 .v2-academy-progress { border: 1px solid #d8d1c7; background: #fff; }.v2-academy-progress article { display: grid; grid-template-columns: 50px minmax(230px,1fr) 1fr; gap: 15px; align-items: center; min-height: 85px; padding: 14px 20px; border-bottom: 1px solid #ded8cf; }.v2-academy-progress article > i { color: #a76347; font-family: "Muli"; font-size: 11px; font-style: normal; }.v2-academy-progress article span b, .v2-academy-progress article span small { display: block; }.v2-academy-progress article span b { font-size: 10px; }.v2-academy-progress article span small { margin-top: 3px; color: #777168; font-size: 7px; }.v2-academy-progress article > em { height: 7px; background: #e3ded6; }.v2-academy-progress article > em b { display: block; height: 100%; background: #a76347; }
 .v2-support-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 13px; }.v2-support-grid article { min-height: 210px; padding: 20px; border: 1px solid #d8d1c7; background: #fff; }.v2-support-grid article i { float: right; color: #d1a792; font-family: "Muli"; font-style: normal; }.v2-support-grid article span { color: #a76347; font-size: 7px; }.v2-support-grid h3 { margin: 14px 0 4px; font-size: 16px; }.v2-support-grid p { color: #746e66; font-size: 8px; }.v2-support-grid button { margin-top: 16px; padding: 8px 10px; color: #8b4d34; border: 1px solid #a76347; background: transparent; font-size: 7px; }
 
+/* Isolate V2 navigation from the legacy global nav rules. */
+.v2-job-nav nav button b {
+  min-width: 0;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+  background: transparent;
+  font-size: 10px;
+  line-height: 1.35;
+  place-items: initial;
+}
+.v2-job-nav nav button:focus { outline: 0; }
+.v2-job-nav nav button:focus-visible { outline: 2px solid #b96f50; outline-offset: -2px; }
+
 @media (max-width: 1050px) {
   .v2-brand-header { grid-template-columns: auto 1fr auto; }.v2-brand-copy, .v2-brand-header > em { display: none; }.v2-layout { grid-template-columns: 230px 1fr; }.v2-work { padding-left: 20px; padding-right: 20px; }.v2-work-head { grid-template-columns: 1fr auto; }.v2-work-head label { grid-column: 1 / -1; grid-row: 2; margin-bottom: 12px; }.v2-metrics, .v2-choice-grid { grid-template-columns: repeat(2,1fr); }.v2-model-row { grid-template-columns: repeat(3,1fr); }.v2-progress > div { grid-template-columns: repeat(4,1fr); }.v2-client-opportunities { grid-template-columns: 1fr 1fr; }
 }
