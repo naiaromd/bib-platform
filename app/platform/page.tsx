@@ -52,11 +52,6 @@ export default function InternalPlatformPage() {
     <main className="v2-shell">
       <BrandHeader area="INTERNAL · RESTRICTED" />
 
-      <section className="v2-intro v2-intro-internal">
-        <div><span>ศูนย์ปฏิบัติงานภายใน</span><h1>เริ่มจากสิ่งที่ต้องทำ<br />ไม่ใช่เริ่มจากเมนู</h1><p>ข้อมูลลูกค้า ข้อเสนอ สัญญา และงานหลังการขายอยู่ในเส้นทางเดียวกัน</p></div>
-        <aside><b>6</b><span>เรื่องที่ต้องตัดสินใจวันนี้</span><button onClick={() => setView("approval")}>เปิดรายการอนุมัติ</button></aside>
-      </section>
-
       <section className="v2-layout">
         <aside className="v2-job-nav">
           <span>CHOOSE A JOB TO DO</span>
@@ -73,6 +68,10 @@ export default function InternalPlatformPage() {
         </aside>
 
         <div className="v2-work">
+          <section className="v2-intro v2-module-hero">
+            <div><span>ศูนย์ปฏิบัติงานภายใน</span><h1>เริ่มจากสิ่งที่ต้องทำ<br />ไม่ใช่เริ่มจากเมนู</h1><p>ข้อมูลลูกค้า ข้อเสนอ สัญญา และงานหลังการขายอยู่ในเส้นทางเดียวกัน</p></div>
+            <aside><b>6</b><span>เรื่องที่ต้องตัดสินใจวันนี้</span><button onClick={() => setView("approval")}>เปิดรายการอนุมัติ</button></aside>
+          </section>
           <header className="v2-work-head">
             <div><span>BIB INTERNAL WORKSPACE</span><h2>{workspaces.find(([id]) => id === view)?.[2]}</h2></div>
             <label><i>⌕</i><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ค้นหาลูกค้า งาน หรือเอกสาร" /></label>
