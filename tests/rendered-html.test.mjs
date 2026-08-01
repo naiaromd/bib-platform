@@ -10,6 +10,7 @@ const identityUrl = new URL("../lib/server-identity.ts", import.meta.url);
 const workspaceUrl = new URL("../app/api/workspace/route.ts", import.meta.url);
 const demoUrl = new URL("../app/api/public/demo-request/route.ts", import.meta.url);
 const crmWorkspaceUrl = new URL("../app/api/crm/workspace/route.ts", import.meta.url);
+const crmContactUrl = new URL("../app/api/crm/contacts/[id]/route.ts", import.meta.url);
 const evidenceUrl = new URL("../app/api/evidence/route.ts", import.meta.url);
 const evidenceFilesUrl = new URL("../app/api/evidence/files/route.ts", import.meta.url);
 const workspaceV2Url = new URL("../app/workspace/WorkspaceClient.tsx", import.meta.url);
@@ -62,8 +63,9 @@ test("enforces server-side identity and tenant-scoped CRM", async () => {
 });
 
 test("ships the focused CRM workspace and therapist evidence flow", async () => {
-  const [crm, evidence, files, workspace, therapist, therapistCss, hosting] = await Promise.all([
+  const [crm, contact, evidence, files, workspace, therapist, therapistCss, hosting] = await Promise.all([
     readFile(crmWorkspaceUrl, "utf8"),
+    readFile(crmContactUrl, "utf8"),
     readFile(evidenceUrl, "utf8"),
     readFile(evidenceFilesUrl, "utf8"),
     readFile(workspaceV2Url, "utf8"),
@@ -75,6 +77,11 @@ test("ships the focused CRM workspace and therapist evidence flow", async () => 
   assert.match(crm, /accountScope/);
   assert.match(workspace, /งานวันนี้/);
   assert.match(workspace, /ลูกค้าและผู้สนใจ/);
+  assert.match(workspace, /บุคคลที่เกี่ยวข้องกับการตัดสินใจ/);
+  assert.match(workspace, /แก้ไขรายละเอียดผู้ติดต่อ/);
+  assert.match(contact, /resolveLinkedAccount/);
+  assert.match(contact, /preferred_channel/);
+  assert.match(contact, /consent_status/);
   assert.match(evidence, /ห้ามบันทึกชื่อ เบอร์โทร หรืออีเมล/);
   assert.match(evidence, /Evidence case submitted/);
   assert.match(therapist, /capture="environment"/);

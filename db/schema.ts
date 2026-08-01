@@ -120,9 +120,17 @@ export const clientContacts = sqliteTable("client_contacts", {
   accountId: text("account_id").notNull(),
   email: text("email").notNull(),
   displayName: text("display_name").notNull(),
+  positionTitle: text("position_title").notNull().default(""),
   buyingRole: text("buying_role").notNull(),
   portalRole: text("portal_role").notNull(),
+  phone: text("phone").notNull().default(""),
+  lineId: text("line_id").notNull().default(""),
+  preferredChannel: text("preferred_channel").notNull().default("LINE"),
+  decisionLevel: text("decision_level").notNull().default("ยังไม่ยืนยัน"),
+  consentStatus: text("consent_status").notNull().default("ยังไม่ยืนยัน"),
+  notes: text("notes").notNull().default(""),
   active: integer("active", { mode: "boolean" }).notNull().default(true),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const deviceDeployments = sqliteTable("device_deployments", {

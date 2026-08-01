@@ -70,8 +70,11 @@ async function initialize() {
       account_status TEXT NOT NULL DEFAULT 'Active', created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
     d1.prepare(`CREATE TABLE IF NOT EXISTS client_contacts (
       id TEXT PRIMARY KEY, tenant_id TEXT NOT NULL DEFAULT 'bib', account_id TEXT NOT NULL, email TEXT NOT NULL DEFAULT '',
-      display_name TEXT NOT NULL, buying_role TEXT NOT NULL, portal_role TEXT NOT NULL DEFAULT 'Contact',
-      active INTEGER NOT NULL DEFAULT 1)`),
+      display_name TEXT NOT NULL, position_title TEXT NOT NULL DEFAULT '', buying_role TEXT NOT NULL,
+      portal_role TEXT NOT NULL DEFAULT 'Contact', phone TEXT NOT NULL DEFAULT '', line_id TEXT NOT NULL DEFAULT '',
+      preferred_channel TEXT NOT NULL DEFAULT 'LINE', decision_level TEXT NOT NULL DEFAULT 'ยังไม่ยืนยัน',
+      consent_status TEXT NOT NULL DEFAULT 'ยังไม่ยืนยัน', notes TEXT NOT NULL DEFAULT '',
+      active INTEGER NOT NULL DEFAULT 1, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
     d1.prepare(`CREATE TABLE IF NOT EXISTS device_deployments (
       id TEXT PRIMARY KEY, account_id TEXT NOT NULL, model TEXT NOT NULL,
       serial_number TEXT NOT NULL DEFAULT '', installed_at TEXT NOT NULL DEFAULT '',

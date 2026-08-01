@@ -46,6 +46,22 @@ type AccountDetail = {
   timeline: Array<{ type: string; date: string; data: Record<string, unknown> }>;
 };
 
+type CrmContact = {
+  id: string;
+  displayName?: string;
+  positionTitle?: string;
+  buyingRole?: string;
+  portalRole?: string;
+  phone?: string;
+  email?: string;
+  lineId?: string;
+  preferredChannel?: string;
+  decisionLevel?: string;
+  consentStatus?: string;
+  notes?: string;
+  active?: boolean | number;
+};
+
 const menu: Array<{ key: View; icon: string; label: string; hint: string }> = [
   { key: "today", icon: "01", label: "งานวันนี้", hint: "งาน นัดหมาย และสิ่งที่ต้องติดตาม" },
   { key: "crm", icon: "02", label: "CRM", hint: "ลูกค้า ผู้ติดต่อ และโอกาสขาย" },
@@ -86,6 +102,7 @@ export default function WorkspaceClient() {
   const [message, setMessage] = useState("");
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showActivityForm, setShowActivityForm] = useState(false);
+  const [editingContact, setEditingContact] = useState<CrmContact | null>(null);
   const [accountDetail, setAccountDetail] = useState<AccountDetail | null>(null);
 
   function mapCrmPayload(payload: Record<string, unknown>): WorkspaceData {
@@ -202,6 +219,14 @@ export default function WorkspaceClient() {
     return () => { active = false; };
   }, [selectedLead?.accountId]);
 
+  async function reloadAccountDetail(accountId = selectedLead?.accountId || "") {
+    if (!accountId) return;
+    const response = await fetch(`/api/crm/accounts/${encodeURIComponent(accountId)}`, { cache: "no-store" });
+    const payload = (await response.json()) as AccountDetail & { error?: string };
+    if (!response.ok) throw new Error(payload.error || "ไม่สามารถเปิดประวัติลูกค้าได้");
+    setAccountDetail(payload);
+  }
+
   async function createTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -265,6 +290,34 @@ export default function WorkspaceClient() {
     await loadWorkspace();
   }
 
+  async function updateContact(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!editingContact?.id) return;
+    const form = new FormData(event.currentTarget);
+    const response = await fetch(`/api/crm/contacts/${encodeURIComponent(editingContact.id)}`, {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        displayName: form.get("displayName"),
+        positionTitle: form.get("positionTitle"),
+        buyingRole: form.get("buyingRole"),
+        decisionLevel: form.get("decisionLevel"),
+        phone: form.get("phone"),
+        email: form.get("email"),
+        lineId: form.get("lineId"),
+        preferredChannel: form.get("preferredChannel"),
+        consentStatus: form.get("consentStatus"),
+        notes: form.get("notes"),
+      }),
+    });
+    const result = (await response.json()) as { error?: string };
+    if (!response.ok) { setMessage(result.error || "แก้ไขข้อมูลผู้ติดต่อไม่สำเร็จ"); return; }
+    setEditingContact(null);
+    setMessage("บันทึกข้อมูลผู้ติดต่อแล้ว");
+    await reloadAccountDetail();
+    await loadWorkspace();
+  }
+
   return (
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
@@ -304,7 +357,7 @@ export default function WorkspaceClient() {
           </div>
           <div className={styles.topActions}>
             <button onClick={() => setShowTaskForm(true)}>+ เพิ่มงาน</button>
-            <a href="/platform">ดูระบบเดิม</a>
+            <a href="/platform">เปิดต้นแบบเดิม</a>
           </div>
         </header>
 
@@ -393,6 +446,38 @@ export default function WorkspaceClient() {
                   <section className={styles.nextAction}>
                     <div><span>ขั้นตอนถัดไป</span><h2>{selectedLead.next}</h2><p>กำหนด {shortDate(selectedLead.nextActionAt)} · ผู้รับผิดชอบ {selectedLead.owner}</p></div>
                     <button onClick={() => setShowActivityForm(true)}>บันทึกการติดตาม</button>
+                  </section>
+
+                  <section className={`${styles.panel} ${styles.contactPanel}`}>
+                    <header>
+                      <div><span>ข้อมูลผู้ติดต่อ</span><h2>บุคคลที่เกี่ยวข้องกับการตัดสินใจ</h2></div>
+                      <small>{accountDetail?.contacts?.length || 0} ราย</small>
+                    </header>
+                    <div className={styles.contactGrid}>
+                      {(accountDetail?.contacts || []).map((rawContact) => {
+                        const contact = rawContact as CrmContact;
+                        return (
+                          <article key={contact.id}>
+                            <div className={styles.contactName}>
+                              <i>{String(contact.displayName || "—").slice(0, 2).toUpperCase()}</i>
+                              <span><strong>{contact.displayName || "ยังไม่ระบุชื่อ"}</strong><small>{contact.positionTitle || contact.buyingRole || "ยังไม่ระบุตำแหน่ง"}</small></span>
+                              <em>{contact.active ? "ใช้งาน" : "ไม่ใช้งาน"}</em>
+                            </div>
+                            <dl>
+                              <div><dt>บทบาท</dt><dd>{contact.buyingRole || "ยังไม่ระบุ"}</dd></div>
+                              <div><dt>การตัดสินใจ</dt><dd>{contact.decisionLevel || "ยังไม่ยืนยัน"}</dd></div>
+                              <div><dt>โทรศัพท์</dt><dd>{contact.phone || "ยังไม่ระบุ"}</dd></div>
+                              <div><dt>อีเมล</dt><dd>{contact.email || "ยังไม่ระบุ"}</dd></div>
+                              <div><dt>LINE</dt><dd>{contact.lineId || "ยังไม่ระบุ"}</dd></div>
+                              <div><dt>ช่องทางหลัก</dt><dd>{contact.preferredChannel || "ยังไม่ระบุ"}</dd></div>
+                            </dl>
+                            {contact.notes && <p>{contact.notes}</p>}
+                            <button onClick={() => setEditingContact(contact)}>แก้ไขข้อมูลผู้ติดต่อ</button>
+                          </article>
+                        );
+                      })}
+                      {!accountDetail?.contacts?.length && <p className={styles.empty}>ยังไม่มีข้อมูลผู้ติดต่อ</p>}
+                    </div>
                   </section>
 
                   <section className={styles.detailColumns}>
@@ -487,6 +572,27 @@ export default function WorkspaceClient() {
               <label><span>ความเสี่ยงที่ต้องระวัง</span><textarea name="riskNote" rows={2} defaultValue={selectedLead.risk === "ยังไม่มีบันทึกความเสี่ยง" ? "" : selectedLead.risk} /></label>
             </>}
             <footer><button type="button" onClick={() => setShowActivityForm(false)}>ยกเลิก</button><button type="submit">บันทึกและอัปเดต</button></footer>
+          </form>
+        </div>
+      )}
+
+      {editingContact && (
+        <div className={styles.modalBackdrop} role="presentation" onMouseDown={() => setEditingContact(null)}>
+          <form className={`${styles.modal} ${styles.activityModal}`} onSubmit={updateContact} onMouseDown={(event) => event.stopPropagation()}>
+            <header><div><span>ข้อมูลผู้ติดต่อ</span><h2>แก้ไขรายละเอียดผู้ติดต่อ</h2></div><button type="button" onClick={() => setEditingContact(null)}>×</button></header>
+            <div className={styles.formGrid}>
+              <label><span>ชื่อ–นามสกุล</span><input name="displayName" required autoFocus defaultValue={editingContact.displayName || ""} /></label>
+              <label><span>ตำแหน่ง</span><input name="positionTitle" defaultValue={editingContact.positionTitle || ""} /></label>
+              <label><span>บทบาทในการซื้อ</span><input name="buyingRole" defaultValue={editingContact.buyingRole || ""} placeholder="เช่น แพทย์ ผู้จัดการ ฝ่ายจัดซื้อ" /></label>
+              <label><span>ระดับการตัดสินใจ</span><select name="decisionLevel" defaultValue={editingContact.decisionLevel || "ยังไม่ยืนยัน"}><option>ผู้ตัดสินใจ</option><option>ผู้มีอิทธิพล</option><option>ผู้ประเมิน</option><option>ผู้ประสานงาน</option><option>ยังไม่ยืนยัน</option></select></label>
+              <label><span>เบอร์โทร</span><input name="phone" inputMode="tel" defaultValue={editingContact.phone || ""} /></label>
+              <label><span>อีเมล</span><input name="email" type="email" defaultValue={editingContact.email || ""} /></label>
+              <label><span>LINE ID</span><input name="lineId" defaultValue={editingContact.lineId || ""} /></label>
+              <label><span>ช่องทางที่สะดวก</span><select name="preferredChannel" defaultValue={editingContact.preferredChannel || "LINE"}><option>LINE</option><option>โทรศัพท์</option><option>อีเมล</option><option>พบที่สถานที่</option><option>ประชุมออนไลน์</option></select></label>
+              <label><span>สถานะการติดต่อ</span><select name="consentStatus" defaultValue={editingContact.consentStatus || "ยังไม่ยืนยัน"}><option>ติดต่อได้</option><option>รอยืนยัน</option><option>ไม่ประสงค์รับการติดต่อ</option><option>ยังไม่ยืนยัน</option></select></label>
+            </div>
+            <label><span>บันทึกที่จำเป็น</span><textarea name="notes" rows={3} defaultValue={editingContact.notes || ""} placeholder="เช่น เวลาที่สะดวก ความสนใจ หรือข้อควรระวังในการติดต่อ" /></label>
+            <footer><button type="button" onClick={() => setEditingContact(null)}>ยกเลิก</button><button type="submit">บันทึกข้อมูล</button></footer>
           </form>
         </div>
       )}

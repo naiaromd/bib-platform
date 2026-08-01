@@ -20,8 +20,12 @@ export async function GET(request: Request, context: RouteContext) {
         account_status AS accountStatus, created_at AS createdAt
         FROM client_accounts WHERE tenant_id = ? AND id = ? LIMIT 1`)
         .bind(actor.tenantId, id).first(),
-      d1.prepare(`SELECT id, email, display_name AS displayName, buying_role AS buyingRole,
-        portal_role AS portalRole, active FROM client_contacts
+      d1.prepare(`SELECT id, email, display_name AS displayName,
+        position_title AS positionTitle, buying_role AS buyingRole,
+        portal_role AS portalRole, phone, line_id AS lineId,
+        preferred_channel AS preferredChannel, decision_level AS decisionLevel,
+        consent_status AS consentStatus, notes, active, updated_at AS updatedAt
+        FROM client_contacts
         WHERE tenant_id = ? AND account_id = ? ORDER BY active DESC, display_name`)
         .bind(actor.tenantId, id).all(),
       d1.prepare(`SELECT l.id, l.contact_id AS contactId, c.display_name AS contactName,

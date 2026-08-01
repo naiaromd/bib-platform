@@ -86,6 +86,7 @@
 .panel header span { color: var(--accent); font: 700 10px/1 "Muli", sans-serif; letter-spacing: .1em; }
 .panel header h2 { margin-top: 5px; font-size: 18px; font-weight: 500; }
 .panel header button { border: 0; color: var(--accent); background: transparent; cursor: pointer; }
+.panel > header > small { color: var(--muted); font-size: 12px; }
 .taskList > div { min-height: 66px; display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 17px; border-bottom: 1px solid var(--line); }
 .taskList > div:last-child { border-bottom: 0; }
 .taskList b { color: #8f6a26; font-size: 10px; font-weight: 500; }
@@ -151,6 +152,25 @@
 .profileData dt { color: var(--muted); font-size: 11px; }
 .profileData dd { margin: 0; font-size: 12px; }
 
+.contactPanel { margin-top: 16px; }
+.contactGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.contactGrid > article { min-width: 0; padding: 18px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.contactGrid > article:nth-child(even) { border-right: 0; }
+.contactGrid > article:nth-last-child(-n + 2) { border-bottom: 0; }
+.contactName { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 11px; }
+.contactName i { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; color: #6b402f; background: var(--accent-soft); font: 700 11px/1 "Muli", sans-serif; font-style: normal; }
+.contactName span, .contactName strong, .contactName small { display: block; }
+.contactName strong { font-size: 15px; font-weight: 500; }
+.contactName small { margin-top: 3px; color: var(--muted); font-size: 12px; }
+.contactName em { padding: 5px 8px; color: #506455; background: #e7efe7; font-size: 10px; font-style: normal; }
+.contactGrid dl { margin: 15px 0 0; }
+.contactGrid dl div { display: grid; grid-template-columns: 108px minmax(0, 1fr); gap: 9px; padding: 8px 0; border-top: 1px solid var(--line); }
+.contactGrid dt { color: var(--muted); font-size: 12px; }
+.contactGrid dd { min-width: 0; margin: 0; overflow-wrap: anywhere; font-size: 13px; }
+.contactGrid article > p { margin: 12px 0 0; padding: 10px 12px; color: #68564b; background: #f7f1e9; font-size: 12px; line-height: 1.55; }
+.contactGrid article > button { width: 100%; margin-top: 14px; padding: 9px 12px; border: 1px solid #c9b8aa; color: #6d493a; background: transparent; cursor: pointer; }
+.contactGrid article > button:hover { border-color: var(--accent); background: #fbf3ed; }
+
 .pageHeading { max-width: 850px; padding: 10px 0 26px; border-bottom: 1px solid var(--line); }
 .pageHeading h1 { margin: 8px 0 6px; font-size: clamp(30px, 4vw, 48px); font-weight: 500; }
 .pageHeading p { margin: 0; color: var(--muted); font-size: 14px; }
@@ -196,6 +216,10 @@
   .metrics article:nth-child(2) { border-right: 0; }
   .metrics article:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
   .twoColumns, .detailColumns { grid-template-columns: 1fr; }
+  .contactGrid { grid-template-columns: 1fr; }
+  .contactGrid > article { border-right: 0; }
+  .contactGrid > article:nth-last-child(-n + 2) { border-bottom: 1px solid var(--line); }
+  .contactGrid > article:last-child { border-bottom: 0; }
   .demoGrid { grid-template-columns: 1fr 1fr; }
   .evidenceJourney { grid-template-columns: 1fr; }
   .evidenceJourney article { min-height: auto; display: grid; grid-template-columns: 40px 1fr; gap: 12px; border-right: 0; border-bottom: 1px solid var(--line); }
