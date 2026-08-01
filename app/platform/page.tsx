@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type InternalView = "today" | "crm" | "account" | "campaigns" | "approval" | "performance";
 
@@ -92,21 +92,34 @@ export default function InternalPlatformPage() {
 
 function TodayView({ changeView, toast }: { changeView: (view: InternalView) => void; toast: (text: string) => void }) {
   const [tasks, setTasks] = useState([
-    { id: 1, account: "Dr. J Clinic", title: "ตรวจข้อมูลก่อนส่งสัญญาแบบ B", owner: "ผู้รับผิดชอบ", due: 1, status: "กำลังทำ", priority: "สูง" },
-    { id: 2, account: "LINNA", title: "ตรวจรายงานรายได้และข้อยกเว้น", owner: "ผู้รับผิดชอบ", due: 2, status: "รอตรวจ", priority: "สูง" },
-    { id: 3, account: "Modiolistics Clinic", title: "เชิญร่วมงาน CME และโทรติดตาม", owner: "ผู้รับผิดชอบ", due: 4, status: "ยังไม่เริ่ม", priority: "กลาง" },
-    { id: 4, account: "Citycare Clinic", title: "ยืนยันวันสาธิตนอกสถานที่", owner: "ผู้รับผิดชอบ", due: 5, status: "กำลังทำ", priority: "สูง" },
-    { id: 5, account: "Wholeness Way Clinic", title: "ติดตามคำเชิญทดลองเครื่อง", owner: "ผู้รับผิดชอบ", due: 6, status: "ยังไม่เริ่ม", priority: "กลาง" },
+    { id: "task-drj-contract", account: "Dr. J Clinic", title: "ตรวจข้อมูลก่อนส่งสัญญาแบบ B", owner: "ผู้รับผิดชอบ", due: 1, status: "กำลังทำ", priority: "สูง" },
+    { id: "task-linna-report", account: "LINNA", title: "ตรวจรายงานรายได้และข้อยกเว้น", owner: "ผู้รับผิดชอบ", due: 2, status: "รอตรวจ", priority: "สูง" },
+    { id: "task-cme-followup", account: "Modiolistics Clinic", title: "เชิญร่วมงาน CME และโทรติดตาม", owner: "ผู้รับผิดชอบ", due: 4, status: "ยังไม่เริ่ม", priority: "กลาง" },
+    { id: "task-citycare-demo", account: "Citycare Clinic", title: "ยืนยันวันสาธิตนอกสถานที่", owner: "ผู้รับผิดชอบ", due: 5, status: "กำลังทำ", priority: "สูง" },
+    { id: "task-wholeness-demo", account: "Wholeness Way Clinic", title: "ติดตามคำเชิญทดลองเครื่อง", owner: "ผู้รับผิดชอบ", due: 6, status: "ยังไม่เริ่ม", priority: "กลาง" },
   ]);
   const [selectedDay, setSelectedDay] = useState(1);
   const [newTask, setNewTask] = useState("");
+  const [annualTarget, setAnnualTarget] = useState(0);
+  const [sold, setSold] = useState(0);
+  const [dataState, setDataState] = useState<"loading" | "saved" | "fallback">("loading");
   const days = Array.from({ length: 31 }, (_, index) => index + 1);
-  const updateStatus = (id: number, status: string) => setTasks(tasks.map((task) => task.id === id ? { ...task, status } : task));
-  const addTask = () => { if (!newTask.trim()) return; setTasks([...tasks, { id: Date.now(), account: "งานทั่วไป", title: newTask.trim(), owner: "ผู้รับผิดชอบ", due: selectedDay, status: "ยังไม่เริ่ม", priority: "กลาง" }]); setNewTask(""); toast("เพิ่มงานลงปฏิทินแล้ว"); };
+  const remaining = Math.max(annualTarget - sold, 0);
+  useEffect(() => {
+    fetch("/api/workspace").then((response) => response.ok ? response.json() : Promise.reject()).then((payload) => {
+      if (Array.isArray(payload.tasks)) setTasks(payload.tasks.map((task: Record<string, unknown>) => ({ id: String(task.id), account: String(task.account_id || "งานทั่วไป"), title: String(task.title), owner: "ผู้รับผิดชอบ", due: Number(String(task.due_date).slice(-2)), status: String(task.status), priority: String(task.priority) })));
+      if (payload.target) { setAnnualTarget(Number(payload.target.target_value || 0)); setSold(Number(payload.target.actual_value || 0)); }
+      setDataState("saved");
+    }).catch(() => setDataState("fallback"));
+  }, []);
+  const updateStatus = async (id: string, status: string) => { setTasks(tasks.map((task) => task.id === id ? { ...task, status } : task)); const response = await fetch("/api/workspace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "update_task", id, status }) }); if (!response.ok) setDataState("fallback"); };
+  const addTask = async () => { if (!newTask.trim()) return; const title = newTask.trim(); const temporaryId = `temporary-${Date.now()}`; setTasks([...tasks, { id: temporaryId, account: "งานทั่วไป", title, owner: "ผู้รับผิดชอบ", due: selectedDay, status: "ยังไม่เริ่ม", priority: "กลาง" }]); setNewTask(""); const response = await fetch("/api/workspace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "create_task", title, dueDate: `2026-08-${String(selectedDay).padStart(2, "0")}` }) }); if (response.ok) { const payload = await response.json(); setTasks((current) => current.map((task) => task.id === temporaryId ? { ...task, id: payload.id } : task)); toast("เพิ่มและบันทึกงานแล้ว"); } else { setDataState("fallback"); toast("เพิ่มงานในหน้าจอแล้ว แต่ยังบันทึกถาวรไม่ได้"); } };
+  const saveTarget = async () => { const response = await fetch("/api/workspace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "save_target", targetValue: annualTarget, actualValue: sold }) }); if (response.ok) { setDataState("saved"); toast("บันทึกเป้าหมายแล้ว"); } else { setDataState("fallback"); toast("ยังบันทึกเป้าหมายไม่ได้"); } };
   const openTasks = tasks.filter((task) => task.status !== "เสร็จแล้ว");
   return <div className="v2-view">
     <section className="v2-user-dashboard"><div className="v2-user-identity"><i>น</i><span><small>สวัสดี</small><h2>ไนน์</h2><p>ภาพรวมสำหรับผู้บริหารการขาย · 1 ส.ค. 2569</p></span></div><div className="v2-user-focus"><small>สิ่งที่ควรดูเป็นอันดับแรก</small><b>3 Lead ต้องยืนยันขั้นตอนถัดไป</b><button onClick={() => changeView("crm")}>เปิดรายการ →</button></div></section>
-    <section className="v2-kicker-row"><div><span>CURRENT DASHBOARD</span><h2>งานและนัดหมายของไนน์</h2><p>เห็นสิ่งที่ต้องทำ สถานะ และกำหนดเวลาในหน้าเดียว</p></div><em>สิงหาคม 2569</em></section>
+    <section className="v2-kicker-row"><div><span>CURRENT DASHBOARD</span><h2>งานและนัดหมายของไนน์</h2><p>เห็นสิ่งที่ต้องทำ สถานะ และกำหนดเวลาในหน้าเดียว</p></div><em className={`data-${dataState}`}>{dataState === "saved" ? "● บันทึกในระบบแล้ว" : dataState === "loading" ? "กำลังโหลดข้อมูล" : "ข้อมูลสำรองในหน้าจอ"}</em></section>
+    <section className="v2-home-target"><header><div><span>ACTIONABLE TARGET · 2569</span><h3>เป้าหมายที่ต้องลงมือทำ</h3></div><button onClick={() => changeView("performance")}>ดูรายละเอียดทั้งหมด</button></header><div className="inputs"><label>เป้าขายทั้งปี<input type="number" min="0" value={annualTarget} onChange={(event) => setAnnualTarget(Math.max(0, Number(event.target.value) || 0))} /></label><label>ขายแล้ว<input type="number" min="0" max={annualTarget} value={sold} onChange={(event) => setSold(Math.min(annualTarget, Math.max(0, Number(event.target.value) || 0)))} /></label><article><span>ต้องขายเพิ่ม</span><strong>{remaining} เครื่อง</strong></article><article><span>นัดสาธิตที่ควรมี</span><strong>{remaining * 5} ครั้ง</strong></article><article><span>Lead ที่ผ่านเกณฑ์</span><strong>{Math.ceil((remaining * 5) / .4)} ราย</strong></article><button className="save" onClick={saveTarget}>บันทึกเป้าหมาย</button></div><footer>อัตราแปลงเป็นสมมติฐานสำหรับวางแผน จนกว่าจะมีข้อมูลจริงย้อนหลังเพียงพอ</footer></section>
     <div className="v2-today-metrics">{[[String(openTasks.length), "งานที่ยังเปิด"], [String(tasks.filter((task) => task.status === "กำลังทำ").length), "กำลังดำเนินการ"], [String(tasks.filter((task) => task.priority === "สูง" && task.status !== "เสร็จแล้ว").length), "งานสำคัญ"], [String(new Set(openTasks.map((task) => task.due)).size), "วันที่มีนัดหมาย"]].map((item) => <article key={item[1]}><strong>{item[0]}</strong><span>{item[1]}</span></article>)}</div>
     <div className="v2-todo-calendar">
       <section className="v2-panel v2-todo-list"><header><div><span>MY TO-DO LIST</span><h3>รายการงาน</h3></div><button onClick={() => changeView("crm")}>เปิดรายชื่อลูกค้า</button></header>
@@ -208,9 +221,21 @@ function ApprovalView({ toast }: { toast: (text: string) => void }) {
 }
 
 function PerformanceView() {
-  const [annualTarget, setAnnualTarget] = useState(8);
-  const [sold, setSold] = useState(3);
+  const [annualTarget, setAnnualTarget] = useState(0);
+  const [sold, setSold] = useState(0);
   const [saved, setSaved] = useState(false);
+  useEffect(() => {
+    fetch("/api/workspace").then((response) => response.ok ? response.json() : Promise.reject()).then((payload) => {
+      if (payload.target) {
+        setAnnualTarget(Number(payload.target.target_value || 0));
+        setSold(Number(payload.target.actual_value || 0));
+      }
+    }).catch(() => undefined);
+  }, []);
+  const saveGoal = async () => {
+    const response = await fetch("/api/workspace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "save_target", targetValue: annualTarget, actualValue: sold }) });
+    setSaved(response.ok);
+  };
   const remaining = Math.max(annualTarget - sold, 0);
   const monthsLeft = 5;
   const targetRevenue = annualTarget * 2150000;
@@ -231,7 +256,7 @@ function PerformanceView() {
       </div>
       <div className="v2-action-breakdown"><article><span>งานสัปดาห์นี้</span><b>สร้างผู้สนใจใหม่ {Math.ceil(newLeadsNeeded / 20)} ราย</b><small>จากกิจกรรม ออนไลน์ และการแนะนำ</small></article><article><span>งานสัปดาห์นี้</span><b>ยืนยันนัดสาธิต {Math.ceil(demosNeeded / 20)} ราย</b><small>ให้ผู้มีอำนาจเข้าร่วมอย่างน้อย 1 ราย</small></article><article><span>งานบริหาร</span><b>ทบทวน Pipeline ทุกวันจันทร์</b><small>ทุกดีลต้องมีผู้ดูแลและขั้นตอนถัดไป</small></article><article><span>จุดเตือน</span><b>Pipeline ปัจจุบันยังไม่พอ {Math.max(remaining * 2 - 5, 0)} ดีล</b><small>ต้องเติมดีลที่ผ่านเกณฑ์ก่อนเพิ่ม Forecast</small></article></div>
       <section className="v2-sales-targets"><header><div><span>SALES TARGET BY OWNER</span><h4>ข้อเสนอการแบ่งเป้าตามผู้ดูแล</h4></div><em>คำแนะนำเบื้องต้น · ไม่ใช่เป้าที่อนุมัติแล้ว</em></header>{[["ผู้รับผิดชอบ", sunaiTarget], ["ผู้รับผิดชอบ", oiTarget], ["ผู้รับผิดชอบ", topTarget]].map((item) => <article key={item[0]}><i>{String(item[0]).slice(0, 1)}</i><span><b>{item[0]}</b><small>ต้องมีนัดสาธิตประมาณ {Number(item[1]) * 5} ครั้ง</small></span><strong>{item[1]} เครื่อง</strong></article>)}</section>
-      <footer><span>สมมติฐาน: ผู้สนใจใหม่ 50% ผ่านเกณฑ์ · 40% ได้นัดสาธิต · สาธิต 20% ปิดการขาย</span><button onClick={() => setSaved(true)}>{saved ? "✓ บันทึกแล้ว" : "บันทึกเป็นเป้าหมายทีม"}</button></footer>
+      <footer><span>สมมติฐาน: ผู้สนใจใหม่ 50% ผ่านเกณฑ์ · 40% ได้นัดสาธิต · สาธิต 20% ปิดการขาย</span><button onClick={saveGoal}>{saved ? "✓ บันทึกแล้ว" : "บันทึกเป็นเป้าหมายทีม"}</button></footer>
     </section>
     <div className="v2-metrics">{[["฿8.9M", "รายได้ถ่วงน้ำหนัก", "Pipeline ฿21.4M"], ["42%", "กำไรขั้นต้น", "หลังค่าตอบแทนและบริการ"], ["฿3.2M", "รายได้แบ่งรายได้ต่อปี", "แบบ C, D และ D2"], ["฿326K", "ประมาณการค่าตอบแทน", "รออนุมัติ 4 รายการ"]].map((item, index) => <article key={item[1]}><i>0{index + 1}</i><strong>{item[0]}</strong><span>{item[1]}</span><small>{item[2]}</small></article>)}</div>
     <div className="v2-split"><section className="v2-panel v2-pnl"><header><div><span>FORECAST P&L</span><h3>ประมาณการ 12 เดือน</h3></div></header>{[["รายได้ขายเครื่อง", "฿12,900,000"], ["รายได้แบ่งรายได้", "฿3,240,000"], ["ต้นทุนและการส่งมอบ", "(฿8,020,000)"], ["ค่าตอบแทน", "(฿326,000)"], ["Training/Service", "(฿740,000)"], ["กำไรประมาณการ", "฿7,054,000"]].map((item, index) => <p className={index === 5 ? "total" : ""} key={item[0]}><span>{item[0]}</span><strong>{item[1]}</strong></p>)}</section><section className="v2-panel v2-quality"><header><div><span>SYSTEM QUALITY</span><h3>สิ่งที่ต้องแก้ก่อนใช้จริง</h3></div><em>3 รายการ</em></header>{[["สูง", "สูตร Lead Score ใน Airtable ขึ้น Error"], ["สูง", "Dr. J ยังไม่มีข้อมูลนิติบุคคล"], ["กลาง", "LINNA ยังไม่มี Serial Number"]].map((item) => <article key={item[1]}><b>{item[0]}</b><span>{item[1]}</span><em>เปิดรายการ</em></article>)}</section></div>

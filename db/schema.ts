@@ -184,3 +184,54 @@ export const protocolRecords = sqliteTable("protocol_records", {
   status: text("status").notNull().default("Draft"),
   version: integer("version").notNull().default(1),
 });
+
+export const workspaceTasks = sqliteTable("workspace_tasks", {
+  id: text("id").primaryKey(),
+  ownerUserId: text("owner_user_id").notNull(),
+  accountId: text("account_id").notNull().default(""),
+  leadId: text("lead_id").notNull().default(""),
+  sourceId: text("source_id").notNull().default(""),
+  title: text("title").notNull(),
+  status: text("status").notNull().default("ยังไม่เริ่ม"),
+  priority: text("priority").notNull().default("กลาง"),
+  dueDate: text("due_date").notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const salesTargets = sqliteTable("sales_targets", {
+  id: text("id").primaryKey(),
+  ownerUserId: text("owner_user_id").notNull(),
+  periodKey: text("period_key").notNull(),
+  metricCode: text("metric_code").notNull(),
+  targetValue: integer("target_value").notNull().default(0),
+  actualValue: integer("actual_value").notNull().default(0),
+  status: text("status").notNull().default("Draft"),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const leadSources = sqliteTable("lead_sources", {
+  id: text("id").primaryKey(),
+  sourceType: text("source_type").notNull(),
+  name: text("name").notNull(),
+  ownerUserId: text("owner_user_id").notNull(),
+  startDate: text("start_date").notNull().default(""),
+  endDate: text("end_date").notNull().default(""),
+  budget: integer("budget").notNull().default(0),
+  status: text("status").notNull().default("Active"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const crmLeads = sqliteTable("crm_leads", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull().default(""),
+  contactId: text("contact_id").notNull().default(""),
+  sourceId: text("source_id").notNull(),
+  ownerUserId: text("owner_user_id").notNull(),
+  status: text("status").notNull(),
+  score: integer("score").notNull().default(0),
+  nextAction: text("next_action").notNull().default(""),
+  nextActionAt: text("next_action_at").notNull().default(""),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});

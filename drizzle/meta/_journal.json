@@ -15,6 +15,13 @@
       "when": 1784951682504,
       "tag": "0001_slippery_madrox",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1785567137733,
+      "tag": "0002_wooden_mordo",
+      "breakpoints": true
     }
   ]
 }
