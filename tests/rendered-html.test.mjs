@@ -6,6 +6,9 @@ const pageUrl = new URL("../app/page.tsx", import.meta.url);
 const routeUrl = new URL("../app/api/reviews/route.ts", import.meta.url);
 const cssUrl = new URL("../app/globals.css", import.meta.url);
 const hostingUrl = new URL("../.openai/hosting.json", import.meta.url);
+const identityUrl = new URL("../lib/server-identity.ts", import.meta.url);
+const workspaceUrl = new URL("../app/api/workspace/route.ts", import.meta.url);
+const demoUrl = new URL("../app/api/public/demo-request/route.ts", import.meta.url);
 
 test("ships the controlled review workflow", async () => {
   const [page, route] = await Promise.all([
@@ -33,4 +36,21 @@ test("uses BIB CI and durable storage", async () => {
   assert.match(css, /font-family:\s*"Muli"/);
   assert.match(css, /--canvas:\s*#f6f3ee/);
   assert.equal(JSON.parse(hosting).d1, "DB");
+});
+
+test("enforces server-side identity and tenant-scoped CRM", async () => {
+  const [identity, reviews, workspace, demo] = await Promise.all([
+    readFile(identityUrl, "utf8"),
+    readFile(routeUrl, "utf8"),
+    readFile(workspaceUrl, "utf8"),
+    readFile(demoUrl, "utf8"),
+  ]);
+  assert.match(identity, /oai-authenticated-user-email/);
+  assert.match(identity, /tenant_memberships/);
+  assert.doesNotMatch(reviews, /x-bib-role/);
+  assert.doesNotMatch(reviews, /requestedRole/);
+  assert.match(workspace, /crm_opportunities/);
+  assert.match(workspace, /WHERE l\.tenant_id = \?/);
+  assert.match(demo, /INSERT INTO demo_appointments/);
+  assert.match(demo, /INSERT INTO workspace_tasks/);
 });

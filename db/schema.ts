@@ -19,6 +19,7 @@ export const reviewDocuments = sqliteTable(
   "review_documents",
   {
     id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull().default("bib"),
     account: text("account").notNull(),
     title: text("title").notNull(),
     model: text("model").notNull(),
@@ -36,6 +37,7 @@ export const reviewDocuments = sqliteTable(
 
 export const reviewComments = sqliteTable("review_comments", {
   id: integer("id").primaryKey({ autoIncrement: true }),
+  tenantId: text("tenant_id").notNull().default("bib"),
   documentId: text("document_id").notNull(),
   authorEmail: text("author_email").notNull(),
   authorLabel: text("author_label").notNull(),
@@ -47,6 +49,7 @@ export const reviewComments = sqliteTable("review_comments", {
 
 export const reviewDecisions = sqliteTable("review_decisions", {
   id: integer("id").primaryKey({ autoIncrement: true }),
+  tenantId: text("tenant_id").notNull().default("bib"),
   documentId: text("document_id").notNull(),
   version: text("version").notNull(),
   actorEmail: text("actor_email").notNull(),
@@ -58,6 +61,7 @@ export const reviewDecisions = sqliteTable("review_decisions", {
 
 export const approvalRecords = sqliteTable("approval_records", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   documentId: text("document_id").notNull(),
   documentVersion: text("document_version").notNull(),
   versionHash: text("version_hash").notNull(),
@@ -70,6 +74,7 @@ export const approvalRecords = sqliteTable("approval_records", {
 
 export const auditEvents = sqliteTable("audit_events", {
   id: integer("id").primaryKey({ autoIncrement: true }),
+  tenantId: text("tenant_id").notNull().default("bib"),
   documentId: text("document_id").notNull(),
   actorEmail: text("actor_email").notNull(),
   actorRole: text("actor_role").notNull(),
@@ -80,6 +85,7 @@ export const auditEvents = sqliteTable("audit_events", {
 
 export const partnerMonthlyReports = sqliteTable("partner_monthly_reports", {
   id: integer("id").primaryKey({ autoIncrement: true }),
+  tenantId: text("tenant_id").notNull().default("bib"),
   accountId: text("account_id").notNull(),
   reportMonth: text("report_month").notNull(),
   paidSessions: integer("paid_sessions").notNull().default(0),
@@ -98,9 +104,11 @@ export const partnerMonthlyReports = sqliteTable("partner_monthly_reports", {
 
 export const clientAccounts = sqliteTable("client_accounts", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   legalName: text("legal_name").notNull(),
   displayName: text("display_name").notNull(),
   businessSegment: text("business_segment").notNull(),
+  province: text("province").notNull().default(""),
   commercialModel: text("commercial_model").notNull(),
   accountStatus: text("account_status").notNull().default("Active"),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
@@ -108,6 +116,7 @@ export const clientAccounts = sqliteTable("client_accounts", {
 
 export const clientContacts = sqliteTable("client_contacts", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   accountId: text("account_id").notNull(),
   email: text("email").notNull(),
   displayName: text("display_name").notNull(),
@@ -118,6 +127,7 @@ export const clientContacts = sqliteTable("client_contacts", {
 
 export const deviceDeployments = sqliteTable("device_deployments", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   accountId: text("account_id").notNull(),
   model: text("model").notNull(),
   serialNumber: text("serial_number").notNull().default(""),
@@ -128,6 +138,7 @@ export const deviceDeployments = sqliteTable("device_deployments", {
 
 export const warranties = sqliteTable("warranties", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   deploymentId: text("deployment_id").notNull(),
   startsAt: text("starts_at").notNull(),
   endsAt: text("ends_at").notNull(),
@@ -137,6 +148,7 @@ export const warranties = sqliteTable("warranties", {
 
 export const trainingRecords = sqliteTable("training_records", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   accountId: text("account_id").notNull(),
   contactId: text("contact_id").notNull(),
   courseCode: text("course_code").notNull(),
@@ -147,6 +159,7 @@ export const trainingRecords = sqliteTable("training_records", {
 
 export const serviceEvents = sqliteTable("service_events", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   deploymentId: text("deployment_id").notNull(),
   eventType: text("event_type").notNull(),
   status: text("status").notNull(),
@@ -157,6 +170,7 @@ export const serviceEvents = sqliteTable("service_events", {
 
 export const customerOrders = sqliteTable("customer_orders", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   accountId: text("account_id").notNull(),
   orderType: text("order_type").notNull(),
   status: text("status").notNull(),
@@ -167,6 +181,7 @@ export const customerOrders = sqliteTable("customer_orders", {
 
 export const knowledgeEntitlements = sqliteTable("knowledge_entitlements", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   accountId: text("account_id").notNull(),
   commercialModel: text("commercial_model").notNull(),
   resourceCode: text("resource_code").notNull(),
@@ -175,6 +190,7 @@ export const knowledgeEntitlements = sqliteTable("knowledge_entitlements", {
 
 export const treatmentMenus = sqliteTable("treatment_menus", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   accountId: text("account_id").notNull(),
   serviceName: text("service_name").notNull(),
   durationMinutes: integer("duration_minutes").notNull(),
@@ -187,6 +203,7 @@ export const treatmentMenus = sqliteTable("treatment_menus", {
 
 export const protocolRecords = sqliteTable("protocol_records", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   accountId: text("account_id").notNull(),
   approvedProtocolCode: text("approved_protocol_code").notNull(),
   preparationText: text("preparation_text").notNull().default(""),
@@ -199,6 +216,7 @@ export const protocolRecords = sqliteTable("protocol_records", {
 
 export const workspaceTasks = sqliteTable("workspace_tasks", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   ownerUserId: text("owner_user_id").notNull(),
   accountId: text("account_id").notNull().default(""),
   leadId: text("lead_id").notNull().default(""),
@@ -213,6 +231,7 @@ export const workspaceTasks = sqliteTable("workspace_tasks", {
 
 export const salesTargets = sqliteTable("sales_targets", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   ownerUserId: text("owner_user_id").notNull(),
   periodKey: text("period_key").notNull(),
   metricCode: text("metric_code").notNull(),
@@ -224,6 +243,7 @@ export const salesTargets = sqliteTable("sales_targets", {
 
 export const leadSources = sqliteTable("lead_sources", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   sourceType: text("source_type").notNull(),
   name: text("name").notNull(),
   ownerUserId: text("owner_user_id").notNull(),
@@ -236,12 +256,16 @@ export const leadSources = sqliteTable("lead_sources", {
 
 export const crmLeads = sqliteTable("crm_leads", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   accountId: text("account_id").notNull().default(""),
   contactId: text("contact_id").notNull().default(""),
   sourceId: text("source_id").notNull(),
   ownerUserId: text("owner_user_id").notNull(),
   status: text("status").notNull(),
   score: integer("score").notNull().default(0),
+  temperature: text("temperature").notNull().default("Cold"),
+  evidenceJson: text("evidence_json").notNull().default("[]"),
+  lastContactAt: text("last_contact_at").notNull().default(""),
   nextAction: text("next_action").notNull().default(""),
   nextActionAt: text("next_action_at").notNull().default(""),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
@@ -250,6 +274,7 @@ export const crmLeads = sqliteTable("crm_leads", {
 
 export const partnerPerformanceSnapshots = sqliteTable("partner_performance_snapshots", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   accountId: text("account_id").notNull(),
   reportMonth: text("report_month").notNull(),
   reportedPaidSessions: integer("reported_paid_sessions").notNull().default(0),
@@ -272,6 +297,7 @@ export const partnerPerformanceSnapshots = sqliteTable("partner_performance_snap
 
 export const sourceImports = sqliteTable("source_imports", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   sourceFileId: text("source_file_id").notNull(),
   fileName: text("file_name").notNull(),
   sourceModifiedAt: text("source_modified_at").notNull(),
@@ -281,6 +307,7 @@ export const sourceImports = sqliteTable("source_imports", {
 
 export const companyTeamDirectory = sqliteTable("company_team_directory", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   displayName: text("display_name").notNull(),
   responsibility: text("responsibility").notNull(),
   email: text("email").notNull().default(""),
@@ -290,6 +317,7 @@ export const companyTeamDirectory = sqliteTable("company_team_directory", {
 
 export const kpiEventRecords = sqliteTable("kpi_event_records", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   periodKey: text("period_key").notNull(),
   name: text("name").notNull(),
   activityType: text("activity_type").notNull(),
@@ -308,6 +336,7 @@ export const kpiEventRecords = sqliteTable("kpi_event_records", {
 
 export const trainingActivityRecords = sqliteTable("training_activity_records", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   activityDate: text("activity_date").notNull().default(""),
   projectName: text("project_name").notNull(),
   targetSegment: text("target_segment").notNull().default(""),
@@ -324,6 +353,7 @@ export const trainingActivityRecords = sqliteTable("training_activity_records", 
 
 export const afterSalesActivityRecords = sqliteTable("after_sales_activity_records", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   clientName: text("client_name").notNull(),
   activityDate: text("activity_date").notNull().default(""),
   activity: text("activity").notNull(),
@@ -335,6 +365,7 @@ export const afterSalesActivityRecords = sqliteTable("after_sales_activity_recor
 
 export const businessIssues = sqliteTable("business_issues", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
   title: text("title").notNull(),
   details: text("details").notNull().default(""),
   dueDate: text("due_date").notNull().default(""),
@@ -348,6 +379,75 @@ export const tenantCompanies = sqliteTable("tenant_companies", {
   brandCode: text("brand_code").notNull(),
   status: text("status").notNull().default("Active"),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const tenantMemberships = sqliteTable(
+  "tenant_memberships",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    userEmail: text("user_email").notNull(),
+    displayName: text("display_name").notNull(),
+    role: text("role").notNull(),
+    accountScope: text("account_scope").notNull().default("*"),
+    active: integer("active", { mode: "boolean" }).notNull().default(true),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => [uniqueIndex("tenant_memberships_tenant_email_idx").on(table.tenantId, table.userEmail)],
+);
+
+export const crmOpportunities = sqliteTable("crm_opportunities", {
+  id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
+  accountId: text("account_id").notNull(),
+  primaryContactId: text("primary_contact_id").notNull().default(""),
+  ownerUserId: text("owner_user_id").notNull(),
+  name: text("name").notNull(),
+  stage: text("stage").notNull(),
+  commercialModel: text("commercial_model").notNull().default(""),
+  expectedValueSatang: integer("expected_value_satang").notNull().default(0),
+  probabilityBps: integer("probability_bps").notNull().default(0),
+  expectedCloseDate: text("expected_close_date").notNull().default(""),
+  nextAction: text("next_action").notNull().default(""),
+  nextActionAt: text("next_action_at").notNull().default(""),
+  riskNote: text("risk_note").notNull().default(""),
+  status: text("status").notNull().default("Open"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const crmActivities = sqliteTable("crm_activities", {
+  id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
+  accountId: text("account_id").notNull().default(""),
+  contactId: text("contact_id").notNull().default(""),
+  leadId: text("lead_id").notNull().default(""),
+  opportunityId: text("opportunity_id").notNull().default(""),
+  activityType: text("activity_type").notNull(),
+  channel: text("channel").notNull().default(""),
+  summary: text("summary").notNull(),
+  outcome: text("outcome").notNull().default(""),
+  occurredAt: text("occurred_at").notNull(),
+  ownerUserId: text("owner_user_id").notNull(),
+  sourceRecordId: text("source_record_id").notNull().default(""),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const demoAppointments = sqliteTable("demo_appointments", {
+  id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull().default("bib"),
+  leadId: text("lead_id").notNull(),
+  opportunityId: text("opportunity_id").notNull().default(""),
+  locationType: text("location_type").notNull(),
+  siteId: text("site_id").notNull().default(""),
+  scheduledAt: text("scheduled_at").notNull().default(""),
+  decisionMakerAttending: integer("decision_maker_attending", { mode: "boolean" }).notNull().default(false),
+  qualificationScore: integer("qualification_score").notNull().default(0),
+  approvalStatus: text("approval_status").notNull().default("Pending"),
+  status: text("status").notNull().default("Requested"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const moduleDefinitions = sqliteTable("module_definitions", {

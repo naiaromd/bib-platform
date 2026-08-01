@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
+import { accessErrorResponse, type AppRole, requireRequestActor } from "@/lib/server-identity";
 
-type Role = "Executive" | "Finance" | "Legal" | "Sales" | "Customer";
 type DocumentId = "linna" | "drj" | "memo";
 
 const documents = [
@@ -9,7 +9,7 @@ const documents = [
   ["memo", "BIB Internal", "Commission Policy Memo", "Model A–D2", "v2.0", "Executive approval", "Policy change", "Sunai · Policy owner", 0, "Pending", "sha256:6661add482e1ec0dad92b3013b5d127b7bddac226f22cdabf3f545a6a05a81d6"],
 ] as const;
 
-const actionRoles: Record<DocumentId, Record<string, Role[]>> = {
+const actionRoles: Record<DocumentId, Record<string, AppRole[]>> = {
   linna: {
     "Changes requested": ["Executive", "Finance", "Legal", "Sales", "Customer"],
     Conditional: ["Executive", "Finance", "Legal"],
@@ -131,26 +131,24 @@ async function initialize() {
   }
 }
 
-function actor(request: Request, requestedRole?: Role) {
-  const email = request.headers.get("oai-authenticated-user-email") || "local-demo@bib.local";
-  const productionRole = request.headers.get("x-bib-role") as Role | null;
-  const role = productionRole || requestedRole || "Executive";
-  return { email, role };
-}
-
 export async function GET(request: Request) {
   try {
     await initialize();
-    const url = new URL(request.url);
-    const requestedRole = (url.searchParams.get("role") || "Executive") as Role;
-    const currentActor = actor(request, requestedRole);
+    const currentActor = await requireRequestActor(request);
     const d1 = db();
-    const docs = await d1.prepare("SELECT * FROM review_documents ORDER BY id").all();
-    const comments = await d1.prepare("SELECT * FROM review_comments ORDER BY id").all();
-    const audits = await d1.prepare("SELECT * FROM audit_events ORDER BY id DESC LIMIT 100").all();
-    const approvals = await d1.prepare("SELECT * FROM approval_records ORDER BY created_at DESC LIMIT 100").all();
+    const customerScope = currentActor.role === "Customer" ? currentActor.accountScope : "*";
+    const docs = await d1.prepare(`SELECT * FROM review_documents WHERE tenant_id = ?
+      AND (? = '*' OR (id = ? AND customer_visible = 1)) ORDER BY id`)
+      .bind(currentActor.tenantId, customerScope, customerScope).all();
+    const comments = await d1.prepare(`SELECT * FROM review_comments WHERE tenant_id = ?
+      AND (? = '*' OR (document_id = ? AND visibility = 'Customer-visible')) ORDER BY id`)
+      .bind(currentActor.tenantId, customerScope, customerScope).all();
+    const audits = currentActor.role === "Customer" ? { results: [] } : await d1.prepare("SELECT * FROM audit_events WHERE tenant_id = ? ORDER BY id DESC LIMIT 100").bind(currentActor.tenantId).all();
+    const approvals = currentActor.role === "Customer" ? { results: [] } : await d1.prepare("SELECT * FROM approval_records WHERE tenant_id = ? ORDER BY created_at DESC LIMIT 100").bind(currentActor.tenantId).all();
     return Response.json({ actor: currentActor, documents: docs.results, comments: comments.results, approvals: approvals.results, audits: audits.results });
   } catch (error) {
+    const accessResponse = accessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     return Response.json({ error: error instanceof Error ? error.message : "Unable to load reviews" }, { status: 500 });
   }
 }
@@ -161,7 +159,6 @@ export async function POST(request: Request) {
     const payload = await request.json() as {
       type?: "comment" | "decision" | "monthly_report";
       documentId?: DocumentId;
-      role?: Role;
       body?: string;
       visibility?: "Internal" | "Customer-visible";
       decision?: string;
@@ -180,7 +177,10 @@ export async function POST(request: Request) {
     if (!payload.documentId || !["linna", "drj", "memo"].includes(payload.documentId)) {
       return Response.json({ error: "Valid documentId is required" }, { status: 400 });
     }
-    const currentActor = actor(request, payload.role);
+    const currentActor = await requireRequestActor(request);
+    if (currentActor.role === "Customer" && (currentActor.accountScope !== payload.documentId || payload.documentId === "memo")) {
+      return Response.json({ error: "ไม่มีสิทธิ์เข้าถึงเอกสารนี้" }, { status: 403 });
+    }
     const d1 = db();
     if (payload.type === "monthly_report") {
       if (currentActor.role !== "Customer" || payload.documentId !== "linna") {
@@ -203,7 +203,7 @@ export async function POST(request: Request) {
          gross_revenue, approved_refunds, approved_marketing, opening_hours, closing_hours,
          consumable_note, submitted_by)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
-          "linna", payload.reportMonth, ...values, payload.consumableNote || "", currentActor.email
+          currentActor.accountScope, payload.reportMonth, ...values, payload.consumableNote || "", currentActor.email
         ).run();
       await d1.prepare(`INSERT INTO audit_events
         (document_id, actor_email, actor_role, event_type, event_data)
@@ -257,6 +257,8 @@ export async function POST(request: Request) {
     }
     return Response.json({ error: "Unsupported action" }, { status: 400 });
   } catch (error) {
+    const accessResponse = accessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     return Response.json({ error: error instanceof Error ? error.message : "Unable to save review" }, { status: 500 });
   }
 }

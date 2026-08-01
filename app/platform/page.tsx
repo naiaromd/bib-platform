@@ -15,14 +15,28 @@ const workspaces: Array<[InternalView, string, string, string]> = [
   ["settings", "08", "ตั้งค่าพื้นที่ BIB", "ช่องข้อมูล เอกสาร งาน และขั้นอนุมัติ"],
 ];
 
-const leads = [
-  { name: "โรงพยาบาลกรุงเทพ เชียงใหม่", status: "นัดสาธิต", score: 75, next: "ส่ง Term Sheet แบบ A", due: "วันนี้", owner: "ผู้รับผิดชอบ", segment: "โรงพยาบาล", model: "A", contact: "ฝ่ายจัดซื้อและทีมแพทย์", role: "ผู้ประเมินโครงการ", city: "เชียงใหม่", source: "การติดต่อโดยตรง", sourceId: "SRC-DIRECT", lastContact: "31 ก.ค. 2569", evidence: ["ยืนยันนิติบุคคล", "ประชุมเบื้องต้น", "ผู้มีอำนาจร่วมสาธิต"], risk: "ต้องยืนยันงบประมาณและรอบจัดซื้อ" },
-  { name: "Dr. J Clinic", status: "ตรวจสัญญา", score: 60, next: "ขอข้อมูลยืนยันตัวตน", due: "วันนี้", owner: "ผู้รับผิดชอบ", segment: "คลินิกความงาม", model: "B", contact: "Dr. J", role: "แพทย์และผู้ตัดสินใจ", city: "กรุงเทพฯ", source: "การแนะนำ", sourceId: "SRC-REFERRAL", lastContact: "31 ก.ค. 2569", evidence: ["แพทย์เป็นผู้ตัดสินใจ", "ขอเอกสารสัญญา", "แจ้งสถานที่ติดตั้งแล้ว"], risk: "ทำสัญญาในนามบุคคล ต้องตรวจรายได้และเครดิต" },
-  { name: "Modiolistics Clinic", status: "ติดต่อแล้ว", score: 35, next: "เชิญร่วมงาน CME และโทรติดตาม", due: "4 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "คลินิกความงาม", model: "ยังไม่เลือก", contact: "ผู้รับผิดชอบ", role: "แพทย์", city: "กรุงเทพฯ", source: "CME Evidence Outreach", sourceId: "CMP-2608-01", lastContact: "10 ส.ค. 2568", evidence: ["ยืนยันสถานประกอบการ", "มีข้อมูลผู้ติดต่อ", "ติดต่อแล้ว"], risk: "ยังไม่มีการยืนยันนัดสาธิต" },
-  { name: "Citycare Clinic", status: "สนใจสาธิต", score: 70, next: "ยืนยันวันสาธิตนอกสถานที่", due: "5 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "คลินิก", model: "ยังไม่เลือก", contact: "ผู้รับผิดชอบ", role: "ผู้ประสานงาน", city: "ภูเก็ต", source: "Phuket Demo Roadshow 2026", sourceId: "EVT-2605-01", lastContact: "พ.ค. 2569", evidence: ["ตอบรับการสาธิต", "แจ้งช่วงวันที่สะดวก", "มีกรณีใช้งานที่ต้องการทดลอง"], risk: "ต้องยืนยันว่าผู้มีอำนาจเข้าร่วม" },
-  { name: "LINNA Clinic", status: "ลูกค้าที่ใช้งาน", score: 100, next: "ตรวจรายงานรายได้", due: "2 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "เวลเนส", model: "D2", contact: "ผู้จัดการ LINNA", role: "ผู้ดูแลบัญชี", city: "กรุงเทพฯ", source: "ลูกค้าปัจจุบัน", sourceId: "SRC-CUSTOMER", lastContact: "31 ก.ค. 2569", evidence: ["ลงนามสัญญาแล้ว", "ติดตั้งและฝึกอบรมแล้ว", "ส่งรายงานรายได้"], risk: "ยอดวันที่ 29 พ.ค. ไม่ตรงกับรายงานสรุป" },
-  { name: "Wholeness Way Clinic", status: "ขอนัดทดลอง", score: 50, next: "ติดตามคำเชิญทดลองเครื่อง", due: "6 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "กายภาพบำบัด", model: "ยังไม่เลือก", contact: "ผู้รับผิดชอบ", role: "ผู้ประสานงาน", city: "กรุงเทพฯ", source: "ค้นหารายชื่อโดยทีมขาย", sourceId: "SRC-OUTBOUND", lastContact: "6 ส.ค. 2568", evidence: ["ขอข้อมูลเพิ่มเติม", "แจ้งผู้รับผิดชอบ", "ส่งอีเมลแล้ว"], risk: "ยังไม่ยืนยันผู้มีอำนาจและวันสาธิต" },
-];
+type LeadRecord = {
+  id: string; accountId: string; name: string; status: string; score: number; temperature: string;
+  next: string; nextActionAt: string; due: string; owner: string; segment: string; model: string;
+  contact: string; role: string; city: string; source: string; sourceId: string;
+  lastContactAt: string; lastContact: string; evidence: string[]; risk: string; stage: string;
+  opportunityId: string; expectedValueSatang: number; probabilityBps: number;
+};
+
+const emptyLead: LeadRecord = {
+  id: "", accountId: "", name: "ยังไม่ได้เลือกลูกค้า", status: "รอข้อมูล", score: 0, temperature: "Cold",
+  next: "ยังไม่มีขั้นตอนถัดไป", nextActionAt: "", due: "ยังไม่กำหนด", owner: "ยังไม่ระบุ", segment: "ยังไม่ระบุ",
+  model: "ยังไม่เลือก", contact: "ยังไม่มีผู้ติดต่อ", role: "ยังไม่ระบุ", city: "ยังไม่ระบุ",
+  source: "ยังไม่ระบุ", sourceId: "", lastContactAt: "", lastContact: "ยังไม่มีข้อมูล", evidence: [],
+  risk: "ยังไม่มีข้อมูล", stage: "Lead", opportunityId: "", expectedValueSatang: 0, probabilityBps: 0,
+};
+
+function formatThaiDate(value: string) {
+  if (!value) return "ยังไม่กำหนด";
+  const date = new Date(`${value.slice(0, 10)}T00:00:00+07:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "short", year: "numeric" }).format(date);
+}
 
 function BrandHeader({ area }: { area: string }) {
   return (
@@ -45,19 +59,44 @@ function BrandHeader({ area }: { area: string }) {
 
 export default function InternalPlatformPage() {
   const [view, setView] = useState<InternalView>("today");
-  const [selectedAccount, setSelectedAccount] = useState(leads[0]);
+  const [leads, setLeads] = useState<LeadRecord[]>([]);
+  const [selectedAccount, setSelectedAccount] = useState<LeadRecord>(emptyLead);
+  const [currentUser, setCurrentUser] = useState({ displayName: "กำลังโหลด", role: "" });
   const [query, setQuery] = useState("");
   const [notice, setNotice] = useState("");
   const toast = (text: string) => {
     setNotice(text);
     window.setTimeout(() => setNotice(""), 2200);
   };
+  const roleViews: Record<string, InternalView[]> = {
+    Executive: ["today", "crm", "account", "customers", "campaigns", "operations", "approval", "performance", "settings"],
+    Finance: ["today", "customers", "approval", "performance"],
+    Legal: ["today", "approval"],
+    Sales: ["today", "crm", "account", "customers", "campaigns", "approval"],
+    Trainer: ["today", "customers", "operations"],
+    Marketing: ["today", "crm", "account", "campaigns"],
+    "After Sales": ["today", "customers", "operations"],
+  };
+  const visibleWorkspaces = workspaces.filter(([id]) => !currentUser.role || (roleViews[currentUser.role] || ["today"]).includes(id));
+  useEffect(() => {
+    fetch("/api/workspace", { cache: "no-store" }).then((response) => response.ok ? response.json() : Promise.reject())
+      .then((payload) => {
+        const records = (Array.isArray(payload.leads) ? payload.leads : []).map((lead: Record<string, unknown>) => ({
+          ...lead,
+          due: formatThaiDate(String(lead.nextActionAt || "")),
+          lastContact: formatThaiDate(String(lead.lastContactAt || "")),
+        })) as LeadRecord[];
+        setLeads(records);
+        if (records.length) setSelectedAccount(records[0]);
+        if (payload.user) setCurrentUser({ displayName: String(payload.user.displayName || payload.user.email), role: String(payload.user.role || "") });
+      }).catch(() => toast("ยังโหลดข้อมูล CRM ไม่สำเร็จ"));
+  }, []);
   const visibleLeads = leads.filter((lead) => Object.values(lead).flat().join(" ").toLowerCase().includes(query.toLowerCase()));
-  const openAccount = (account: typeof leads[number]) => { setSelectedAccount(account); setView("account"); };
+  const openAccount = (account: LeadRecord) => { if (!account.id) return; setSelectedAccount(account); setView("account"); };
 
   return (
     <main className="v2-shell">
-      <BrandHeader area="ไนน์ · ผู้บริหารการขาย" />
+      <BrandHeader area={`${currentUser.displayName}${currentUser.role ? ` · ${currentUser.role}` : ""}`} />
 
       <section className="v2-layout">
         <aside className="v2-job-nav">
@@ -65,7 +104,7 @@ export default function InternalPlatformPage() {
           <h2>พื้นที่ทำงาน</h2>
           <p>แสดงเฉพาะงานตามหน้าที่และสิทธิ์</p>
           <nav>
-            {workspaces.map(([id, no, title, text]) => (
+            {visibleWorkspaces.map(([id, no, title, text]) => (
               <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}>
                 <i>{no}</i><span><b>{title}</b><small>{text}</small></span><em>↗</em>
               </button>
@@ -76,15 +115,15 @@ export default function InternalPlatformPage() {
 
         <div className="v2-work">
           <header className="v2-work-head">
-            <div><span>BIB INTERNAL WORKSPACE</span><h2>{workspaces.find(([id]) => id === view)?.[2]}</h2></div>
+            <div><span>BIB INTERNAL WORKSPACE</span><h2>{visibleWorkspaces.find(([id]) => id === view)?.[2] || "พื้นที่ทำงาน"}</h2></div>
             <label><i>⌕</i><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ค้นหาลูกค้า งาน หรือเอกสาร" /></label>
             <button onClick={() => toast("เปิดแบบฟอร์มสร้างรายการใหม่แล้ว")}>＋ สร้างรายการ</button>
           </header>
-          {view === "today" && <TodayView changeView={setView} toast={toast} />}
+          {view === "today" && <TodayView changeView={setView} toast={toast} user={currentUser} />}
           {view === "crm" && <CrmView leads={visibleLeads} toast={toast} openAccount={openAccount} />}
           {view === "customers" && <CustomersView />}
           {view === "account" && <AccountView account={selectedAccount} back={() => setView("crm")} openSource={() => setView("campaigns")} toast={toast} />}
-          {view === "campaigns" && <CampaignView toast={toast} openAccount={openAccount} />}
+          {view === "campaigns" && <CampaignView leads={leads} toast={toast} openAccount={openAccount} />}
           {view === "operations" && <OperationsView />}
           {view === "approval" && <ApprovalView toast={toast} />}
           {view === "performance" && <PerformanceView />}
@@ -132,19 +171,16 @@ function CustomersView() {
   </div>;
 }
 
-function TodayView({ changeView, toast }: { changeView: (view: InternalView) => void; toast: (text: string) => void }) {
-  const [tasks, setTasks] = useState([
-    { id: "task-drj-contract", account: "Dr. J Clinic", title: "ตรวจข้อมูลก่อนส่งสัญญาแบบ B", owner: "ผู้รับผิดชอบ", due: 1, status: "กำลังทำ", priority: "สูง" },
-    { id: "task-linna-report", account: "LINNA", title: "ตรวจรายงานรายได้และข้อยกเว้น", owner: "ผู้รับผิดชอบ", due: 2, status: "รอตรวจ", priority: "สูง" },
-    { id: "task-cme-followup", account: "Modiolistics Clinic", title: "เชิญร่วมงาน CME และโทรติดตาม", owner: "ผู้รับผิดชอบ", due: 4, status: "ยังไม่เริ่ม", priority: "กลาง" },
-    { id: "task-citycare-demo", account: "Citycare Clinic", title: "ยืนยันวันสาธิตนอกสถานที่", owner: "ผู้รับผิดชอบ", due: 5, status: "กำลังทำ", priority: "สูง" },
-    { id: "task-wholeness-demo", account: "Wholeness Way Clinic", title: "ติดตามคำเชิญทดลองเครื่อง", owner: "ผู้รับผิดชอบ", due: 6, status: "ยังไม่เริ่ม", priority: "กลาง" },
-  ]);
+function TodayView({ changeView, toast, user }: { changeView: (view: InternalView) => void; toast: (text: string) => void; user: { displayName: string; role: string } }) {
+  const [tasks, setTasks] = useState<Array<{ id: string; account: string; title: string; owner: string; due: number; status: string; priority: string }>>([]);
   const [selectedDay, setSelectedDay] = useState(1);
   const [newTask, setNewTask] = useState("");
   const [annualTarget, setAnnualTarget] = useState(0);
   const [sold, setSold] = useState(0);
   const [importedCounts, setImportedCounts] = useState({ events: 0, training: 0, afterSales: 0, openService: 0 });
+  const [leadFollowUps, setLeadFollowUps] = useState(0);
+  const [pipelineRows, setPipelineRows] = useState<Array<{ stage: string; total: number; valueSatang: number }>>([]);
+  const [sourceHighlights, setSourceHighlights] = useState<Array<{ name: string; leads: number; status: string }>>([]);
   const [dataState, setDataState] = useState<"loading" | "saved" | "fallback">("loading");
   const days = Array.from({ length: 31 }, (_, index) => index + 1);
   const remaining = Math.max(annualTarget - sold, 0);
@@ -159,6 +195,10 @@ function TodayView({ changeView, toast }: { changeView: (view: InternalView) => 
         afterSales: afterSales.length,
         openService: afterSales.filter((item: Record<string, unknown>) => String(item.status).toLowerCase() !== "done").length,
       });
+      const crmLeads = Array.isArray(payload.leads) ? payload.leads : [];
+      setLeadFollowUps(crmLeads.filter((item: Record<string, unknown>) => String(item.next || "").length > 0).length);
+      setPipelineRows((Array.isArray(payload.funnel) ? payload.funnel : []).map((item: Record<string, unknown>) => ({ stage: String(item.stage), total: Number(item.total || 0), valueSatang: Number(item.value_satang || 0) })));
+      setSourceHighlights((Array.isArray(payload.events) ? payload.events : []).slice(0, 3).map((item: Record<string, unknown>) => ({ name: String(item.name), leads: Number(item.actual_leads || 0), status: String(item.status) })));
       setDataState("saved");
     }).catch(() => setDataState("fallback"));
   }, []);
@@ -167,8 +207,8 @@ function TodayView({ changeView, toast }: { changeView: (view: InternalView) => 
   const saveTarget = async () => { const response = await fetch("/api/workspace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "save_target", targetValue: annualTarget, actualValue: sold }) }); if (response.ok) { setDataState("saved"); toast("บันทึกเป้าหมายแล้ว"); } else { setDataState("fallback"); toast("ยังบันทึกเป้าหมายไม่ได้"); } };
   const openTasks = tasks.filter((task) => task.status !== "เสร็จแล้ว");
   return <div className="v2-view">
-    <section className="v2-user-dashboard"><div className="v2-user-identity"><i>น</i><span><small>สวัสดี</small><h2>ไนน์</h2><p>ภาพรวมสำหรับผู้บริหารการขาย · 1 ส.ค. 2569</p></span></div><div className="v2-user-focus"><small>สิ่งที่ควรดูเป็นอันดับแรก</small><b>3 Lead ต้องยืนยันขั้นตอนถัดไป</b><button onClick={() => changeView("crm")}>เปิดรายการ →</button></div></section>
-    <section className="v2-kicker-row"><div><span>CURRENT DASHBOARD</span><h2>งานและนัดหมายของไนน์</h2><p>เห็นสิ่งที่ต้องทำ สถานะ และกำหนดเวลาในหน้าเดียว</p></div><em className={`data-${dataState}`}>{dataState === "saved" ? "● บันทึกในระบบแล้ว" : dataState === "loading" ? "กำลังโหลดข้อมูล" : "ข้อมูลสำรองในหน้าจอ"}</em></section>
+    <section className="v2-user-dashboard"><div className="v2-user-identity"><i>{user.displayName.slice(0, 1)}</i><span><small>สวัสดี</small><h2>{user.displayName}</h2><p>{user.role || "กำลังตรวจสอบสิทธิ์"} · 1 ส.ค. 2569</p></span></div><div className="v2-user-focus"><small>สิ่งที่ควรดูเป็นอันดับแรก</small><b>{leadFollowUps} Lead มีขั้นตอนถัดไป</b><button onClick={() => changeView("crm")}>เปิดรายการ →</button></div></section>
+    <section className="v2-kicker-row"><div><span>CURRENT DASHBOARD</span><h2>งานและนัดหมายของคุณ</h2><p>เห็นสิ่งที่ต้องทำ สถานะ และกำหนดเวลาในหน้าเดียว</p></div><em className={`data-${dataState}`}>{dataState === "saved" ? "● บันทึกในระบบแล้ว" : dataState === "loading" ? "กำลังโหลดข้อมูล" : "เชื่อมข้อมูลไม่สำเร็จ"}</em></section>
     <section className="v2-home-target"><header><div><span>ACTIONABLE TARGET · 2569</span><h3>เป้าหมายที่ต้องลงมือทำ</h3></div><button onClick={() => changeView("performance")}>ดูรายละเอียดทั้งหมด</button></header><div className="inputs"><label>เป้าขายทั้งปี<input type="number" min="0" value={annualTarget} onChange={(event) => setAnnualTarget(Math.max(0, Number(event.target.value) || 0))} /></label><label>ขายแล้ว<input type="number" min="0" max={annualTarget} value={sold} onChange={(event) => setSold(Math.min(annualTarget, Math.max(0, Number(event.target.value) || 0)))} /></label><article><span>ต้องขายเพิ่ม</span><strong>{remaining} เครื่อง</strong></article><article><span>นัดสาธิตที่ควรมี</span><strong>{remaining * 5} ครั้ง</strong></article><article><span>Lead ที่ผ่านเกณฑ์</span><strong>{Math.ceil((remaining * 5) / .4)} ราย</strong></article><button className="save" onClick={saveTarget}>บันทึกเป้าหมาย</button></div><footer>อัตราแปลงเป็นสมมติฐานสำหรับวางแผน จนกว่าจะมีข้อมูลจริงย้อนหลังเพียงพอ</footer></section>
     <section className="v2-import-overview"><header><div><span>KPI EVALUATION · THAILAND</span><h3>ข้อมูลปี 2569 ที่นำเข้าแล้ว</h3></div><em>แหล่งข้อมูลจริง · 24 ก.ค. 2569</em></header><div>{[[String(importedCounts.events), "กิจกรรมและแคมเปญ", "campaigns"], [String(importedCounts.training), "ฝึกอบรมและสาธิต", "operations"], [String(importedCounts.afterSales), "งานหลังการขาย", "operations"], [String(importedCounts.openService), "งานบริการที่ยังเปิด", "operations"]].map((item) => <button key={item[1]} onClick={() => changeView(item[2] as InternalView)}><strong>{item[0]}</strong><span>{item[1]}</span><small>เปิดดูรายละเอียด →</small></button>)}</div></section>
     <div className="v2-today-metrics">{[[String(openTasks.length), "งานที่ยังเปิด"], [String(tasks.filter((task) => task.status === "กำลังทำ").length), "กำลังดำเนินการ"], [String(tasks.filter((task) => task.priority === "สูง" && task.status !== "เสร็จแล้ว").length), "งานสำคัญ"], [String(new Set(openTasks.map((task) => task.due)).size), "วันที่มีนัดหมาย"]].map((item) => <article key={item[1]}><strong>{item[0]}</strong><span>{item[1]}</span></article>)}</div>
@@ -179,14 +219,22 @@ function TodayView({ changeView, toast }: { changeView: (view: InternalView) => 
       </section>
       <section className="v2-panel v2-calendar"><header><div><span>CALENDAR</span><h3>สิงหาคม 2569</h3></div><button onClick={() => setSelectedDay(1)}>วันนี้</button></header><div className="week"><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span><span>อา</span></div><div className="days"><i /><i /><i /><i /><i />{days.map((day) => { const dayTasks = tasks.filter((task) => task.due === day); return <button className={`${selectedDay === day ? "active" : ""} ${dayTasks.length ? "has-task" : ""}`} onClick={() => setSelectedDay(day)} key={day}><b>{day}</b>{dayTasks.length > 0 && <small>{dayTasks.length}</small>}</button>; })}</div><div className="v2-calendar-detail"><span>{selectedDay} สิงหาคม</span>{tasks.filter((task) => task.due === selectedDay).map((task) => <p key={task.id}><i /><b>{task.title}</b><small>{task.status}</small></p>)}{!tasks.some((task) => task.due === selectedDay) && <em>ยังไม่มีงานในวันนี้</em>}<label><input value={newTask} onChange={(event) => setNewTask(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") addTask(); }} placeholder="เพิ่มงานในวันที่เลือก" /><button onClick={addTask}>＋ เพิ่ม</button></label></div></section>
     </div>
-    <div className="v2-split v2-dashboard-secondary"><section className="v2-panel v2-pipeline"><header><div><span>PIPELINE</span><h3>มูลค่าตามขั้นตอน</h3></div><button onClick={() => changeView("performance")}>ดูประมาณการ</button></header>{[["นัดสาธิต", "฿6.45M", 82], ["เสนอราคา", "฿8.55M", 69], ["เจรจา", "฿4.30M", 48], ["ทำสัญญา", "฿2.15M", 34]].map((item) => <div key={item[0]}><span>{item[0]}</span><i><b style={{ width: `${item[2]}%` }} /></i><strong>{item[1]}</strong></div>)}</section><section className="v2-panel v2-source-mini"><header><div><span>LEAD SOURCE</span><h3>ต้นทางที่ต้องติดตาม</h3></div><button onClick={() => changeView("campaigns")}>ดูกิจกรรม</button></header>{[["Phuket Roadshow", "10 Lead", "1 สนใจสาธิต"], ["Webinar", "27 Lead", "รอคัดกรอง"], ["CME Outreach", "1 Lead", "กำลังติดตาม"]].map((item) => <article key={item[0]}><span><b>{item[0]}</b><small>{item[2]}</small></span><strong>{item[1]}</strong></article>)}</section></div>
+    <div className="v2-split v2-dashboard-secondary"><section className="v2-panel v2-pipeline"><header><div><span>PIPELINE</span><h3>มูลค่าตามขั้นตอน</h3></div><button onClick={() => changeView("performance")}>ดูประมาณการ</button></header>{pipelineRows.length ? pipelineRows.map((item) => { const max = Math.max(...pipelineRows.map((row) => row.valueSatang), 1); return <div key={item.stage}><span>{item.stage}</span><i><b style={{ width: `${Math.max((item.valueSatang / max) * 100, 4)}%` }} /></i><strong>฿{Math.round(item.valueSatang / 100).toLocaleString("th-TH")}</strong></div>; }) : <p>ยังไม่มีข้อมูล Opportunity</p>}</section><section className="v2-panel v2-source-mini"><header><div><span>LEAD SOURCE</span><h3>ต้นทางที่ต้องติดตาม</h3></div><button onClick={() => changeView("campaigns")}>ดูกิจกรรม</button></header>{sourceHighlights.length ? sourceHighlights.map((item) => <article key={item.name}><span><b>{item.name}</b><small>{item.status}</small></span><strong>{item.leads} Lead</strong></article>) : <p>ยังไม่มีข้อมูลกิจกรรม</p>}</section></div>
   </div>;
 }
 
-function CrmView({ leads: items, toast, openAccount }: { leads: typeof leads; toast: (text: string) => void; openAccount: (account: typeof leads[number]) => void }) {
+function CrmView({ leads: items, toast, openAccount }: { leads: LeadRecord[]; toast: (text: string) => void; openAccount: (account: LeadRecord) => void }) {
+  const lifecycle = [
+    ["ผู้สนใจ", items.length],
+    ["ผ่านเกณฑ์", items.filter((item) => item.score >= 30).length],
+    ["นัดสาธิต", items.filter((item) => item.stage.includes("Demo")).length],
+    ["เสนอราคา", items.filter((item) => ["Offered", "Offer Approval"].includes(item.stage)).length],
+    ["เจรจา", items.filter((item) => item.stage === "Negotiating").length],
+    ["ทำสัญญา", items.filter((item) => item.stage === "Contracting").length],
+  ];
   return <div className="v2-view">
     <section className="v2-kicker-row"><div><span>CRM · PERSON → ORGANIZATION → OPPORTUNITY</span><h2>ลูกค้าและโอกาสขาย</h2><p>ติดตามบุคคล องค์กร และขั้นตอนถัดไป</p></div><button onClick={() => toast("เปิดแบบฟอร์มเพิ่มผู้ติดต่อแล้ว")}>＋ เพิ่มผู้ติดต่อ</button></section>
-    <div className="v2-lifecycle">{[["ผู้สนใจ", "28"], ["ผ่านเกณฑ์", "14"], ["นัดสาธิต", "8"], ["เสนอราคา", "5"], ["เจรจา", "3"], ["ทำสัญญา", "2"]].map((item, index) => <article key={item[0]}><i>0{index + 1}</i><strong>{item[1]}</strong><span>{item[0]}</span></article>)}</div>
+    <div className="v2-lifecycle">{lifecycle.map((item, index) => <article key={item[0]}><i>0{index + 1}</i><strong>{item[1]}</strong><span>{item[0]}</span></article>)}</div>
     <section className="v2-panel v2-table"><header><div><span>CONTACT & ACCOUNT VIEW</span><h3>รายการที่ต้องติดตาม</h3></div><em>{leads.length} รายการ</em></header>
       <div className="v2-table-head"><span>บุคคลหรือองค์กร</span><span>สถานะ</span><span>คะแนน</span><span>ขั้นตอนถัดไป</span><span>กำหนด</span></div>
       {items.map((lead) => <button key={lead.name} onClick={() => openAccount(lead)}><span className="v2-contact-card"><i>{lead.contact.replace(/^(นพ\.|พญ\.|Dr\.\s*)/i, "").trim().slice(0, 2)}</i><span><b>{lead.contact}</b><small>{lead.name} · {lead.owner}</small></span></span><em>{lead.status}</em><strong>{lead.score}</strong><span>{lead.next}</span><time>{lead.due}</time></button>)}
@@ -195,7 +243,7 @@ function CrmView({ leads: items, toast, openAccount }: { leads: typeof leads; to
   </div>;
 }
 
-function AccountView({ account, back, openSource, toast }: { account: typeof leads[number]; back: () => void; openSource: () => void; toast: (text: string) => void }) {
+function AccountView({ account, back, openSource, toast }: { account: LeadRecord; back: () => void; openSource: () => void; toast: (text: string) => void }) {
   const [tab, setTab] = useState<"overview" | "demo" | "offer" | "activity" | "comments">("overview");
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState<Array<{ author: string; text: string; date: string }>>([{ author: "ผู้ดูแลบัญชี", text: `ขั้นตอนถัดไป: ${account.next}`, date: "วันนี้" }]);
@@ -271,7 +319,7 @@ function OperationsView() {
   </div>;
 }
 
-function CampaignView({ toast, openAccount }: { toast: (text: string) => void; openAccount: (account: typeof leads[number]) => void }) {
+function CampaignView({ leads, toast, openAccount }: { leads: LeadRecord[]; toast: (text: string) => void; openAccount: (account: LeadRecord) => void }) {
   const [budgets, setBudgets] = useState<Record<string, number>>({});
   const [importedEvents, setImportedEvents] = useState<ImportedEvent[]>([]);
   const [source, setSource] = useState<SourceImport | null>(null);
@@ -282,10 +330,10 @@ function CampaignView({ toast, openAccount }: { toast: (text: string) => void; o
     });
   }, []);
   const campaigns = [
-    { id: "EVT-2605-01", type: "EVENT", name: "Phuket Demo Roadshow", date: "25–30 พ.ค. 2569", owner: "ผู้รับผิดชอบ", leads: 10, qualified: 3, customers: 0, result: "Citycare Clinic สนใจสาธิต", status: "ติดตามผล", lead: leads.find((item) => item.name === "Citycare Clinic")! },
-    { id: "EVT-WEBINAR", type: "EVENT", name: "Beauty Innovation Trend Webinar", date: "ข้อมูลจากแผ่นงาน Webinar", owner: "ผู้รับผิดชอบ", leads: 27, qualified: 0, customers: 0, result: "ต้องคัดกรองผู้ลงทะเบียน", status: "รอคัดกรอง", lead: leads.find((item) => item.name === "Modiolistics Clinic")! },
-    { id: "CMP-2608-01", type: "CAMPAIGN", name: "CME Evidence Outreach", date: "ส.ค.–ก.ย. 2569", owner: "ผู้รับผิดชอบ", leads: 1, qualified: 1, customers: 0, result: "รอกำหนดเป้าหมายหลังอนุมัติ", status: "กำลังดำเนินการ", lead: leads.find((item) => item.name === "Modiolistics Clinic")! },
-    { id: "PRO-2608-01", type: "PROMOTION", name: "Model A Event Offer", date: "สิ้นสุด 31 ส.ค. 2569", owner: "ผู้รับผิดชอบ", leads: 1, qualified: 1, customers: 0, result: "ราคา 2.15 ล้านบาท · 10 งวด", status: "รออนุมัติ", lead: leads.find((item) => item.name === "Dr. J Clinic")! },
+    { id: "EVT-2605-01", type: "EVENT", name: "Phuket Demo Roadshow", date: "25–30 พ.ค. 2569", owner: "ผู้รับผิดชอบ", leads: 10, qualified: 3, customers: 0, result: "Citycare Clinic สนใจสาธิต", status: "ติดตามผล", lead: leads.find((item) => item.name === "Citycare Clinic") || emptyLead },
+    { id: "EVT-WEBINAR", type: "EVENT", name: "Beauty Innovation Trend Webinar", date: "ข้อมูลจากแผ่นงาน Webinar", owner: "ผู้รับผิดชอบ", leads: 27, qualified: 0, customers: 0, result: "ต้องคัดกรองผู้ลงทะเบียน", status: "รอคัดกรอง", lead: leads.find((item) => item.name === "Modiolistics Clinic") || emptyLead },
+    { id: "CMP-2608-01", type: "CAMPAIGN", name: "CME Evidence Outreach", date: "ส.ค.–ก.ย. 2569", owner: "ผู้รับผิดชอบ", leads: 1, qualified: 1, customers: 0, result: "รอกำหนดเป้าหมายหลังอนุมัติ", status: "กำลังดำเนินการ", lead: leads.find((item) => item.name === "Modiolistics Clinic") || emptyLead },
+    { id: "PRO-2608-01", type: "PROMOTION", name: "Model A Event Offer", date: "สิ้นสุด 31 ส.ค. 2569", owner: "ผู้รับผิดชอบ", leads: 1, qualified: 1, customers: 0, result: "ราคา 2.15 ล้านบาท · 10 งวด", status: "รออนุมัติ", lead: leads.find((item) => item.name === "Dr. J Clinic") || emptyLead },
   ];
   return <div className="v2-view">
     <section className="v2-kicker-row"><div><span>EVENT · PROMOTION · CAMPAIGN</span><h2>กิจกรรมที่ต้องสร้างผลลัพธ์</h2><p>ทุกกิจกรรมต้องมีเป้าหมาย ผู้ดูแล Lead และการติดตามผล</p></div><button onClick={() => toast("เปิดแบบสร้างกิจกรรมแล้ว")}>＋ สร้างกิจกรรม</button></section>
@@ -311,7 +359,7 @@ function ApprovalView({ toast }: { toast: (text: string) => void }) {
   const [reviewDecision, setReviewDecision] = useState<Record<ReviewId, string>>({ linna: "Pending", drj: "Blocked", memo: "Pending" });
   const current = reviewDocs[reviewId];
   useEffect(() => {
-    fetch("/api/reviews?role=Executive").then((response) => response.json()).then((payload) => {
+    fetch("/api/reviews").then((response) => response.json()).then((payload) => {
       if (Array.isArray(payload.comments)) setReviewComments(payload.comments);
       if (Array.isArray(payload.documents)) {
         const next = { linna: "Pending", drj: "Blocked", memo: "Pending" };
@@ -322,11 +370,11 @@ function ApprovalView({ toast }: { toast: (text: string) => void }) {
   }, []);
   const saveReviewComment = async () => {
     if (!reviewComment.trim()) return;
-    const response = await fetch("/api/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "comment", documentId: reviewId, role: "Executive", body: reviewComment, visibility: "Internal" }) });
+    const response = await fetch("/api/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "comment", documentId: reviewId, body: reviewComment, visibility: "Internal" }) });
     if (response.ok) { setReviewComments([...reviewComments, { document_id: reviewId, author_label: "ผู้บริหาร · ผู้ตรวจทาน", body: reviewComment, visibility: "Internal" }]); setReviewComment(""); toast("บันทึกความเห็นแล้ว"); }
   };
   const decideReview = async (decision: string) => {
-    const response = await fetch("/api/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "decision", documentId: reviewId, role: "Executive", decision, version: current.version }) });
+    const response = await fetch("/api/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "decision", documentId: reviewId, decision, version: current.version }) });
     if (response.ok) { setReviewDecision({ ...reviewDecision, [reviewId]: decision }); toast(decision === "Approved" ? "บันทึกการอนุมัติภายในแล้ว" : "ส่งกลับเพื่อแก้ไขแล้ว"); }
     else toast("รายการนี้ยังไม่ผ่านเงื่อนไขการอนุมัติ");
   };
@@ -409,12 +457,19 @@ function PerformanceView() {
   const [annualTarget, setAnnualTarget] = useState(0);
   const [sold, setSold] = useState(0);
   const [saved, setSaved] = useState(false);
+  const [forecast, setForecast] = useState({ pipelineSatang: 0, weightedSatang: 0, openOpportunities: 0, updatedAt: "" });
   useEffect(() => {
     fetch("/api/workspace").then((response) => response.ok ? response.json() : Promise.reject()).then((payload) => {
       if (payload.target) {
         setAnnualTarget(Number(payload.target.target_value || 0));
         setSold(Number(payload.target.actual_value || 0));
       }
+      if (payload.forecast) setForecast({
+        pipelineSatang: Number(payload.forecast.pipeline_satang || 0),
+        weightedSatang: Number(payload.forecast.weighted_satang || 0),
+        openOpportunities: Number(payload.forecast.open_opportunities || 0),
+        updatedAt: String(payload.forecast.updated_at || ""),
+      });
     }).catch(() => undefined);
   }, []);
   const saveGoal = async () => {
@@ -431,6 +486,7 @@ function PerformanceView() {
   const sunaiTarget = Math.ceil(remaining / 3);
   const oiTarget = Math.ceil((remaining - sunaiTarget) / 2);
   const topTarget = Math.max(remaining - sunaiTarget - oiTarget, 0);
+  const money = (satang: number) => `฿${Math.round(satang / 100).toLocaleString("th-TH")}`;
   return <div className="v2-view">
     <section className="v2-kicker-row"><div><span>PERFORMANCE & QUALITY</span><h2>ผลการดำเนินงาน</h2><p>รวมยอดขาย รูปแบบธุรกิจ และงานบริการ</p></div><em>อัปเดตล่าสุด 31 ก.ค.</em></section>
     <section className="v2-goal-builder">
@@ -443,7 +499,7 @@ function PerformanceView() {
       <section className="v2-sales-targets"><header><div><span>SALES TARGET BY OWNER</span><h4>ข้อเสนอการแบ่งเป้าตามผู้ดูแล</h4></div><em>คำแนะนำเบื้องต้น · ไม่ใช่เป้าที่อนุมัติแล้ว</em></header>{[["ผู้รับผิดชอบ", sunaiTarget], ["ผู้รับผิดชอบ", oiTarget], ["ผู้รับผิดชอบ", topTarget]].map((item) => <article key={item[0]}><i>{String(item[0]).slice(0, 1)}</i><span><b>{item[0]}</b><small>ต้องมีนัดสาธิตประมาณ {Number(item[1]) * 5} ครั้ง</small></span><strong>{item[1]} เครื่อง</strong></article>)}</section>
       <footer><span>สมมติฐาน: ผู้สนใจใหม่ 50% ผ่านเกณฑ์ · 40% ได้นัดสาธิต · สาธิต 20% ปิดการขาย</span><button onClick={saveGoal}>{saved ? "✓ บันทึกแล้ว" : "บันทึกเป็นเป้าหมายทีม"}</button></footer>
     </section>
-    <div className="v2-metrics">{[["฿8.9M", "รายได้ถ่วงน้ำหนัก", "Pipeline ฿21.4M"], ["42%", "กำไรขั้นต้น", "หลังค่าตอบแทนและบริการ"], ["฿3.2M", "รายได้แบ่งรายได้ต่อปี", "แบบ C, D และ D2"], ["฿326K", "ประมาณการค่าตอบแทน", "รออนุมัติ 4 รายการ"]].map((item, index) => <article key={item[1]}><i>0{index + 1}</i><strong>{item[0]}</strong><span>{item[1]}</span><small>{item[2]}</small></article>)}</div>
-    <div className="v2-split"><section className="v2-panel v2-pnl"><header><div><span>FORECAST P&L</span><h3>ประมาณการ 12 เดือน</h3></div></header>{[["รายได้ขายเครื่อง", "฿12,900,000"], ["รายได้แบ่งรายได้", "฿3,240,000"], ["ต้นทุนและการส่งมอบ", "(฿8,020,000)"], ["ค่าตอบแทน", "(฿326,000)"], ["Training/Service", "(฿740,000)"], ["กำไรประมาณการ", "฿7,054,000"]].map((item, index) => <p className={index === 5 ? "total" : ""} key={item[0]}><span>{item[0]}</span><strong>{item[1]}</strong></p>)}</section><section className="v2-panel v2-quality"><header><div><span>SYSTEM QUALITY</span><h3>สิ่งที่ต้องแก้ก่อนใช้จริง</h3></div><em>3 รายการ</em></header>{[["สูง", "สูตร Lead Score ใน Airtable ขึ้น Error"], ["สูง", "Dr. J ยังไม่มีข้อมูลนิติบุคคล"], ["กลาง", "LINNA ยังไม่มี Serial Number"]].map((item) => <article key={item[1]}><b>{item[0]}</b><span>{item[1]}</span><em>เปิดรายการ</em></article>)}</section></div>
+    <div className="v2-metrics">{[[money(forecast.weightedSatang), "มูลค่าถ่วงน้ำหนัก", `จาก Pipeline ${money(forecast.pipelineSatang)}`], [String(forecast.openOpportunities), "โอกาสขายที่เปิดอยู่", "คำนวณจาก CRM"], ["รอข้อมูล", "กำไรขั้นต้น", "ยังไม่มีต้นทุนที่ตรวจสอบแล้ว"], ["รอข้อมูล", "ประมาณการค่าตอบแทน", "ต้องเชื่อม Commission Rule"]].map((item, index) => <article key={item[1]}><i>0{index + 1}</i><strong>{item[0]}</strong><span>{item[1]}</span><small>{item[2]}</small></article>)}</div>
+    <div className="v2-split"><section className="v2-panel v2-pnl"><header><div><span>FORECAST P&L</span><h3>สถานะข้อมูลประมาณการ</h3></div><em>คำนวณจาก CRM</em></header>{[["Pipeline ที่เปิดอยู่", money(forecast.pipelineSatang)], ["มูลค่าถ่วงน้ำหนัก", money(forecast.weightedSatang)], ["ยอดขายจริงตามเป้าหมาย", `฿${bookedRevenue.toLocaleString("th-TH")}`], ["ต้นทุนและการส่งมอบ", "รอข้อมูล"], ["ค่าตอบแทน", "รอเชื่อมกฎ"], ["กำไรประมาณการ", "ยังไม่คำนวณ"]].map((item, index) => <p className={index === 5 ? "total" : ""} key={item[0]}><span>{item[0]}</span><strong>{item[1]}</strong></p>)}<footer>ไม่แสดงกำไรจนกว่าจะมีต้นทุน ค่าตอบแทน และภาระบริการที่ตรวจสอบแล้ว</footer></section><section className="v2-panel v2-quality"><header><div><span>SYSTEM QUALITY</span><h3>สิ่งที่ต้องแก้ก่อนใช้จริง</h3></div><em>3 รายการ</em></header>{[["สูง", "Dr. J ยังไม่มีข้อมูลนิติบุคคล"], ["สูง", "LINNA ยังไม่มี Serial Number"], ["กลาง", "ต้นทุนและ Commission ยังไม่เชื่อม Forecast"]].map((item) => <article key={item[1]}><b>{item[0]}</b><span>{item[1]}</span><em>เปิดรายการ</em></article>)}</section></div>
   </div>;
 }

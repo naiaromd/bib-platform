@@ -1,4 +1,5 @@
 import { env } from "cloudflare:workers";
+import { accessErrorResponse, requireRequestActor, requireRole } from "@/lib/server-identity";
 
 type TemplateKind = "field" | "document" | "task" | "workflow";
 
@@ -77,20 +78,24 @@ async function initialize() {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await initialize();
+    const actor = await requireRequestActor(request);
+    requireRole(actor, ["Executive"]);
     const d1 = db();
     const [tenants, modules, fields, documents, tasks, workflows] = await Promise.all([
-      d1.prepare("SELECT * FROM tenant_companies ORDER BY created_at").all(),
-      d1.prepare("SELECT * FROM module_definitions WHERE tenant_id = 'bib' AND active = 1 ORDER BY sort_order").all(),
-      d1.prepare("SELECT * FROM field_definitions WHERE tenant_id = 'bib' AND active = 1 ORDER BY created_at DESC").all(),
-      d1.prepare("SELECT * FROM document_template_registry WHERE tenant_id = 'bib' AND active = 1 ORDER BY created_at DESC").all(),
-      d1.prepare("SELECT * FROM task_template_registry WHERE tenant_id = 'bib' AND active = 1 ORDER BY created_at DESC").all(),
-      d1.prepare("SELECT * FROM workflow_definitions WHERE tenant_id = 'bib' AND active = 1 ORDER BY created_at DESC").all(),
+      d1.prepare("SELECT * FROM tenant_companies WHERE id = ? ORDER BY created_at").bind(actor.tenantId).all(),
+      d1.prepare("SELECT * FROM module_definitions WHERE tenant_id = ? AND active = 1 ORDER BY sort_order").bind(actor.tenantId).all(),
+      d1.prepare("SELECT * FROM field_definitions WHERE tenant_id = ? AND active = 1 ORDER BY created_at DESC").bind(actor.tenantId).all(),
+      d1.prepare("SELECT * FROM document_template_registry WHERE tenant_id = ? AND active = 1 ORDER BY created_at DESC").bind(actor.tenantId).all(),
+      d1.prepare("SELECT * FROM task_template_registry WHERE tenant_id = ? AND active = 1 ORDER BY created_at DESC").bind(actor.tenantId).all(),
+      d1.prepare("SELECT * FROM workflow_definitions WHERE tenant_id = ? AND active = 1 ORDER BY created_at DESC").bind(actor.tenantId).all(),
     ]);
     return Response.json({ tenants: tenants.results, modules: modules.results, fields: fields.results, documents: documents.results, tasks: tasks.results, workflows: workflows.results });
   } catch (error) {
+    const accessResponse = accessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     return Response.json({ error: error instanceof Error ? error.message : "Unable to load configuration" }, { status: 500 });
   }
 }
@@ -98,6 +103,8 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     await initialize();
+    const actor = await requireRequestActor(request);
+    requireRole(actor, ["Executive"]);
     const payload = await request.json() as {
       kind?: TemplateKind; moduleKey?: string; label?: string; fieldType?: string;
       required?: boolean; name?: string; templateCode?: string; approvalWorkflow?: string;
@@ -112,25 +119,27 @@ export async function POST(request: Request) {
       const key = payload.label.trim().toLowerCase().replace(/\s+/g, "_").slice(0, 48) + "_" + id.slice(0, 6);
       await d1.prepare(`INSERT INTO field_definitions
         (id, tenant_id, module_key, field_key, label, field_type, required)
-        VALUES (?, 'bib', ?, ?, ?, ?, ?)`).bind(id, payload.moduleKey, key, payload.label.trim(), payload.fieldType, payload.required ? 1 : 0).run();
+        VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(id, actor.tenantId, payload.moduleKey, key, payload.label.trim(), payload.fieldType, payload.required ? 1 : 0).run();
     } else if (payload.kind === "document") {
       if (!payload.name?.trim() || !payload.templateCode?.trim()) return Response.json({ error: "กรุณาระบุชื่อและรหัสแม่แบบ" }, { status: 400 });
       await d1.prepare(`INSERT INTO document_template_registry
         (id, tenant_id, module_key, template_code, name, approval_workflow)
-        VALUES (?, 'bib', ?, ?, ?, ?)`).bind(id, payload.moduleKey, payload.templateCode.trim(), payload.name.trim(), payload.approvalWorkflow || "Review → Approve").run();
+        VALUES (?, ?, ?, ?, ?, ?)`).bind(id, actor.tenantId, payload.moduleKey, payload.templateCode.trim(), payload.name.trim(), payload.approvalWorkflow || "Review → Approve").run();
     } else if (payload.kind === "task") {
       if (!payload.name?.trim()) return Response.json({ error: "กรุณาระบุชื่องาน" }, { status: 400 });
       await d1.prepare(`INSERT INTO task_template_registry
         (id, tenant_id, module_key, name, default_owner_role, due_offset_days, trigger_event)
-        VALUES (?, 'bib', ?, ?, ?, ?, ?)`).bind(id, payload.moduleKey, payload.name.trim(), payload.ownerRole || "Sales", Number(payload.dueOffsetDays || 0), payload.triggerEvent || "Manual").run();
+        VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(id, actor.tenantId, payload.moduleKey, payload.name.trim(), payload.ownerRole || "Sales", Number(payload.dueOffsetDays || 0), payload.triggerEvent || "Manual").run();
     } else if (payload.kind === "workflow") {
       if (!payload.name?.trim() || !payload.workflowCode?.trim() || !payload.steps?.length) return Response.json({ error: "กรุณาระบุชื่อ รหัส และขั้นตอน" }, { status: 400 });
       await d1.prepare(`INSERT INTO workflow_definitions
         (id, tenant_id, module_key, workflow_code, name, steps_json)
-        VALUES (?, 'bib', ?, ?, ?, ?)`).bind(id, payload.moduleKey, payload.workflowCode.trim(), payload.name.trim(), JSON.stringify(payload.steps)).run();
+        VALUES (?, ?, ?, ?, ?, ?)`).bind(id, actor.tenantId, payload.moduleKey, payload.workflowCode.trim(), payload.name.trim(), JSON.stringify(payload.steps)).run();
     }
     return Response.json({ ok: true, id }, { status: 201 });
   } catch (error) {
+    const accessResponse = accessErrorResponse(error);
+    if (accessResponse) return accessResponse;
     return Response.json({ error: error instanceof Error ? error.message : "Unable to save configuration" }, { status: 500 });
   }
 }
