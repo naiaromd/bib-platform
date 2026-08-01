@@ -13,12 +13,12 @@ const workspaces: Array<[InternalView, string, string, string]> = [
 ];
 
 const leads = [
-  { name: "โรงพยาบาลกรุงเทพ เชียงใหม่", status: "นัดสาธิต", score: 75, next: "ส่ง Term Sheet แบบ A", due: "วันนี้", owner: "ผู้รับผิดชอบ", segment: "โรงพยาบาล", model: "A", contact: "ฝ่ายจัดซื้อและทีมแพทย์", role: "ผู้ประเมินโครงการ", city: "เชียงใหม่", source: "การติดต่อโดยตรง", lastContact: "31 ก.ค. 2569", evidence: ["ยืนยันนิติบุคคล", "ประชุมเบื้องต้น", "ผู้มีอำนาจร่วมสาธิต"], risk: "ต้องยืนยันงบประมาณและรอบจัดซื้อ" },
-  { name: "Dr. J Clinic", status: "ตรวจสัญญา", score: 60, next: "ขอข้อมูลยืนยันตัวตน", due: "วันนี้", owner: "ผู้รับผิดชอบ", segment: "คลินิกความงาม", model: "B", contact: "Dr. J", role: "แพทย์และผู้ตัดสินใจ", city: "กรุงเทพฯ", source: "การแนะนำ", lastContact: "31 ก.ค. 2569", evidence: ["แพทย์เป็นผู้ตัดสินใจ", "ขอเอกสารสัญญา", "แจ้งสถานที่ติดตั้งแล้ว"], risk: "ทำสัญญาในนามบุคคล ต้องตรวจรายได้และเครดิต" },
-  { name: "Modiolistics Clinic", status: "ติดต่อแล้ว", score: 35, next: "เชิญร่วมงาน CME และโทรติดตาม", due: "4 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "คลินิกความงาม", model: "ยังไม่เลือก", contact: "ผู้รับผิดชอบ", role: "แพทย์", city: "กรุงเทพฯ", source: "ค้นหารายชื่อโดยทีมขาย", lastContact: "10 ส.ค. 2568", evidence: ["ยืนยันสถานประกอบการ", "มีข้อมูลผู้ติดต่อ", "ติดต่อแล้ว"], risk: "ยังไม่มีการยืนยันนัดสาธิต" },
-  { name: "Citycare Clinic", status: "สนใจสาธิต", score: 70, next: "ยืนยันวันสาธิตนอกสถานที่", due: "5 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "คลินิก", model: "ยังไม่เลือก", contact: "ผู้รับผิดชอบ", role: "ผู้ประสานงาน", city: "ภูเก็ต", source: "Phuket Demo Roadshow 2026", lastContact: "พ.ค. 2569", evidence: ["ตอบรับการสาธิต", "แจ้งช่วงวันที่สะดวก", "มีกรณีใช้งานที่ต้องการทดลอง"], risk: "ต้องยืนยันว่าผู้มีอำนาจเข้าร่วม" },
-  { name: "LINNA Clinic", status: "ลูกค้าที่ใช้งาน", score: 100, next: "ตรวจรายงานรายได้", due: "2 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "เวลเนส", model: "D2", contact: "ผู้จัดการ LINNA", role: "ผู้ดูแลบัญชี", city: "กรุงเทพฯ", source: "ลูกค้าปัจจุบัน", lastContact: "31 ก.ค. 2569", evidence: ["ลงนามสัญญาแล้ว", "ติดตั้งและฝึกอบรมแล้ว", "ส่งรายงานรายได้"], risk: "ยอดวันที่ 29 พ.ค. ไม่ตรงกับรายงานสรุป" },
-  { name: "Wholeness Way Clinic", status: "ขอนัดทดลอง", score: 50, next: "ติดตามคำเชิญทดลองเครื่อง", due: "6 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "กายภาพบำบัด", model: "ยังไม่เลือก", contact: "ผู้รับผิดชอบ", role: "ผู้ประสานงาน", city: "กรุงเทพฯ", source: "ค้นหารายชื่อโดยทีมขาย", lastContact: "6 ส.ค. 2568", evidence: ["ขอข้อมูลเพิ่มเติม", "แจ้งผู้รับผิดชอบ", "ส่งอีเมลแล้ว"], risk: "ยังไม่ยืนยันผู้มีอำนาจและวันสาธิต" },
+  { name: "โรงพยาบาลกรุงเทพ เชียงใหม่", status: "นัดสาธิต", score: 75, next: "ส่ง Term Sheet แบบ A", due: "วันนี้", owner: "ผู้รับผิดชอบ", segment: "โรงพยาบาล", model: "A", contact: "ฝ่ายจัดซื้อและทีมแพทย์", role: "ผู้ประเมินโครงการ", city: "เชียงใหม่", source: "การติดต่อโดยตรง", sourceId: "SRC-DIRECT", lastContact: "31 ก.ค. 2569", evidence: ["ยืนยันนิติบุคคล", "ประชุมเบื้องต้น", "ผู้มีอำนาจร่วมสาธิต"], risk: "ต้องยืนยันงบประมาณและรอบจัดซื้อ" },
+  { name: "Dr. J Clinic", status: "ตรวจสัญญา", score: 60, next: "ขอข้อมูลยืนยันตัวตน", due: "วันนี้", owner: "ผู้รับผิดชอบ", segment: "คลินิกความงาม", model: "B", contact: "Dr. J", role: "แพทย์และผู้ตัดสินใจ", city: "กรุงเทพฯ", source: "การแนะนำ", sourceId: "SRC-REFERRAL", lastContact: "31 ก.ค. 2569", evidence: ["แพทย์เป็นผู้ตัดสินใจ", "ขอเอกสารสัญญา", "แจ้งสถานที่ติดตั้งแล้ว"], risk: "ทำสัญญาในนามบุคคล ต้องตรวจรายได้และเครดิต" },
+  { name: "Modiolistics Clinic", status: "ติดต่อแล้ว", score: 35, next: "เชิญร่วมงาน CME และโทรติดตาม", due: "4 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "คลินิกความงาม", model: "ยังไม่เลือก", contact: "ผู้รับผิดชอบ", role: "แพทย์", city: "กรุงเทพฯ", source: "CME Evidence Outreach", sourceId: "CMP-2608-01", lastContact: "10 ส.ค. 2568", evidence: ["ยืนยันสถานประกอบการ", "มีข้อมูลผู้ติดต่อ", "ติดต่อแล้ว"], risk: "ยังไม่มีการยืนยันนัดสาธิต" },
+  { name: "Citycare Clinic", status: "สนใจสาธิต", score: 70, next: "ยืนยันวันสาธิตนอกสถานที่", due: "5 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "คลินิก", model: "ยังไม่เลือก", contact: "ผู้รับผิดชอบ", role: "ผู้ประสานงาน", city: "ภูเก็ต", source: "Phuket Demo Roadshow 2026", sourceId: "EVT-2605-01", lastContact: "พ.ค. 2569", evidence: ["ตอบรับการสาธิต", "แจ้งช่วงวันที่สะดวก", "มีกรณีใช้งานที่ต้องการทดลอง"], risk: "ต้องยืนยันว่าผู้มีอำนาจเข้าร่วม" },
+  { name: "LINNA Clinic", status: "ลูกค้าที่ใช้งาน", score: 100, next: "ตรวจรายงานรายได้", due: "2 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "เวลเนส", model: "D2", contact: "ผู้จัดการ LINNA", role: "ผู้ดูแลบัญชี", city: "กรุงเทพฯ", source: "ลูกค้าปัจจุบัน", sourceId: "SRC-CUSTOMER", lastContact: "31 ก.ค. 2569", evidence: ["ลงนามสัญญาแล้ว", "ติดตั้งและฝึกอบรมแล้ว", "ส่งรายงานรายได้"], risk: "ยอดวันที่ 29 พ.ค. ไม่ตรงกับรายงานสรุป" },
+  { name: "Wholeness Way Clinic", status: "ขอนัดทดลอง", score: 50, next: "ติดตามคำเชิญทดลองเครื่อง", due: "6 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "กายภาพบำบัด", model: "ยังไม่เลือก", contact: "ผู้รับผิดชอบ", role: "ผู้ประสานงาน", city: "กรุงเทพฯ", source: "ค้นหารายชื่อโดยทีมขาย", sourceId: "SRC-OUTBOUND", lastContact: "6 ส.ค. 2568", evidence: ["ขอข้อมูลเพิ่มเติม", "แจ้งผู้รับผิดชอบ", "ส่งอีเมลแล้ว"], risk: "ยังไม่ยืนยันผู้มีอำนาจและวันสาธิต" },
 ];
 
 function BrandHeader({ area }: { area: string }) {
@@ -54,7 +54,7 @@ export default function InternalPlatformPage() {
 
   return (
     <main className="v2-shell">
-      <BrandHeader area="INTERNAL · RESTRICTED" />
+      <BrandHeader area="ไนน์ · ผู้บริหารการขาย" />
 
       <section className="v2-layout">
         <aside className="v2-job-nav">
@@ -77,14 +77,9 @@ export default function InternalPlatformPage() {
             <label><i>⌕</i><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ค้นหาลูกค้า งาน หรือเอกสาร" /></label>
             <button onClick={() => toast("เปิดแบบฟอร์มสร้างรายการใหม่แล้ว")}>＋ สร้างรายการ</button>
           </header>
-          {view === "today" && <section className="v2-intro v2-module-hero">
-            <div><span>ศูนย์ปฏิบัติงานภายใน</span><h1>เริ่มจากงาน<br />ที่ต้องทำ</h1><p>รวมลูกค้า ข้อเสนอ สัญญา และบริการหลังการขาย</p></div>
-            <aside><b>6</b><span>เรื่องที่ต้องตัดสินใจวันนี้</span><button onClick={() => setView("approval")}>เปิดรายการอนุมัติ</button></aside>
-          </section>}
-
           {view === "today" && <TodayView changeView={setView} toast={toast} />}
           {view === "crm" && <CrmView leads={visibleLeads} toast={toast} openAccount={openAccount} />}
-          {view === "account" && <AccountView account={selectedAccount} back={() => setView("crm")} toast={toast} />}
+          {view === "account" && <AccountView account={selectedAccount} back={() => setView("crm")} openSource={() => setView("campaigns")} toast={toast} />}
           {view === "campaigns" && <CampaignView toast={toast} openAccount={openAccount} />}
           {view === "approval" && <ApprovalView toast={toast} />}
           {view === "performance" && <PerformanceView />}
@@ -97,7 +92,8 @@ export default function InternalPlatformPage() {
 
 function TodayView({ changeView, toast }: { changeView: (view: InternalView) => void; toast: (text: string) => void }) {
   return <div className="v2-view">
-    <section className="v2-kicker-row"><div><span>TODAY · 31 JUL 2026</span><h2>ภาพรวมวันนี้</h2><p>เรียงตามรายได้ ความเสี่ยง และกำหนดเวลา</p></div><em>ข้อมูลทดสอบ</em></section>
+    <section className="v2-user-dashboard"><div className="v2-user-identity"><i>น</i><span><small>สวัสดี</small><h2>ไนน์</h2><p>ภาพรวมสำหรับผู้บริหารการขาย · 1 ส.ค. 2569</p></span></div><div className="v2-user-focus"><small>สิ่งที่ควรดูเป็นอันดับแรก</small><b>3 Lead ต้องยืนยันขั้นตอนถัดไป</b><button onClick={() => changeView("crm")}>เปิดรายการ →</button></div></section>
+    <section className="v2-kicker-row"><div><span>CURRENT DASHBOARD</span><h2>ภาพรวมของไนน์วันนี้</h2><p>เรียงตามกำหนดเวลา ความเสี่ยง และโอกาสสร้างรายได้</p></div><em>ข้อมูลต้นแบบ</em></section>
     <div className="v2-metrics">
       {[["14", "ผู้สนใจที่ต้องติดตาม", "Hot 5 · Warm 9"], ["8", "นัดสาธิตสัปดาห์นี้", "นอกสถานที่ 3"], ["฿8.9M", "Pipeline ที่มีน้ำหนัก", "เพิ่มขึ้น 12%"], ["6", "รายการรออนุมัติ", "ครบกำหนดวันนี้ 2"]].map((item, index) => <article key={item[1]}><i>0{index + 1}</i><strong>{item[0]}</strong><span>{item[1]}</span><small>{item[2]}</small></article>)}
     </div>
@@ -124,13 +120,13 @@ function CrmView({ leads: items, toast, openAccount }: { leads: typeof leads; to
     <div className="v2-lifecycle">{[["ผู้สนใจ", "28"], ["ผ่านเกณฑ์", "14"], ["นัดสาธิต", "8"], ["เสนอราคา", "5"], ["เจรจา", "3"], ["ทำสัญญา", "2"]].map((item, index) => <article key={item[0]}><i>0{index + 1}</i><strong>{item[1]}</strong><span>{item[0]}</span></article>)}</div>
     <section className="v2-panel v2-table"><header><div><span>CONTACT & ACCOUNT VIEW</span><h3>รายการที่ต้องติดตาม</h3></div><em>{leads.length} รายการ</em></header>
       <div className="v2-table-head"><span>บุคคลหรือองค์กร</span><span>สถานะ</span><span>คะแนน</span><span>ขั้นตอนถัดไป</span><span>กำหนด</span></div>
-      {items.map((lead) => <button key={lead.name} onClick={() => openAccount(lead)}><span><b>{lead.name}</b><small>{lead.owner} · {lead.segment}</small></span><em>{lead.status}</em><strong>{lead.score}</strong><span>{lead.next}</span><time>{lead.due}</time></button>)}
+      {items.map((lead) => <button key={lead.name} onClick={() => openAccount(lead)}><span className="v2-contact-card"><i>{lead.contact.replace(/^(นพ\.|พญ\.|Dr\.\s*)/i, "").trim().slice(0, 2)}</i><span><b>{lead.contact}</b><small>{lead.name} · {lead.owner}</small></span></span><em>{lead.status}</em><strong>{lead.score}</strong><span>{lead.next}</span><time>{lead.due}</time></button>)}
     </section>
     <section className="v2-segmentation"><article><span>PERSON</span><h3>บุคคล</h3><p>บทบาท อิทธิพลต่อการตัดสินใจ และความสนใจ</p></article><article><span>ORGANIZATION</span><h3>องค์กร</h3><p>ประเภทธุรกิจ สถานที่ และความพร้อม</p></article><article><span>RELATIONSHIP</span><h3>ความสัมพันธ์</h3><p>ผู้สนใจ ลูกค้า Supplier หรือ Ecosystem</p></article></section>
   </div>;
 }
 
-function AccountView({ account, back, toast }: { account: typeof leads[number]; back: () => void; toast: (text: string) => void }) {
+function AccountView({ account, back, openSource, toast }: { account: typeof leads[number]; back: () => void; openSource: () => void; toast: (text: string) => void }) {
   const [tab, setTab] = useState<"overview" | "demo" | "offer" | "activity" | "comments">("overview");
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState<Array<{ author: string; text: string; date: string }>>([{ author: "ผู้ดูแลบัญชี", text: `ขั้นตอนถัดไป: ${account.next}`, date: "วันนี้" }]);
@@ -145,7 +141,7 @@ function AccountView({ account, back, toast }: { account: typeof leads[number]; 
     <nav className="v2-account-tabs" aria-label="ข้อมูลลูกค้า">{tabs.map(([id, label]) => <button className={tab === id ? "active" : ""} onClick={() => setTab(id)} key={id}>{label}</button>)}</nav>
 
     {tab === "overview" && <div className="v2-account-grid">
-      <section><div className="v2-profile-grid"><article><span>ผู้ติดต่อ</span><b>{account.contact}</b></article><article><span>บทบาท</span><b>{account.role}</b></article><article><span>พื้นที่</span><b>{account.city}</b></article><article><span>แหล่งที่มา</span><b>{account.source}</b></article><article><span>ติดต่อล่าสุด</span><b>{account.lastContact}</b></article><article><span>ผู้ดูแล</span><b>{account.owner}</b></article></div>
+      <section><div className="v2-profile-grid"><article><span>ผู้ติดต่อ</span><b>{account.contact}</b></article><article><span>บทบาท</span><b>{account.role}</b></article><article><span>พื้นที่</span><b>{account.city}</b></article><article className="source"><span>แหล่งที่มา · {account.sourceId}</span><b>{account.source}</b><button onClick={openSource}>ย้อนดูต้นทาง →</button></article><article><span>ติดต่อล่าสุด</span><b>{account.lastContact}</b></article><article><span>ผู้ดูแล</span><b>{account.owner}</b></article></div>
       <section className="v2-panel v2-signal-list"><header><div><span>QUALIFICATION SIGNALS</span><h3>เหตุผลที่ระบบให้คะแนน</h3></div><em>ตรวจสอบได้</em></header>
         {account.evidence.map((item, index) => <article key={item}><i>✓</i><span><b>{item}</b><small>{index === 0 ? "ข้อมูลที่ลูกค้ายืนยัน" : "บันทึกจากกิจกรรมล่าสุด"}</small></span><strong>+{index === 2 ? 10 : 5}</strong></article>)}
         <article className="risk"><i>!</i><span><b>ความเสี่ยงที่ต้องจัดการ</b><small>{account.risk}</small></span><strong>ตรวจ</strong></article>
@@ -177,15 +173,18 @@ function AccountView({ account, back, toast }: { account: typeof leads[number]; 
 }
 
 function CampaignView({ toast, openAccount }: { toast: (text: string) => void; openAccount: (account: typeof leads[number]) => void }) {
+  const [budgets, setBudgets] = useState<Record<string, number>>({});
   const campaigns = [
-    { type: "EVENT", name: "Phuket Demo Roadshow", date: "25–30 พ.ค. 2569", owner: "ผู้รับผิดชอบ", target: "รายชื่อสถานประกอบการจาก Roadshow", result: "Citycare Clinic สนใจสาธิต", status: "ติดตามผล", lead: leads.find((item) => item.name === "Citycare Clinic")! },
-    { type: "CAMPAIGN", name: "CME Evidence Outreach", date: "ส.ค.–ก.ย. 2569", owner: "ผู้รับผิดชอบ", target: "แพทย์และคลินิกที่ขอหลักฐาน", result: "รอกำหนดเป้าหมายหลังอนุมัติ", status: "กำลังดำเนินการ", lead: leads.find((item) => item.name === "Modiolistics Clinic")! },
-    { type: "PROMOTION", name: "Model A Event Offer", date: "สิ้นสุด 31 ส.ค. 2569", owner: "ผู้รับผิดชอบ", target: "ราคา 2.15 ล้านบาท", result: "ผ่อนชำระ 10 งวด", status: "รออนุมัติ", lead: leads.find((item) => item.name === "Dr. J Clinic")! },
+    { id: "EVT-2605-01", type: "EVENT", name: "Phuket Demo Roadshow", date: "25–30 พ.ค. 2569", owner: "ผู้รับผิดชอบ", leads: 10, qualified: 3, customers: 0, result: "Citycare Clinic สนใจสาธิต", status: "ติดตามผล", lead: leads.find((item) => item.name === "Citycare Clinic")! },
+    { id: "EVT-WEBINAR", type: "EVENT", name: "Beauty Innovation Trend Webinar", date: "ข้อมูลจากแผ่นงาน Webinar", owner: "ผู้รับผิดชอบ", leads: 27, qualified: 0, customers: 0, result: "ต้องคัดกรองผู้ลงทะเบียน", status: "รอคัดกรอง", lead: leads.find((item) => item.name === "Modiolistics Clinic")! },
+    { id: "CMP-2608-01", type: "CAMPAIGN", name: "CME Evidence Outreach", date: "ส.ค.–ก.ย. 2569", owner: "ผู้รับผิดชอบ", leads: 1, qualified: 1, customers: 0, result: "รอกำหนดเป้าหมายหลังอนุมัติ", status: "กำลังดำเนินการ", lead: leads.find((item) => item.name === "Modiolistics Clinic")! },
+    { id: "PRO-2608-01", type: "PROMOTION", name: "Model A Event Offer", date: "สิ้นสุด 31 ส.ค. 2569", owner: "ผู้รับผิดชอบ", leads: 1, qualified: 1, customers: 0, result: "ราคา 2.15 ล้านบาท · 10 งวด", status: "รออนุมัติ", lead: leads.find((item) => item.name === "Dr. J Clinic")! },
   ];
   return <div className="v2-view">
     <section className="v2-kicker-row"><div><span>EVENT · PROMOTION · CAMPAIGN</span><h2>กิจกรรมที่ต้องสร้างผลลัพธ์</h2><p>ทุกกิจกรรมต้องมีเป้าหมาย ผู้ดูแล Lead และการติดตามผล</p></div><button onClick={() => toast("เปิดแบบสร้างกิจกรรมแล้ว")}>＋ สร้างกิจกรรม</button></section>
-    <div className="v2-campaign-summary">{[["3", "กิจกรรมที่กำลังติดตาม"], ["3", "Lead ตัวอย่างที่เชื่อมแล้ว"], ["1", "รายการรออนุมัติ"], ["3", "ผู้รับผิดชอบจากตารางเดิม"]].map((item) => <article key={item[1]}><strong>{item[0]}</strong><span>{item[1]}</span></article>)}</div>
-    <section className="v2-campaign-list">{campaigns.map((item, index) => <article key={item.name}><i>0{index + 1}</i><div><span>{item.type} · {item.status}</span><h3>{item.name}</h3><p>{item.date} · ผู้ดูแล {item.owner}</p></div><dl><div><dt>กลุ่มเป้าหมาย</dt><dd>{item.target}</dd></div><div><dt>ผลหรือข้อเสนอ</dt><dd>{item.result}</dd></div></dl><button onClick={() => openAccount(item.lead)}>ดู Lead ที่เกี่ยวข้อง →</button></article>)}</section>
+    <div className="v2-campaign-summary">{[["4", "แหล่ง Lead ที่กำลังติดตาม"], ["39", "Lead ที่ตรวจพบในต้นแบบ"], ["5", "ผ่านเกณฑ์เบื้องต้น"], ["3", "ผู้รับผิดชอบจากตารางเดิม"]].map((item) => <article key={item[1]}><strong>{item[0]}</strong><span>{item[1]}</span></article>)}</div>
+    <section className="v2-source-table"><header><div><span>LEAD SOURCE PERFORMANCE</span><h3>ย้อนจาก Lead ถึงต้นทางและต้นทุน</h3></div><em>ค่าใช้จ่ายที่ยังไม่มีจะไม่คำนวณ</em></header><div className="head"><span>ต้นทาง</span><span>Lead</span><span>ผ่านเกณฑ์</span><span>ลูกค้า</span><span>ค่าใช้จ่าย</span><span>ต้นทุน/Lead</span><span>ต้นทุน/ลูกค้า</span></div>{campaigns.map((item) => { const cost = budgets[item.id] || 0; return <article key={item.id}><span><i>{item.id}</i><b>{item.name}</b><small>{item.type} · {item.owner}</small></span><strong>{item.leads}</strong><strong>{item.qualified}</strong><strong>{item.customers}</strong><label>฿<input aria-label={`ค่าใช้จ่าย ${item.name}`} type="number" min="0" placeholder="กรอก" value={budgets[item.id] || ""} onChange={(event) => setBudgets({ ...budgets, [item.id]: Number(event.target.value) })} /></label><em>{cost ? `฿${Math.round(cost / item.leads).toLocaleString("th-TH")}` : "รอข้อมูล"}</em><em>{cost && item.customers ? `฿${Math.round(cost / item.customers).toLocaleString("th-TH")}` : item.customers ? "฿0" : "ยังไม่มีลูกค้า"}</em></article>; })}</section>
+    <section className="v2-campaign-list">{campaigns.map((item, index) => <article key={item.name}><i>0{index + 1}</i><div><span>{item.id} · {item.type} · {item.status}</span><h3>{item.name}</h3><p>{item.date} · ผู้ดูแล {item.owner}</p></div><dl><div><dt>จำนวน Lead</dt><dd>{item.leads} ราย</dd></div><div><dt>ผลล่าสุด</dt><dd>{item.result}</dd></div></dl><button onClick={() => openAccount(item.lead)}>ดู Lead ที่เกี่ยวข้อง →</button></article>)}</section>
     <section className="v2-owner-target"><header><div><span>SALES OWNERSHIP</span><h3>ผู้ดูแลตามตาราง Lead เดิม</h3></div><em>แหล่งข้อมูล: Lead Update.xlsx</em></header>{[["ผู้รับผิดชอบ", "พบชื่อในตารางรวม", "รอยืนยันเป้ารายบุคคล"], ["ผู้รับผิดชอบ", "มีแผ่นงานรายบุคคล", "รอยืนยันเป้ารายบุคคล"], ["ผู้รับผิดชอบ", "มีแผ่นงานรายบุคคลและ Roadshow", "รอยืนยันเป้ารายบุคคล"]].map((item) => <article key={item[0]}><i>{item[0].slice(0, 1)}</i><span><b>{item[0]}</b><small>{item[1]}</small></span><strong>{item[2]}</strong><button onClick={() => toast(`กรองรายการของ ${item[0]} แล้ว`)}>เปิดรายการ</button></article>)}</section>
   </div>;
 }
