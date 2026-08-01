@@ -144,6 +144,7 @@ function TodayView({ changeView, toast }: { changeView: (view: InternalView) => 
   const [newTask, setNewTask] = useState("");
   const [annualTarget, setAnnualTarget] = useState(0);
   const [sold, setSold] = useState(0);
+  const [importedCounts, setImportedCounts] = useState({ events: 0, training: 0, afterSales: 0, openService: 0 });
   const [dataState, setDataState] = useState<"loading" | "saved" | "fallback">("loading");
   const days = Array.from({ length: 31 }, (_, index) => index + 1);
   const remaining = Math.max(annualTarget - sold, 0);
@@ -151,6 +152,13 @@ function TodayView({ changeView, toast }: { changeView: (view: InternalView) => 
     fetch("/api/workspace").then((response) => response.ok ? response.json() : Promise.reject()).then((payload) => {
       if (Array.isArray(payload.tasks)) setTasks(payload.tasks.map((task: Record<string, unknown>) => ({ id: String(task.id), account: String(task.account_id || "งานทั่วไป"), title: String(task.title), owner: "ผู้รับผิดชอบ", due: Number(String(task.due_date).slice(-2)), status: String(task.status), priority: String(task.priority) })));
       if (payload.target) { setAnnualTarget(Number(payload.target.target_value || 0)); setSold(Number(payload.target.actual_value || 0)); }
+      const afterSales = Array.isArray(payload.afterSales) ? payload.afterSales : [];
+      setImportedCounts({
+        events: Array.isArray(payload.events) ? payload.events.length : 0,
+        training: Array.isArray(payload.training) ? payload.training.length : 0,
+        afterSales: afterSales.length,
+        openService: afterSales.filter((item: Record<string, unknown>) => String(item.status).toLowerCase() !== "done").length,
+      });
       setDataState("saved");
     }).catch(() => setDataState("fallback"));
   }, []);
@@ -162,6 +170,7 @@ function TodayView({ changeView, toast }: { changeView: (view: InternalView) => 
     <section className="v2-user-dashboard"><div className="v2-user-identity"><i>น</i><span><small>สวัสดี</small><h2>ไนน์</h2><p>ภาพรวมสำหรับผู้บริหารการขาย · 1 ส.ค. 2569</p></span></div><div className="v2-user-focus"><small>สิ่งที่ควรดูเป็นอันดับแรก</small><b>3 Lead ต้องยืนยันขั้นตอนถัดไป</b><button onClick={() => changeView("crm")}>เปิดรายการ →</button></div></section>
     <section className="v2-kicker-row"><div><span>CURRENT DASHBOARD</span><h2>งานและนัดหมายของไนน์</h2><p>เห็นสิ่งที่ต้องทำ สถานะ และกำหนดเวลาในหน้าเดียว</p></div><em className={`data-${dataState}`}>{dataState === "saved" ? "● บันทึกในระบบแล้ว" : dataState === "loading" ? "กำลังโหลดข้อมูล" : "ข้อมูลสำรองในหน้าจอ"}</em></section>
     <section className="v2-home-target"><header><div><span>ACTIONABLE TARGET · 2569</span><h3>เป้าหมายที่ต้องลงมือทำ</h3></div><button onClick={() => changeView("performance")}>ดูรายละเอียดทั้งหมด</button></header><div className="inputs"><label>เป้าขายทั้งปี<input type="number" min="0" value={annualTarget} onChange={(event) => setAnnualTarget(Math.max(0, Number(event.target.value) || 0))} /></label><label>ขายแล้ว<input type="number" min="0" max={annualTarget} value={sold} onChange={(event) => setSold(Math.min(annualTarget, Math.max(0, Number(event.target.value) || 0)))} /></label><article><span>ต้องขายเพิ่ม</span><strong>{remaining} เครื่อง</strong></article><article><span>นัดสาธิตที่ควรมี</span><strong>{remaining * 5} ครั้ง</strong></article><article><span>Lead ที่ผ่านเกณฑ์</span><strong>{Math.ceil((remaining * 5) / .4)} ราย</strong></article><button className="save" onClick={saveTarget}>บันทึกเป้าหมาย</button></div><footer>อัตราแปลงเป็นสมมติฐานสำหรับวางแผน จนกว่าจะมีข้อมูลจริงย้อนหลังเพียงพอ</footer></section>
+    <section className="v2-import-overview"><header><div><span>KPI EVALUATION · THAILAND</span><h3>ข้อมูลปี 2569 ที่นำเข้าแล้ว</h3></div><em>แหล่งข้อมูลจริง · 24 ก.ค. 2569</em></header><div>{[[String(importedCounts.events), "กิจกรรมและแคมเปญ", "campaigns"], [String(importedCounts.training), "ฝึกอบรมและสาธิต", "operations"], [String(importedCounts.afterSales), "งานหลังการขาย", "operations"], [String(importedCounts.openService), "งานบริการที่ยังเปิด", "operations"]].map((item) => <button key={item[1]} onClick={() => changeView(item[2] as InternalView)}><strong>{item[0]}</strong><span>{item[1]}</span><small>เปิดดูรายละเอียด →</small></button>)}</div></section>
     <div className="v2-today-metrics">{[[String(openTasks.length), "งานที่ยังเปิด"], [String(tasks.filter((task) => task.status === "กำลังทำ").length), "กำลังดำเนินการ"], [String(tasks.filter((task) => task.priority === "สูง" && task.status !== "เสร็จแล้ว").length), "งานสำคัญ"], [String(new Set(openTasks.map((task) => task.due)).size), "วันที่มีนัดหมาย"]].map((item) => <article key={item[1]}><strong>{item[0]}</strong><span>{item[1]}</span></article>)}</div>
     <div className="v2-todo-calendar">
       <section className="v2-panel v2-todo-list"><header><div><span>MY TO-DO LIST</span><h3>รายการงาน</h3></div><button onClick={() => changeView("crm")}>เปิดรายชื่อลูกค้า</button></header>
