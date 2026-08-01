@@ -270,6 +270,78 @@ export const partnerPerformanceSnapshots = sqliteTable("partner_performance_snap
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const sourceImports = sqliteTable("source_imports", {
+  id: text("id").primaryKey(),
+  sourceFileId: text("source_file_id").notNull(),
+  fileName: text("file_name").notNull(),
+  sourceModifiedAt: text("source_modified_at").notNull(),
+  importedAt: text("imported_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  status: text("status").notNull().default("Imported"),
+});
+
+export const companyTeamDirectory = sqliteTable("company_team_directory", {
+  id: text("id").primaryKey(),
+  displayName: text("display_name").notNull(),
+  responsibility: text("responsibility").notNull(),
+  email: text("email").notNull().default(""),
+  phone: text("phone").notNull().default(""),
+  sourceImportId: text("source_import_id").notNull(),
+});
+
+export const kpiEventRecords = sqliteTable("kpi_event_records", {
+  id: text("id").primaryKey(),
+  periodKey: text("period_key").notNull(),
+  name: text("name").notNull(),
+  activityType: text("activity_type").notNull(),
+  targetLeads: integer("target_leads").notNull().default(0),
+  actualLeads: integer("actual_leads").notNull().default(0),
+  demos: integer("demos").notNull().default(0),
+  quotations: integer("quotations").notNull().default(0),
+  potentialSales: integer("potential_sales").notNull().default(0),
+  closedSales: integer("closed_sales").notNull().default(0),
+  followUp: text("follow_up").notNull().default(""),
+  status: text("status").notNull(),
+  sourceSheet: text("source_sheet").notNull(),
+  sourceRow: integer("source_row").notNull(),
+  sourceImportId: text("source_import_id").notNull(),
+});
+
+export const trainingActivityRecords = sqliteTable("training_activity_records", {
+  id: text("id").primaryKey(),
+  activityDate: text("activity_date").notNull().default(""),
+  projectName: text("project_name").notNull(),
+  targetSegment: text("target_segment").notNull().default(""),
+  location: text("location").notNull().default(""),
+  topic: text("topic").notNull(),
+  studentCount: integer("student_count").notNull().default(0),
+  durationLabel: text("duration_label").notNull().default(""),
+  trainers: text("trainers").notNull().default(""),
+  trainerNote: text("trainer_note").notNull().default(""),
+  sourceSheet: text("source_sheet").notNull(),
+  sourceRow: integer("source_row").notNull(),
+  sourceImportId: text("source_import_id").notNull(),
+});
+
+export const afterSalesActivityRecords = sqliteTable("after_sales_activity_records", {
+  id: text("id").primaryKey(),
+  clientName: text("client_name").notNull(),
+  activityDate: text("activity_date").notNull().default(""),
+  activity: text("activity").notNull(),
+  status: text("status").notNull(),
+  sourceSheet: text("source_sheet").notNull(),
+  sourceRow: integer("source_row").notNull(),
+  sourceImportId: text("source_import_id").notNull(),
+});
+
+export const businessIssues = sqliteTable("business_issues", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  details: text("details").notNull().default(""),
+  dueDate: text("due_date").notNull().default(""),
+  status: text("status").notNull(),
+  sourceImportId: text("source_import_id").notNull(),
+});
+
 export const tenantCompanies = sqliteTable("tenant_companies", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),

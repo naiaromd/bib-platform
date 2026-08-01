@@ -2,16 +2,17 @@
 
 import { useEffect, useState } from "react";
 
-type InternalView = "today" | "crm" | "account" | "customers" | "campaigns" | "approval" | "performance" | "settings";
+type InternalView = "today" | "crm" | "account" | "customers" | "campaigns" | "operations" | "approval" | "performance" | "settings";
 
 const workspaces: Array<[InternalView, string, string, string]> = [
   ["today", "01", "งานวันนี้", "สิ่งที่ต้องตัดสินใจและติดตาม"],
   ["crm", "02", "ลูกค้าและโอกาสขาย", "บุคคล องค์กร และขั้นตอนถัดไป"],
   ["customers", "03", "ลูกค้าที่ใช้งาน", "เครื่องที่ติดตั้งและผลงาน LINNA"],
   ["campaigns", "04", "กิจกรรมและแคมเปญ", "Event Promotion และ Campaign"],
-  ["approval", "05", "ข้อเสนอและการอนุมัติ", "รูปแบบธุรกิจและเอกสาร"],
-  ["performance", "06", "ผลการดำเนินงาน", "เป้าหมาย คุณภาพ และความเสี่ยง"],
-  ["settings", "07", "ตั้งค่าพื้นที่ BIB", "ช่องข้อมูล เอกสาร งาน และขั้นอนุมัติ"],
+  ["operations", "05", "ฝึกอบรมและบริการ", "กิจกรรม Trainer และงานหลังการขาย"],
+  ["approval", "06", "ข้อเสนอและการอนุมัติ", "รูปแบบธุรกิจและเอกสาร"],
+  ["performance", "07", "ผลการดำเนินงาน", "เป้าหมาย คุณภาพ และความเสี่ยง"],
+  ["settings", "08", "ตั้งค่าพื้นที่ BIB", "ช่องข้อมูล เอกสาร งาน และขั้นอนุมัติ"],
 ];
 
 const leads = [
@@ -84,6 +85,7 @@ export default function InternalPlatformPage() {
           {view === "customers" && <CustomersView />}
           {view === "account" && <AccountView account={selectedAccount} back={() => setView("crm")} openSource={() => setView("campaigns")} toast={toast} />}
           {view === "campaigns" && <CampaignView toast={toast} openAccount={openAccount} />}
+          {view === "operations" && <OperationsView />}
           {view === "approval" && <ApprovalView toast={toast} />}
           {view === "performance" && <PerformanceView />}
           {view === "settings" && <ConfigurationView toast={toast} />}
@@ -230,8 +232,46 @@ function AccountView({ account, back, openSource, toast }: { account: typeof lea
   </div>;
 }
 
+type ImportedEvent = { id: string; period_key: string; name: string; activity_type: string; target_leads: number; actual_leads: number; demos: number; quotations: number; potential_sales: number; closed_sales: number; follow_up: string; status: string; source_sheet: string; source_row: number };
+type TrainingActivity = { id: string; activity_date: string; project_name: string; target_segment: string; location: string; topic: string; student_count: number; duration_label: string; trainers: string; trainer_note: string; source_sheet: string; source_row: number };
+type AfterSalesActivity = { id: string; client_name: string; activity_date: string; activity: string; status: string; source_sheet: string; source_row: number };
+type SourceImport = { file_name: string; source_modified_at: string; imported_at: string; status: string };
+
+function OperationsView() {
+  const [training, setTraining] = useState<TrainingActivity[]>([]);
+  const [afterSales, setAfterSales] = useState<AfterSalesActivity[]>([]);
+  const [source, setSource] = useState<SourceImport | null>(null);
+  const [tab, setTab] = useState<"training" | "service">("training");
+  useEffect(() => {
+    fetch("/api/workspace").then((response) => response.json()).then((payload) => {
+      setTraining(Array.isArray(payload.training) ? payload.training : []);
+      setAfterSales(Array.isArray(payload.afterSales) ? payload.afterSales : []);
+      setSource(payload.sourceImport || null);
+    });
+  }, []);
+  const activeService = afterSales.filter((item) => item.status.toLowerCase() !== "done").length;
+  const students = training.reduce((total, item) => total + Number(item.student_count || 0), 0);
+  const thaiDate = (value: string) => value ? new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "short", year: "numeric" }).format(new Date(`${value}T00:00:00`)) : "ยังไม่ระบุวัน";
+  return <div className="v2-view v2-operations-view">
+    <section className="v2-kicker-row"><div><span>TRAINING & AFTER SALES</span><h2>ฝึกอบรมและบริการหลังการขาย</h2><p>กิจกรรมจริงจากรายงาน KPI ของทีมประเทศไทย</p></div><em className="v2-import-badge">นำเข้าแล้ว · {source?.file_name || "กำลังโหลด"}</em></section>
+    <div className="v2-operations-summary"><article><strong>{training.length}</strong><span>กิจกรรมฝึกอบรมและสาธิต</span></article><article><strong>{students}</strong><span>ผู้เข้าร่วมที่บันทึกไว้</span></article><article><strong>{afterSales.length}</strong><span>งานหลังการขาย</span></article><article className={activeService ? "alert" : ""}><strong>{activeService}</strong><span>งานที่ยังดำเนินการ</span></article></div>
+    <nav className="v2-customer-tabs"><button className={tab === "training" ? "active" : ""} onClick={() => setTab("training")}>การฝึกอบรมและสาธิต</button><button className={tab === "service" ? "active" : ""} onClick={() => setTab("service")}>บริการหลังการขาย</button></nav>
+    {tab === "training" && <section className="v2-imported-list"><header><div><span>TRAINING ACTIVITY</span><h3>ประวัติกิจกรรมรายโครงการ</h3></div><em>{training.length} รายการ</em></header><div className="head"><span>วันที่และโครงการ</span><span>หัวข้อ</span><span>ผู้เข้าร่วม</span><span>ผู้ฝึกอบรม</span><span>หลักฐานต้นทาง</span></div>{training.map((item) => <article key={item.id}><span><b>{item.project_name}</b><small>{thaiDate(item.activity_date)} · {item.location}</small></span><span><b>{item.topic}</b><small>{item.target_segment}{item.trainer_note ? ` · ${item.trainer_note}` : ""}</small></span><strong>{item.student_count || "—"}</strong><span>{item.trainers || "ยังไม่ระบุ"}</span><em>{item.source_sheet} · แถว {item.source_row}</em></article>)}</section>}
+    {tab === "service" && <section className="v2-imported-list v2-service-list"><header><div><span>AFTER SALES ACTIVITY</span><h3>คำขอและงานบริการลูกค้า</h3></div><em>{afterSales.length} รายการ</em></header><div className="head"><span>ลูกค้า</span><span>กิจกรรม</span><span>วันที่</span><span>สถานะ</span><span>หลักฐานต้นทาง</span></div>{afterSales.map((item) => <article key={item.id}><span><b>{item.client_name}</b></span><span>{item.activity}</span><span>{thaiDate(item.activity_date)}</span><strong className={item.status.toLowerCase() === "done" ? "done" : "active"}>{item.status === "Done" ? "เสร็จแล้ว" : "กำลังดำเนินการ"}</strong><em>{item.source_sheet} · แถว {item.source_row}</em></article>)}</section>}
+    <footer className="v2-data-quality-note"><b>หมายเหตุคุณภาพข้อมูล</b><span>ช่องว่างยังคงเป็น “ไม่ระบุ” และไม่ถูกนับเป็นศูนย์ · รายการวันที่ 25 ธ.ค. 2568 ถูกเก็บตามวันที่จริงแม้อยู่ในแผ่นงานปี 2569</span></footer>
+  </div>;
+}
+
 function CampaignView({ toast, openAccount }: { toast: (text: string) => void; openAccount: (account: typeof leads[number]) => void }) {
   const [budgets, setBudgets] = useState<Record<string, number>>({});
+  const [importedEvents, setImportedEvents] = useState<ImportedEvent[]>([]);
+  const [source, setSource] = useState<SourceImport | null>(null);
+  useEffect(() => {
+    fetch("/api/workspace").then((response) => response.json()).then((payload) => {
+      setImportedEvents(Array.isArray(payload.events) ? payload.events : []);
+      setSource(payload.sourceImport || null);
+    });
+  }, []);
   const campaigns = [
     { id: "EVT-2605-01", type: "EVENT", name: "Phuket Demo Roadshow", date: "25–30 พ.ค. 2569", owner: "ผู้รับผิดชอบ", leads: 10, qualified: 3, customers: 0, result: "Citycare Clinic สนใจสาธิต", status: "ติดตามผล", lead: leads.find((item) => item.name === "Citycare Clinic")! },
     { id: "EVT-WEBINAR", type: "EVENT", name: "Beauty Innovation Trend Webinar", date: "ข้อมูลจากแผ่นงาน Webinar", owner: "ผู้รับผิดชอบ", leads: 27, qualified: 0, customers: 0, result: "ต้องคัดกรองผู้ลงทะเบียน", status: "รอคัดกรอง", lead: leads.find((item) => item.name === "Modiolistics Clinic")! },
@@ -240,6 +280,7 @@ function CampaignView({ toast, openAccount }: { toast: (text: string) => void; o
   ];
   return <div className="v2-view">
     <section className="v2-kicker-row"><div><span>EVENT · PROMOTION · CAMPAIGN</span><h2>กิจกรรมที่ต้องสร้างผลลัพธ์</h2><p>ทุกกิจกรรมต้องมีเป้าหมาย ผู้ดูแล Lead และการติดตามผล</p></div><button onClick={() => toast("เปิดแบบสร้างกิจกรรมแล้ว")}>＋ สร้างกิจกรรม</button></section>
+    <section className="v2-imported-events"><header><div><span>ข้อมูลจริงที่นำเข้า</span><h3>กิจกรรมจาก KPI Evaluation</h3></div><em>{source ? `${importedEvents.length} รายการ · ${source.status}` : "กำลังโหลด"}</em></header><div className="head"><span>กิจกรรม</span><span>ช่วงเวลา</span><span>เป้า Lead</span><span>Lead จริง</span><span>ใบเสนอราคา</span><span>โอกาสขาย</span><span>ปิดการขาย</span></div>{importedEvents.map((item) => <article key={item.id}><span><b>{item.name}</b><small>{item.activity_type} · {item.status}</small></span><span>{item.period_key}</span><strong>{item.target_leads || "—"}</strong><strong>{item.actual_leads || "—"}</strong><strong>{item.quotations || "—"}</strong><strong>{item.potential_sales || "—"}</strong><strong>{item.closed_sales || "—"}</strong></article>)}</section>
     <div className="v2-campaign-summary">{[["4", "แหล่ง Lead ที่กำลังติดตาม"], ["39", "Lead ที่ตรวจพบในต้นแบบ"], ["5", "ผ่านเกณฑ์เบื้องต้น"], ["3", "ผู้รับผิดชอบจากตารางเดิม"]].map((item) => <article key={item[1]}><strong>{item[0]}</strong><span>{item[1]}</span></article>)}</div>
     <section className="v2-source-table"><header><div><span>LEAD SOURCE PERFORMANCE</span><h3>ย้อนจาก Lead ถึงต้นทางและต้นทุน</h3></div><em>ค่าใช้จ่ายที่ยังไม่มีจะไม่คำนวณ</em></header><div className="head"><span>ต้นทาง</span><span>Lead</span><span>ผ่านเกณฑ์</span><span>ลูกค้า</span><span>ค่าใช้จ่าย</span><span>ต้นทุน/Lead</span><span>ต้นทุน/ลูกค้า</span></div>{campaigns.map((item) => { const cost = budgets[item.id] || 0; return <article key={item.id}><span><i>{item.id}</i><b>{item.name}</b><small>{item.type} · {item.owner}</small></span><strong>{item.leads}</strong><strong>{item.qualified}</strong><strong>{item.customers}</strong><label>฿<input aria-label={`ค่าใช้จ่าย ${item.name}`} type="number" min="0" placeholder="กรอก" value={budgets[item.id] || ""} onChange={(event) => setBudgets({ ...budgets, [item.id]: Number(event.target.value) })} /></label><em>{cost ? `฿${Math.round(cost / item.leads).toLocaleString("th-TH")}` : "รอข้อมูล"}</em><em>{cost && item.customers ? `฿${Math.round(cost / item.customers).toLocaleString("th-TH")}` : item.customers ? "฿0" : "ยังไม่มีลูกค้า"}</em></article>; })}</section>
     <section className="v2-campaign-list">{campaigns.map((item, index) => <article key={item.name}><i>0{index + 1}</i><div><span>{item.id} · {item.type} · {item.status}</span><h3>{item.name}</h3><p>{item.date} · ผู้ดูแล {item.owner}</p></div><dl><div><dt>จำนวน Lead</dt><dd>{item.leads} ราย</dd></div><div><dt>ผลล่าสุด</dt><dd>{item.result}</dd></div></dl><button onClick={() => openAccount(item.lead)}>ดู Lead ที่เกี่ยวข้อง →</button></article>)}</section>

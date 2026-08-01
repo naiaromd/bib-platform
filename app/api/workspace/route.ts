@@ -1,4 +1,5 @@
 import { env } from "cloudflare:workers";
+import { afterSalesActivities, businessIssues, companyContacts, eventRecords, kpiSource, trainingActivities } from "@/lib/kpi-import-data";
 
 function db() {
   if (!env.DB) throw new Error("D1 binding DB is unavailable");
@@ -54,6 +55,33 @@ async function initialize() {
       approved_refunds REAL NOT NULL DEFAULT 0, total_usage_minutes REAL NOT NULL DEFAULT 0,
       exception_count INTEGER NOT NULL DEFAULT 0, status TEXT NOT NULL DEFAULT 'Needs Review',
       source_note TEXT NOT NULL DEFAULT '', updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS source_imports (
+      id TEXT PRIMARY KEY, source_file_id TEXT NOT NULL, file_name TEXT NOT NULL,
+      source_modified_at TEXT NOT NULL, imported_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      status TEXT NOT NULL DEFAULT 'Imported')`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS company_team_directory (
+      id TEXT PRIMARY KEY, display_name TEXT NOT NULL, responsibility TEXT NOT NULL,
+      email TEXT NOT NULL DEFAULT '', phone TEXT NOT NULL DEFAULT '', source_import_id TEXT NOT NULL)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS kpi_event_records (
+      id TEXT PRIMARY KEY, period_key TEXT NOT NULL, name TEXT NOT NULL, activity_type TEXT NOT NULL,
+      target_leads INTEGER NOT NULL DEFAULT 0, actual_leads INTEGER NOT NULL DEFAULT 0,
+      demos INTEGER NOT NULL DEFAULT 0, quotations INTEGER NOT NULL DEFAULT 0,
+      potential_sales INTEGER NOT NULL DEFAULT 0, closed_sales INTEGER NOT NULL DEFAULT 0,
+      follow_up TEXT NOT NULL DEFAULT '', status TEXT NOT NULL, source_sheet TEXT NOT NULL,
+      source_row INTEGER NOT NULL, source_import_id TEXT NOT NULL)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS training_activity_records (
+      id TEXT PRIMARY KEY, activity_date TEXT NOT NULL DEFAULT '', project_name TEXT NOT NULL,
+      target_segment TEXT NOT NULL DEFAULT '', location TEXT NOT NULL DEFAULT '', topic TEXT NOT NULL,
+      student_count INTEGER NOT NULL DEFAULT 0, duration_label TEXT NOT NULL DEFAULT '',
+      trainers TEXT NOT NULL DEFAULT '', trainer_note TEXT NOT NULL DEFAULT '', source_sheet TEXT NOT NULL,
+      source_row INTEGER NOT NULL, source_import_id TEXT NOT NULL)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS after_sales_activity_records (
+      id TEXT PRIMARY KEY, client_name TEXT NOT NULL, activity_date TEXT NOT NULL DEFAULT '',
+      activity TEXT NOT NULL, status TEXT NOT NULL, source_sheet TEXT NOT NULL,
+      source_row INTEGER NOT NULL, source_import_id TEXT NOT NULL)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS business_issues (
+      id TEXT PRIMARY KEY, title TEXT NOT NULL, details TEXT NOT NULL DEFAULT '', due_date TEXT NOT NULL DEFAULT '',
+      status TEXT NOT NULL, source_import_id TEXT NOT NULL)`),
   ]);
 
   const existing = await d1.prepare("SELECT COUNT(*) AS total FROM workspace_tasks WHERE owner_user_id = ?").bind("nine").first<{ total: number }>();
@@ -69,6 +97,43 @@ async function initialize() {
   await d1.prepare(`INSERT OR IGNORE INTO sales_targets
     (id, owner_user_id, period_key, metric_code, target_value, actual_value, status)
     VALUES (?, ?, ?, ?, ?, ?, ?)`).bind("target-nine-2026-machine", "nine", "2026", "MACHINES_SOLD", 0, 0, "Draft").run();
+  await d1.prepare(`UPDATE sales_targets SET target_value = 15, actual_value = 1,
+    status = 'Imported', updated_at = CURRENT_TIMESTAMP
+    WHERE id = 'target-nine-2026-machine' AND status = 'Draft'`).run();
+
+  await d1.prepare(`INSERT OR IGNORE INTO source_imports
+    (id, source_file_id, file_name, source_modified_at, status) VALUES (?, ?, ?, ?, 'Imported')`)
+    .bind(kpiSource.id, kpiSource.sourceFileId, kpiSource.fileName, kpiSource.modifiedAt).run();
+  for (const row of companyContacts) {
+    await d1.prepare(`INSERT OR IGNORE INTO company_team_directory
+      (id, display_name, responsibility, email, phone, source_import_id) VALUES (?, ?, ?, ?, ?, ?)`)
+      .bind(...row, kpiSource.id).run();
+  }
+  for (const row of eventRecords) {
+    await d1.prepare(`INSERT OR IGNORE INTO kpi_event_records
+      (id, period_key, name, activity_type, target_leads, actual_leads, demos, quotations,
+       potential_sales, closed_sales, follow_up, status, source_sheet, source_row, source_import_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .bind(...row, kpiSource.id).run();
+  }
+  for (const row of trainingActivities) {
+    await d1.prepare(`INSERT OR IGNORE INTO training_activity_records
+      (id, activity_date, project_name, target_segment, location, topic, student_count,
+       duration_label, trainers, trainer_note, source_sheet, source_row, source_import_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .bind(...row, kpiSource.id).run();
+  }
+  for (const row of afterSalesActivities) {
+    await d1.prepare(`INSERT OR IGNORE INTO after_sales_activity_records
+      (id, client_name, activity_date, activity, status, source_sheet, source_row, source_import_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+      .bind(...row, kpiSource.id).run();
+  }
+  for (const row of businessIssues) {
+    await d1.prepare(`INSERT OR IGNORE INTO business_issues
+      (id, title, details, due_date, status, source_import_id) VALUES (?, ?, ?, ?, ?, ?)`)
+      .bind(...row, kpiSource.id).run();
+  }
   const customers = [
     ["anantara-wellness", "Anantara Wellness", "Anantara Wellness", "Luxury resort spa", "A"],
     ["amanpuri", "Amanpuri", "Amanpuri", "Luxury resort", "A"],
@@ -99,7 +164,7 @@ async function initialize() {
      complimentary_sessions, training_sessions, reported_gross_revenue, eligible_gross_revenue,
      bib_share_rate_bps, bib_share_vat_inclusive, linna_share, deductible_marketing,
      approved_refunds, total_usage_minutes, exception_count, status, source_note)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .bind("linna-2026-06", "linna", "2026-06", 5, 4, 2, 1, 19940.80, 15580.60,
       4000, 6232.24, 9348.36, 0, 0, 316.33, 2, "Needs Review",
       "Paid Session_ICOONE.xlsx; one paid row dated 1969-05-29 is outside June and all workbook dates use 1969 instead of 2569/2026").run();
@@ -117,7 +182,18 @@ export async function GET() {
       WHERE a.account_status = 'Active' ORDER BY CASE WHEN a.id = 'linna' THEN 1 ELSE 0 END, a.display_name`).all();
     const linnaPerformance = await d1.prepare(`SELECT * FROM partner_performance_snapshots
       WHERE account_id = 'linna' ORDER BY report_month DESC LIMIT 1`).first();
-    return Response.json({ user: { id: "nine", displayName: "ไนน์", role: "ผู้บริหารการขาย" }, tasks: tasks.results, target, customers: customers.results, linnaPerformance });
+    const events = await d1.prepare("SELECT * FROM kpi_event_records ORDER BY period_key, source_row").all();
+    const training = await d1.prepare("SELECT * FROM training_activity_records ORDER BY activity_date DESC, source_row DESC").all();
+    const afterSales = await d1.prepare("SELECT * FROM after_sales_activity_records ORDER BY CASE WHEN activity_date = '' THEN 1 ELSE 0 END, activity_date DESC, source_row DESC").all();
+    const team = await d1.prepare("SELECT * FROM company_team_directory ORDER BY responsibility, display_name").all();
+    const issues = await d1.prepare("SELECT * FROM business_issues ORDER BY CASE WHEN status = 'Overdue' THEN 0 ELSE 1 END, due_date").all();
+    const sourceImport = await d1.prepare("SELECT * FROM source_imports WHERE id = ?").bind(kpiSource.id).first();
+    return Response.json({
+      user: { id: "nine", displayName: "ไนน์", role: "ผู้บริหารการขาย" },
+      tasks: tasks.results, target, customers: customers.results, linnaPerformance,
+      events: events.results, training: training.results, afterSales: afterSales.results,
+      team: team.results, issues: issues.results, sourceImport,
+    });
   } catch (error) {
     return Response.json({ error: error instanceof Error ? error.message : "Unable to load workspace" }, { status: 500 });
   }
