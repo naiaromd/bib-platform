@@ -130,7 +130,7 @@ export const clientContacts = sqliteTable("client_contacts", {
   consentStatus: text("consent_status").notNull().default("ยังไม่ยืนยัน"),
   notes: text("notes").notNull().default(""),
   active: integer("active", { mode: "boolean" }).notNull().default(true),
-  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(""),
 });
 
 export const deviceDeployments = sqliteTable("device_deployments", {
