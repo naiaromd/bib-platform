@@ -36,6 +36,24 @@ async function initialize() {
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
     d1.prepare(`CREATE INDEX IF NOT EXISTS crm_leads_source_idx ON crm_leads (source_id)`),
     d1.prepare(`CREATE INDEX IF NOT EXISTS crm_leads_owner_status_idx ON crm_leads (owner_user_id, status)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS client_accounts (
+      id TEXT PRIMARY KEY, legal_name TEXT NOT NULL, display_name TEXT NOT NULL,
+      business_segment TEXT NOT NULL, commercial_model TEXT NOT NULL,
+      account_status TEXT NOT NULL DEFAULT 'Active', created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS device_deployments (
+      id TEXT PRIMARY KEY, account_id TEXT NOT NULL, model TEXT NOT NULL,
+      serial_number TEXT NOT NULL DEFAULT '', installed_at TEXT NOT NULL DEFAULT '',
+      cumulative_hours REAL NOT NULL DEFAULT 0, status TEXT NOT NULL DEFAULT 'Pending delivery')`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS partner_performance_snapshots (
+      id TEXT PRIMARY KEY, account_id TEXT NOT NULL, report_month TEXT NOT NULL,
+      reported_paid_sessions INTEGER NOT NULL DEFAULT 0, eligible_paid_sessions INTEGER NOT NULL DEFAULT 0,
+      complimentary_sessions INTEGER NOT NULL DEFAULT 0, training_sessions INTEGER NOT NULL DEFAULT 0,
+      reported_gross_revenue REAL NOT NULL DEFAULT 0, eligible_gross_revenue REAL NOT NULL DEFAULT 0,
+      bib_share_rate_bps INTEGER NOT NULL DEFAULT 4000, bib_share_vat_inclusive REAL NOT NULL DEFAULT 0,
+      linna_share REAL NOT NULL DEFAULT 0, deductible_marketing REAL NOT NULL DEFAULT 0,
+      approved_refunds REAL NOT NULL DEFAULT 0, total_usage_minutes REAL NOT NULL DEFAULT 0,
+      exception_count INTEGER NOT NULL DEFAULT 0, status TEXT NOT NULL DEFAULT 'Needs Review',
+      source_note TEXT NOT NULL DEFAULT '', updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
   ]);
 
   const existing = await d1.prepare("SELECT COUNT(*) AS total FROM workspace_tasks WHERE owner_user_id = ?").bind("nine").first<{ total: number }>();
@@ -51,6 +69,40 @@ async function initialize() {
   await d1.prepare(`INSERT OR IGNORE INTO sales_targets
     (id, owner_user_id, period_key, metric_code, target_value, actual_value, status)
     VALUES (?, ?, ?, ?, ?, ?, ?)`).bind("target-nine-2026-machine", "nine", "2026", "MACHINES_SOLD", 0, 0, "Draft").run();
+  const customers = [
+    ["anantara-wellness", "Anantara Wellness", "Anantara Wellness", "Luxury resort spa", "A"],
+    ["amanpuri", "Amanpuri", "Amanpuri", "Luxury resort", "A"],
+    ["sincere-beauty", "Sincere Beauty Clinic", "Sincere Beauty Clinic", "Beauty clinic", "A"],
+    ["unwa-wellness", "Unwa Wellness (TCM)", "Unwa Wellness", "TCM wellness", "A"],
+    ["kmb-hospital", "KMB Hospital", "KMB Hospital", "Hospital", "A"],
+    ["kihava", "Kihava", "Kihava", "Wellness", "A"],
+    ["phuket-detox", "Phuket Detox", "Phuket Detox", "Detox/wellness", "A"],
+    ["detoxea", "Detoxea", "Detoxea", "Detox/wellness", "A"],
+    ["linna", "บริษัท ซีเคแอล เฮลท์ แอนด์ บิวตี้ อินเตอร์เนชั่นแนล จำกัด", "LINNA Clinic", "Wellness", "D2"],
+  ];
+  for (const customer of customers) {
+    await d1.prepare(`INSERT OR IGNORE INTO client_accounts
+      (id, legal_name, display_name, business_segment, commercial_model, account_status)
+      VALUES (?, ?, ?, ?, ?, 'Active')`).bind(...customer).run();
+  }
+  for (const customer of customers.slice(0, 8)) {
+    await d1.prepare(`INSERT OR IGNORE INTO device_deployments
+      (id, account_id, model, serial_number, installed_at, cumulative_hours, status)
+      VALUES (?, ?, 'icoone Laser Med', '', '', 0, 'ต้องยืนยันข้อมูลเครื่อง')`)
+      .bind(`deployment-${customer[0]}`, customer[0]).run();
+  }
+  await d1.prepare(`INSERT OR IGNORE INTO device_deployments
+    (id, account_id, model, serial_number, installed_at, cumulative_hours, status)
+    VALUES ('deployment-linna', 'linna', 'icoone Laser Med', '', '', 0, 'ใช้งานภายใต้ D2')`).run();
+  await d1.prepare(`INSERT OR REPLACE INTO partner_performance_snapshots
+    (id, account_id, report_month, reported_paid_sessions, eligible_paid_sessions,
+     complimentary_sessions, training_sessions, reported_gross_revenue, eligible_gross_revenue,
+     bib_share_rate_bps, bib_share_vat_inclusive, linna_share, deductible_marketing,
+     approved_refunds, total_usage_minutes, exception_count, status, source_note)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    .bind("linna-2026-06", "linna", "2026-06", 5, 4, 2, 1, 19940.80, 15580.60,
+      4000, 6232.24, 9348.36, 0, 0, 316.33, 2, "Needs Review",
+      "Paid Session_ICOONE.xlsx; one paid row dated 1969-05-29 is outside June and all workbook dates use 1969 instead of 2569/2026").run();
 }
 
 export async function GET() {
@@ -59,7 +111,13 @@ export async function GET() {
     const d1 = db();
     const tasks = await d1.prepare("SELECT * FROM workspace_tasks WHERE owner_user_id = ? ORDER BY due_date, created_at").bind("nine").all();
     const target = await d1.prepare("SELECT * FROM sales_targets WHERE owner_user_id = ? AND period_key = ? AND metric_code = ?").bind("nine", "2026", "MACHINES_SOLD").first();
-    return Response.json({ user: { id: "nine", displayName: "ไนน์", role: "ผู้บริหารการขาย" }, tasks: tasks.results, target });
+    const customers = await d1.prepare(`SELECT a.*, d.model AS device_model, d.serial_number,
+      d.installed_at, d.status AS deployment_status FROM client_accounts a
+      LEFT JOIN device_deployments d ON d.account_id = a.id
+      WHERE a.account_status = 'Active' ORDER BY CASE WHEN a.id = 'linna' THEN 1 ELSE 0 END, a.display_name`).all();
+    const linnaPerformance = await d1.prepare(`SELECT * FROM partner_performance_snapshots
+      WHERE account_id = 'linna' ORDER BY report_month DESC LIMIT 1`).first();
+    return Response.json({ user: { id: "nine", displayName: "ไนน์", role: "ผู้บริหารการขาย" }, tasks: tasks.results, target, customers: customers.results, linnaPerformance });
   } catch (error) {
     return Response.json({ error: error instanceof Error ? error.message : "Unable to load workspace" }, { status: 500 });
   }

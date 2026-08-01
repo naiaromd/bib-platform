@@ -1279,6 +1279,45 @@ nav button.active span { color: #a56145; }
 }
 
 /* Actionable target — converts annual sales goal into weekly work. */
+.v2-customer-tabs { display: flex; gap: 4px; margin-bottom: 18px; border-bottom: 1px solid #d8d0c5; }
+.v2-customer-tabs button { min-height: 46px; padding: 0 18px; color: #77716a; border: 0; border-bottom: 3px solid transparent; background: transparent; font: 600 14px "Kanit"; cursor: pointer; }
+.v2-customer-tabs button.active { color: #262827; border-bottom-color: #ad6448; }
+.v2-installed-customers { border: 1px solid #d8d0c5; background: #fbfaf7; }
+.v2-installed-customers > header, .v2-linna-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 22px; border-bottom: 1px solid #ded7cd; }
+.v2-installed-customers header span, .v2-linna-head span { color: #ad6448; font: 600 11px "Muli"; letter-spacing: .08em; }
+.v2-installed-customers header h3, .v2-linna-head h3 { margin: 4px 0 0; font-size: 22px; }
+.v2-installed-customers header em, .v2-linna-head em { color: #925236; font: 600 12px "Kanit"; font-style: normal; }
+.v2-installed-customers .head, .v2-installed-customers article { display: grid; grid-template-columns: 1.5fr 1fr .5fr 1fr 1fr; gap: 14px; align-items: center; padding: 11px 20px; }
+.v2-installed-customers .head { color: #827b73; background: #f1ece5; font-size: 11px; }
+.v2-installed-customers article { min-height: 65px; border-top: 1px solid #e4ded5; font-size: 13px; }
+.v2-installed-customers article > span:first-child { display: flex; align-items: center; gap: 10px; }
+.v2-installed-customers article i { width: 34px; height: 34px; display: grid; place-items: center; color: #fff; border-radius: 50%; background: #303231; font-style: normal; }
+.v2-installed-customers article strong { width: 34px; height: 30px; display: grid; place-items: center; color: #8a523d; background: #f2dfd4; }
+.v2-installed-customers article em { color: #a05b3f; font-size: 12px; font-style: normal; }
+.v2-linna-performance { border: 1px solid #d8d0c5; background: #fbfaf7; }
+.v2-linna-head p { margin: 4px 0 0; color: #726d66; font-size: 12px; }
+.v2-linna-head > em { padding: 8px 12px; background: #fff0df; }
+.v2-linna-metrics { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid #ded7cd; }
+.v2-linna-metrics article { min-height: 122px; padding: 20px; border-right: 1px solid #ded7cd; }
+.v2-linna-metrics article:last-child { border-right: 0; }
+.v2-linna-metrics article.review { background: #fff5e8; }
+.v2-linna-metrics span, .v2-linna-metrics strong, .v2-linna-metrics small { display: block; }
+.v2-linna-metrics span { color: #746f68; font-size: 12px; }
+.v2-linna-metrics strong { margin: 7px 0; font: 600 25px "Muli"; }
+.v2-linna-metrics small { color: #827b73; font-size: 11px; }
+.v2-linna-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 18px; padding: 18px; }
+.v2-linna-usage article { display: flex; align-items: center; justify-content: space-between; min-height: 54px; padding: 10px 20px; border-top: 1px solid #e4ded5; font-size: 13px; }
+.v2-linna-usage article b { font: 600 18px "Muli"; }
+.v2-linna-check > article { display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: center; min-height: 65px; padding: 10px 18px; border-top: 1px solid #e4ded5; }
+.v2-linna-check > article i { width: 26px; height: 26px; display: grid; place-items: center; color: #fff; border-radius: 50%; background: #47745f; font-style: normal; }
+.v2-linna-check > article.alert { background: #fff5e8; }
+.v2-linna-check > article.alert i { background: #a87822; }
+.v2-linna-check > article b, .v2-linna-check > article small { display: block; }
+.v2-linna-check > article b { font-size: 13px; }
+.v2-linna-check > article small { margin-top: 3px; color: #756f68; font-size: 11px; }
+.v2-linna-source { padding: 10px 18px; color: #756f68; border-top: 1px solid #ded7cd; background: #f3eee7; font-size: 11px; }
+.v2-empty { padding: 40px; text-align: center; border: 1px solid #d8d0c5; background: #fbfaf7; }
+
 .v2-home-target { margin-bottom: 20px; border: 1px solid #d7cec2; background: #fbfaf7; }
 .v2-home-target > header { min-height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px 20px; border-bottom: 1px solid #ded7cd; }
 .v2-home-target > header span { color: #ad6448; font: 600 11px "Muli"; letter-spacing: .08em; }
@@ -1337,6 +1376,10 @@ nav button.active span { color: #a56145; }
   .v2-action-breakdown { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 760px) {
+  .v2-installed-customers .head { display: none; }
+  .v2-installed-customers article { grid-template-columns: 1fr 1fr; }
+  .v2-linna-metrics, .v2-linna-grid { grid-template-columns: 1fr; }
+  .v2-linna-metrics article { border-right: 0; border-bottom: 1px solid #ded7cd; }
   .v2-home-target .inputs { grid-template-columns: repeat(2, 1fr); }
   .v2-home-target .inputs > * { border-bottom: 1px solid #ded7cd; }
   .v2-home-target .save { width: auto; }

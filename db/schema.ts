@@ -235,3 +235,25 @@ export const crmLeads = sqliteTable("crm_leads", {
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const partnerPerformanceSnapshots = sqliteTable("partner_performance_snapshots", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull(),
+  reportMonth: text("report_month").notNull(),
+  reportedPaidSessions: integer("reported_paid_sessions").notNull().default(0),
+  eligiblePaidSessions: integer("eligible_paid_sessions").notNull().default(0),
+  complimentarySessions: integer("complimentary_sessions").notNull().default(0),
+  trainingSessions: integer("training_sessions").notNull().default(0),
+  reportedGrossRevenue: integer("reported_gross_revenue").notNull().default(0),
+  eligibleGrossRevenue: integer("eligible_gross_revenue").notNull().default(0),
+  bibShareRateBps: integer("bib_share_rate_bps").notNull().default(4000),
+  bibShareVatInclusive: integer("bib_share_vat_inclusive").notNull().default(0),
+  linnaShare: integer("linna_share").notNull().default(0),
+  deductibleMarketing: integer("deductible_marketing").notNull().default(0),
+  approvedRefunds: integer("approved_refunds").notNull().default(0),
+  totalUsageMinutes: integer("total_usage_minutes").notNull().default(0),
+  exceptionCount: integer("exception_count").notNull().default(0),
+  status: text("status").notNull().default("Needs Review"),
+  sourceNote: text("source_note").notNull().default(""),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
