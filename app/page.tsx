@@ -437,7 +437,7 @@ export default function Home() {
             <div className="client-metrics portal-module overview-module">
               <article><i>฿</i><span>รายได้จากบริการ</span><strong>฿227,500</strong><small>รอยืนยันรอบเดือนนี้</small></article>
               <article><i>60</i><span>ส่วนแบ่ง LINNA</span><strong>฿106,500</strong><small>ร้อยละ 60 ของรายได้สุทธิ</small></article>
-              <article><i>40</i><span>ส่วนแบ่ง IPQ</span><strong>฿75,970</strong><small>รวมภาษีมูลค่าเพิ่ม</small></article>
+              <article><i>40</i><span>ส่วนแบ่ง IPQ</span><strong>฿71,000</strong><small>รวมภาษีมูลค่าเพิ่ม</small></article>
               <article><i>63</i><span>จำนวนครั้งที่ให้บริการ</span><strong>63 ครั้ง</strong><small>ชำระเงิน 42 · ชุดบริการ 18 · ฟรี 3</small></article>
             </div>
 
@@ -778,7 +778,7 @@ export default function Home() {
               <div className="form-section"><h3>รายได้และรายการหัก</h3><div className="form-row">
                 <label><span>รายได้รวม</span><input type="number" value={reportForm.grossRevenue} onChange={(e) => setReportForm({ ...reportForm, grossRevenue: e.target.value })} /></label>
                 <label><span>เงินคืนที่อนุมัติ</span><input type="number" value={reportForm.approvedRefunds} onChange={(e) => setReportForm({ ...reportForm, approvedRefunds: e.target.value })} /></label>
-                <label><span>ค่าโฆษณาที่อนุมัติให้หัก</span><input type="number" value={reportForm.approvedMarketing} onChange={(e) => setReportForm({ ...reportForm, approvedMarketing: e.target.value })} /></label>
+                <label><span>ค่าโฆษณาที่เข้าเกณฑ์หัก</span><input type="number" value={reportForm.approvedMarketing} onChange={(e) => setReportForm({ ...reportForm, approvedMarketing: e.target.value })} /><small>ไม่เกิน 50,000 บาทต่อเดือนและต้องมีหลักฐาน</small></label>
               </div></div>
               <div className="form-section"><h3>ชั่วโมงการใช้งานเครื่อง</h3><div className="form-row">
                 <label><span>ชั่วโมงสะสมต้นงวด</span><input type="number" value={reportForm.openingHours} onChange={(e) => setReportForm({ ...reportForm, openingHours: e.target.value })} /></label>
@@ -786,7 +786,7 @@ export default function Home() {
                 <label className="file-field"><span>ภาพหน้าจอแสดงชั่วโมง</span><input type="file" accept="image/*,.pdf" /><small>รับภาพถ่ายหรือเอกสาร PDF</small></label>
               </div></div>
               <label><span>หมายเหตุเกี่ยวกับวัสดุหรือการใช้งาน</span><textarea value={reportForm.consumableNote} onChange={(e) => setReportForm({ ...reportForm, consumableNote: e.target.value })} /></label>
-              <div className="calculation-preview"><div><span>รายได้สุทธิเบื้องต้น</span><strong>฿177,500</strong></div><div><span>ส่วนแบ่ง LINNA</span><strong>฿106,500</strong></div><div><span>ส่วนแบ่ง IPQ รวมภาษี</span><strong>฿75,970</strong></div></div>
+              <div className="calculation-preview"><div><span>รายได้สุทธิเบื้องต้น</span><strong>฿177,500</strong></div><div><span>ส่วนแบ่ง LINNA</span><strong>฿106,500</strong></div><div><span>ส่วนแบ่ง IPQ รวมภาษี</span><strong>฿71,000</strong></div></div>
             </div>
             <footer><button onClick={() => setShowReportForm(false)}>บันทึกร่างไว้ก่อน</button><button className="submit-report" disabled={saveState === "saving"} onClick={submitMonthlyReport}>ยืนยันและส่งให้ BIB ตรวจสอบ</button></footer>
           </div>

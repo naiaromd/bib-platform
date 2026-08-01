@@ -246,15 +246,48 @@ function CampaignView({ toast, openAccount }: { toast: (text: string) => void; o
 }
 
 function ApprovalView({ toast }: { toast: (text: string) => void }) {
-  return <div className="v2-view">
-    <section className="v2-kicker-row"><div><span>COMMERCIAL & DOCUMENT CONTROL</span><h2>อนุมัติก่อนออกเอกสาร</h2><p>ลูกค้าเห็นเฉพาะเงื่อนไขที่อนุมัติแล้ว</p></div><a href="/term-templates">สร้าง Term Sheet</a></section>
-    <div className="v2-model-row">{[["A", "ซื้อแบบแบ่งชำระ", "มาตรฐาน"], ["B", "เช่าเพื่อซื้อ", "ต้องอนุมัติ"], ["C", "แบ่งรายได้ + MG", "ประเมิน Traffic"], ["D", "โครงการทดลอง", "ไม่เกิน 90 วัน"], ["D2", "พันธมิตรเชิงกลยุทธ์", "จำกัดสิทธิ์"]].map((item) => <article key={item[0]}><i>{item[0]}</i><span>{item[2]}</span><h3>{item[1]}</h3><button onClick={() => toast(`เปิดแบบประเมินรูปแบบ ${item[0]}`)}>ประเมินความเหมาะสม</button></article>)}</div>
-    <div className="v2-split">
-      <section className="v2-panel v2-approval-list"><header><div><span>PENDING DECISION</span><h3>รายการรออนุมัติ</h3></div><em>6 รายการ</em></header>
-        {[["LINNA", "ยกเว้นเงินประกัน", "ผู้บริหาร + การเงิน"], ["Dr. J", "สัญญาเช่าเพื่อซื้อ แบบ B", "กฎหมาย"], ["Bangkok Hospital Chiangmai", "Term Sheet แบบ A", "ฝ่ายขาย"], ["Commission Memo", "อัตราขั้นบันได", "ผู้บริหาร"]].map((item) => <button key={item[1]} onClick={() => toast(`เปิดรายการ ${item[0]}`)}><i>○</i><span><small>{item[0]}</small><b>{item[1]}</b><em>{item[2]}</em></span><strong>→</strong></button>)}
-      </section>
-      <section className="v2-document-gate"><span>DOCUMENT HEALTH</span><h3>อ่าน · แก้ไข · อนุมัติ</h3><p>ติดตามรุ่น ผู้รับผิดชอบ และประวัติการอนุมัติ</p><a href="/">เปิดศูนย์ตรวจทานเอกสาร</a></section>
-    </div>
+  type ReviewId = "linna" | "drj" | "memo";
+  const reviewDocs: Record<ReviewId, { account: string; title: string; version: string; model: string; file: string; status: string; summary: string[]; issue: string }> = {
+    linna: { account: "LINNA Clinic", title: "สัญญาแบ่งรายได้ระยะยาว", version: "ฉบับที่ 3.2", model: "D2 · 40/60 · ไม่มีรายได้ขั้นต่ำ", file: "/documents/linna-contract.pdf", status: "รอพิจารณา", summary: ["LINNA ร้อยละ 60 และ IPQ ร้อยละ 40", "ส่วนแบ่ง IPQ เป็นยอดรวมภาษีมูลค่าเพิ่มแล้ว", "ไม่มีรายได้ขั้นต่ำ และทบทวนเมื่อครบ 90 วัน", "หักค่าโฆษณาที่เข้าเกณฑ์ได้ไม่เกิน 50,000 บาทต่อเดือน โดยต้องมีหลักฐาน"], issue: "ยืนยันวิธีตรวจหลักฐานค่าโฆษณา การยกเว้นเงินประกัน และข้อมูลนิติบุคคลก่อนส่งลงนาม" },
+    drj: { account: "Dr.J Clinic", title: "สัญญาเช่าเพื่อซื้อ", version: "ฉบับที่ 1.4", model: "B · 24 เดือน", file: "/documents/drj-contract.pdf", status: "ข้อมูลไม่ครบ", summary: ["เช่าเพื่อซื้อ 24 เดือน", "มีเงินประกันและเงื่อนไขโอนกรรมสิทธิ์", "คู่สัญญาเป็นบุคคล", "ต้องตรวจข้อมูลสถานที่และความพร้อมด้านการเงิน"], issue: "ยังไม่ควรส่งลงนามจนกว่าจะได้ข้อมูลยืนยันตัวตน สิทธิใช้สถานที่ และเอกสารประกอบครบ" },
+    memo: { account: "เอกสารภายใน BIB", title: "บันทึกนโยบายค่าตอบแทนการขาย", version: "ฉบับที่ 1.1", model: "รูปแบบ A–D2", file: "/documents/commission-memo.pdf", status: "รอผู้บริหาร", summary: ["รูปแบบ A ใช้อัตราค่าตอบแทนแบบขั้นบันได", "ฝ่ายขายร้อยละ 3 ผู้แนะนำร้อยละ 1 ผู้ฝึกอบรมร้อยละ 1", "หากไม่มีผู้แนะนำ ส่วนดังกล่าวให้ฝ่ายขาย", "ผู้ฝึกอบรมที่ขายเองได้รับตามเงื่อนไขในนโยบาย"], issue: "ต้องยืนยันวันที่เริ่มใช้ อัตราขั้นบันได และผู้มีอำนาจอนุมัติฉบับประกาศใช้" },
+  };
+  const [reviewId, setReviewId] = useState<ReviewId>("linna");
+  const [reviewMode, setReviewMode] = useState<"summary" | "full">("summary");
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewComments, setReviewComments] = useState<Array<{ document_id: string; author_label: string; body: string; visibility: string }>>([]);
+  const [reviewDecision, setReviewDecision] = useState<Record<ReviewId, string>>({ linna: "Pending", drj: "Blocked", memo: "Pending" });
+  const current = reviewDocs[reviewId];
+  useEffect(() => {
+    fetch("/api/reviews?role=Executive").then((response) => response.json()).then((payload) => {
+      if (Array.isArray(payload.comments)) setReviewComments(payload.comments);
+      if (Array.isArray(payload.documents)) {
+        const next = { linna: "Pending", drj: "Blocked", memo: "Pending" };
+        payload.documents.forEach((document: { id: ReviewId; decision: string }) => { if (document.id in next) next[document.id] = document.decision; });
+        setReviewDecision(next);
+      }
+    }).catch(() => undefined);
+  }, []);
+  const saveReviewComment = async () => {
+    if (!reviewComment.trim()) return;
+    const response = await fetch("/api/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "comment", documentId: reviewId, role: "Executive", body: reviewComment, visibility: "Internal" }) });
+    if (response.ok) { setReviewComments([...reviewComments, { document_id: reviewId, author_label: "ผู้บริหาร · ผู้ตรวจทาน", body: reviewComment, visibility: "Internal" }]); setReviewComment(""); toast("บันทึกความเห็นแล้ว"); }
+  };
+  const decideReview = async (decision: string) => {
+    const response = await fetch("/api/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "decision", documentId: reviewId, role: "Executive", decision, version: current.version }) });
+    if (response.ok) { setReviewDecision({ ...reviewDecision, [reviewId]: decision }); toast(decision === "Approved" ? "อนุมัติเอกสารแล้ว" : "ส่งกลับเพื่อแก้ไขแล้ว"); }
+    else toast("รายการนี้ยังไม่ผ่านเงื่อนไขการอนุมัติ");
+  };
+  const visibleComments = reviewComments.filter((comment) => comment.document_id === reviewId);
+  return <div className="v2-view v2-integrated-review">
+    <section className="v2-kicker-row"><div><span>COMMERCIAL & DOCUMENT CONTROL</span><h2>ตรวจทานและอนุมัติเอกสาร</h2><p>รายการเอกสาร สาระสำคัญ และคำตัดสินอยู่ในหน้าเดียว</p></div><a href="/term-templates">สร้างเอกสารจากแม่แบบ</a></section>
+    <section className="v2-review-workbench">
+      <aside className="v2-review-queue"><header><span>เอกสารที่ต้องตรวจ</span><strong>3 ฉบับ</strong></header>{(Object.keys(reviewDocs) as ReviewId[]).map((id) => { const document = reviewDocs[id]; return <button key={id} className={reviewId === id ? "active" : ""} onClick={() => { setReviewId(id); setReviewMode("summary"); }}><i>{id === "linna" ? "LI" : id === "drj" ? "DJ" : "ME"}</i><span><small>{document.account}</small><b>{document.title}</b><em>{document.version} · {reviewDecision[id] === "Pending" ? document.status : reviewDecision[id]}</em></span></button>; })}<a href="/">เปิดหน้าตรวจทานเดิม</a></aside>
+      <article className="v2-review-document"><header><div><span>{current.account} · {current.version}</span><h3>{current.title}</h3><p>{current.model}</p></div><nav><button className={reviewMode === "summary" ? "active" : ""} onClick={() => setReviewMode("summary")}>สรุป</button><button className={reviewMode === "full" ? "active" : ""} onClick={() => setReviewMode("full")}>อ่านฉบับเต็ม</button></nav></header>
+        {reviewMode === "summary" ? <div className="v2-review-summary"><span>สาระสำคัญ</span><ul>{current.summary.map((line) => <li key={line}>{line}</li>)}</ul><section><b>ประเด็นที่ต้องตัดสินใจ</b><p>{current.issue}</p></section><footer><small>สถานะเอกสาร</small><strong>{reviewDecision[reviewId] === "Pending" ? current.status : reviewDecision[reviewId]}</strong></footer></div> : <iframe title={`${current.title} ${current.version}`} src={`${current.file}#view=FitH&toolbar=1`} />}
+      </article>
+      <aside className="v2-review-decision"><header><span>ความเห็นและคำตัดสิน</span><strong>{visibleComments.length}</strong></header><div className="v2-review-current"><small>ผลการพิจารณาปัจจุบัน</small><b>{reviewDecision[reviewId]}</b><em>{reviewId.toUpperCase()} · {current.version}</em></div><div className="v2-review-comments">{visibleComments.length ? visibleComments.map((comment, index) => <article key={`${comment.author_label}-${index}`}><b>{comment.author_label}</b><p>{comment.body}</p><small>{comment.visibility === "Internal" ? "ภายในเท่านั้น" : "ลูกค้าเห็นได้"}</small></article>) : <p>ยังไม่มีความเห็นในเอกสารนี้</p>}</div><div className="v2-review-compose"><textarea value={reviewComment} onChange={(event) => setReviewComment(event.target.value)} placeholder="พิมพ์ความเห็นหรือสิ่งที่ต้องแก้ไข" /><button onClick={saveReviewComment}>บันทึกความเห็น</button></div><footer><button onClick={() => decideReview("Changes requested")}>ส่งกลับเพื่อแก้ไข</button><button className="approve" disabled={reviewId === "drj"} onClick={() => decideReview("Approved")}>{reviewId === "drj" ? "รอข้อมูลให้ครบ" : "อนุมัติ"}</button></footer></aside>
+    </section>
   </div>;
 }
 
