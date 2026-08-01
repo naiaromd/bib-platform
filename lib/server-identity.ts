@@ -62,6 +62,9 @@ export async function requireRequestActor(request: Request): Promise<RequestActo
   const url = new URL(request.url);
   const isLocal = url.hostname === "localhost" || url.hostname === "127.0.0.1";
   const authenticatedEmail = request.headers.get("oai-authenticated-user-email")?.trim().toLowerCase();
+  const authenticatedUserId = request.headers.get("oai-authenticated-user-id")?.trim();
+  const configuredOwnerId = String((env as unknown as Record<string, unknown>).SITE_OWNER_USER_ID || "").trim();
+  const isConfiguredOwner = Boolean(authenticatedUserId && configuredOwnerId && authenticatedUserId === configuredOwnerId);
   if (!authenticatedEmail && !isLocal) {
     throw new AccessError("กรุณาเข้าสู่ระบบก่อนใช้งาน", 401);
   }
@@ -78,7 +81,7 @@ export async function requireRequestActor(request: Request): Promise<RequestActo
   if (!membership) {
     const count = await d1.prepare("SELECT COUNT(*) AS total FROM tenant_memberships WHERE tenant_id = 'bib' AND active = 1")
       .first<{ total: number }>();
-    if ((count?.total || 0) > 0 && !isLocal) {
+    if ((count?.total || 0) > 0 && !isLocal && !isConfiguredOwner) {
       throw new AccessError("บัญชีนี้ยังไม่ได้รับสิทธิ์ในพื้นที่ BIB", 403);
     }
     const displayName = headerName || (isLocal ? "ผู้ดูแลระบบทดสอบ" : email);
