@@ -1088,3 +1088,92 @@ nav button.active span { color: #a56145; }
   .form-row, .calculation-preview { grid-template-columns: 1fr; }
   .editor-form.two-columns, .protocol-locks, .approval-strip { grid-template-columns: 1fr; }
 }
+
+/* Readability scale — minimum practical sizes for daily use. */
+.v2-brand-copy b { font-size: 13px; }
+.v2-brand-copy span { font-size: 12px; }
+.v2-brand-header > nav a { font-size: 13px; }
+.v2-brand-header > em { font-size: 11px; }
+.v2-job-nav > span,
+.v2-work-head > div span,
+.v2-kicker-row > div > span,
+.v2-panel header span,
+.v2-client-opportunities article > span,
+.v2-support-grid article > span { font-size: 12px; }
+.v2-job-nav > p,
+.v2-control-note p { font-size: 13px; }
+.v2-job-nav nav button b,
+.v2-job-nav nav a b { font-size: 15px; }
+.v2-job-nav nav button small,
+.v2-job-nav nav a small { font-size: 12px; }
+.v2-job-nav nav button > i,
+.v2-job-nav nav a > i { font-size: 12px; }
+.v2-work-head input { font-size: 13px; }
+.v2-work-head > button,
+.v2-kicker-row > button,
+.v2-kicker-row > a,
+.v2-primary { font-size: 13px; }
+.v2-module-hero > div > span,
+.v2-explore-hero.v2-module-hero > div > span,
+.v2-client-welcome.v2-module-hero > div > span { font-size: 13px; }
+.v2-module-hero > div > p,
+.v2-explore-hero.v2-module-hero p,
+.v2-client-welcome.v2-module-hero > div > p { font-size: 16px; line-height: 1.65; }
+.v2-module-hero > aside b,
+.v2-explore-hero.v2-module-hero > aside i,
+.v2-client-welcome.v2-module-hero > aside b { font-size: 14px; }
+.v2-module-hero > aside span,
+.v2-explore-hero.v2-module-hero > aside b,
+.v2-client-welcome.v2-module-hero > aside span,
+.v2-client-welcome.v2-module-hero > aside small { font-size: 12px; }
+.v2-kicker-row h2 { font-size: 31px; }
+.v2-kicker-row p { font-size: 14px; }
+.v2-kicker-row > em { font-size: 12px; }
+.v2-metrics article > span { font-size: 14px; }
+.v2-metrics article > small { font-size: 12px; }
+.v2-panel header h3 { font-size: 20px; }
+.v2-panel header button,
+.v2-panel header em { font-size: 12px; }
+.v2-action span small,
+.v2-action span em,
+.v2-approval-list > button small,
+.v2-approval-list > button em { font-size: 12px; }
+.v2-action span b,
+.v2-approval-list > button b { font-size: 14px; }
+.v2-pipeline > div,
+.v2-progress article span,
+.v2-pnl > p,
+.v2-quality article,
+.v2-table-head,
+.v2-table > button { font-size: 13px; }
+.v2-lifecycle article span,
+.v2-segmentation p,
+.v2-model-row article > span,
+.v2-model-row button { font-size: 12px; }
+.v2-model-row h3 { font-size: 15px; }
+.v2-public-flow > article > span { font-size: 12px; }
+.v2-public-flow h2 { font-size: 32px; }
+.v2-choice-grid button,
+.v2-evidence-cards p,
+.v2-evidence-cards em,
+.v2-demo-select b,
+.v2-demo-select small,
+.v2-success { font-size: 14px; }
+.v2-evidence-cards b { font-size: 16px; }
+.v2-client-next article b,
+.v2-client-opportunities p,
+.v2-support-grid p,
+.v2-academy-progress article span b { font-size: 14px; }
+.v2-client-next article small,
+.v2-client-next article button,
+.v2-client-opportunities button,
+.v2-support-grid button,
+.v2-academy-progress article span small { font-size: 12px; }
+.v2-program-preview > span,
+.v2-program-preview > p,
+.v2-program-preview > button,
+.v2-evidence-loop p { font-size: 14px; }
+.v2-client-opportunities h3,
+.v2-support-grid h3,
+.v2-evidence-loop h3 { font-size: 20px; }
+.v2-simple-footer { font-size: 12px; }
