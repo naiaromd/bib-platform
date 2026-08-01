@@ -1224,3 +1224,51 @@ nav button.active span { color: #a56145; }
   .v2-account-tabs button { white-space: nowrap; }
   .v2-account-grid { grid-template-columns: 1fr; }
 }
+
+/* Actionable target — converts annual sales goal into weekly work. */
+.v2-goal-builder { margin-bottom: 22px; border: 1px solid #d6cec2; background: #fbfaf7; }
+.v2-goal-builder > header { min-height: 105px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 24px; border-bottom: 1px solid #ded7cd; }
+.v2-goal-builder > header span { color: #ad6448; font: 600 12px "Muli"; letter-spacing: .08em; }
+.v2-goal-builder > header h3 { margin: 5px 0 1px; font-size: 24px; }
+.v2-goal-builder > header p { margin: 0; color: #77726b; font-size: 13px; }
+.v2-goal-inputs { display: flex; gap: 8px; }
+.v2-goal-inputs label { color: #6f6b65; font-size: 12px; }
+.v2-goal-inputs input { width: 72px; height: 42px; display: block; margin-top: 4px; padding: 0 9px; border: 1px solid #cfc6ba; background: #fff; font: 600 18px "Muli"; }
+.v2-goal-summary { display: grid; grid-template-columns: repeat(3, 1fr); }
+.v2-goal-summary article { min-height: 125px; padding: 20px 24px; border-right: 1px solid #ded7cd; }
+.v2-goal-summary article:last-child { border-right: 0; }
+.v2-goal-summary span, .v2-goal-summary small { display: block; color: #746f68; font-size: 12px; }
+.v2-goal-summary strong { display: block; margin: 5px 0; font: 600 31px "Muli"; }
+.v2-funnel-target { display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid #ded7cd; border-bottom: 1px solid #ded7cd; background: #f3ebe2; }
+.v2-funnel-target article { position: relative; min-height: 125px; padding: 18px 17px; border-right: 1px solid #d8cec2; }
+.v2-funnel-target article:last-child { color: #fff; border-right: 0; background: #a86145; }
+.v2-funnel-target article > i { color: #aa6549; font: 600 11px "Muli"; font-style: normal; }
+.v2-funnel-target article:last-child > i { color: #f5d8ca; }
+.v2-funnel-target article span, .v2-funnel-target article span b, .v2-funnel-target article span small { display: block; }
+.v2-funnel-target article span b { margin-top: 7px; font-size: 14px; }
+.v2-funnel-target article span small { color: #716c66; font-size: 11px; }
+.v2-funnel-target article:last-child span small { color: #f1d8cc; }
+.v2-funnel-target article > strong { display: block; margin-top: 9px; font: 600 27px "Muli"; }
+.v2-funnel-target article > em { position: absolute; right: -10px; top: 51px; z-index: 2; width: 20px; height: 20px; display: grid; place-items: center; color: #a86145; border: 1px solid #d7ccbf; border-radius: 50%; background: #fbfaf7; font-size: 11px; font-style: normal; }
+.v2-action-breakdown { display: grid; grid-template-columns: repeat(4, 1fr); }
+.v2-action-breakdown article { min-height: 112px; padding: 18px 20px; border-right: 1px solid #ded7cd; }
+.v2-action-breakdown article:last-child { border-right: 0; background: #fff6e9; }
+.v2-action-breakdown span, .v2-action-breakdown b, .v2-action-breakdown small { display: block; }
+.v2-action-breakdown span { color: #aa6549; font-size: 11px; }
+.v2-action-breakdown b { margin-top: 7px; font-size: 14px; }
+.v2-action-breakdown small { margin-top: 4px; color: #77726b; font-size: 11px; line-height: 1.45; }
+.v2-goal-builder > footer { min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 11px 20px; border-top: 1px solid #ded7cd; }
+.v2-goal-builder > footer span { color: #77726b; font-size: 11px; }
+.v2-goal-builder > footer button { min-height: 36px; padding: 0 15px; color: #fff; border: 0; background: #292b2b; font: 600 12px "Kanit"; }
+
+@media (max-width: 1050px) {
+  .v2-funnel-target { grid-template-columns: repeat(3, 1fr); }
+  .v2-funnel-target article:nth-child(3) { border-right: 0; }
+  .v2-action-breakdown { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 760px) {
+  .v2-goal-builder > header, .v2-goal-builder > footer { align-items: flex-start; flex-direction: column; }
+  .v2-goal-summary, .v2-funnel-target, .v2-action-breakdown { grid-template-columns: 1fr; }
+  .v2-goal-summary article, .v2-funnel-target article, .v2-action-breakdown article { min-height: auto; border-right: 0; border-bottom: 1px solid #ded7cd; }
+  .v2-funnel-target article > em { display: none; }
+}

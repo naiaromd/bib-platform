@@ -179,9 +179,28 @@ function ApprovalView({ toast }: { toast: (text: string) => void }) {
 }
 
 function PerformanceView() {
+  const [annualTarget, setAnnualTarget] = useState(8);
+  const [sold, setSold] = useState(3);
+  const [saved, setSaved] = useState(false);
+  const remaining = Math.max(annualTarget - sold, 0);
+  const monthsLeft = 5;
+  const targetRevenue = annualTarget * 2150000;
+  const bookedRevenue = sold * 2150000;
+  const demosNeeded = remaining * 5;
+  const qualifiedNeeded = Math.ceil(demosNeeded / .4);
+  const newLeadsNeeded = qualifiedNeeded * 2;
   return <div className="v2-view">
     <section className="v2-kicker-row"><div><span>PERFORMANCE & QUALITY</span><h2>ผลการดำเนินงาน</h2><p>รวมยอดขาย รูปแบบธุรกิจ และงานบริการ</p></div><em>อัปเดตล่าสุด 31 ก.ค.</em></section>
-    <div className="v2-metrics">{[["฿8.9M", "รายได้ถ่วงน้ำหนัก", "Pipeline ฿21.4M"], ["42%", "กำไรขั้นต้น", "หลัง Commission/Service"], ["฿3.2M", "Revenue Share ARR", "แบบ C, D และ D2"], ["฿326K", "ประมาณการค่าตอบแทน", "รออนุมัติ 4 รายการ"]].map((item, index) => <article key={item[1]}><i>0{index + 1}</i><strong>{item[0]}</strong><span>{item[1]}</span><small>{item[2]}</small></article>)}</div>
+    <section className="v2-goal-builder">
+      <header><div><span>ACTIONABLE SALES TARGET</span><h3>จากเป้าหมายยอดขายสู่งานที่ต้องทำ</h3><p>ระบบคำนวณย้อนกลับจากจำนวนเครื่องที่ต้องขาย</p></div><div className="v2-goal-inputs"><label>เป้าทั้งปี<input type="number" min="1" value={annualTarget} onChange={(event) => setAnnualTarget(Math.max(1, Number(event.target.value) || 1))} /></label><label>ขายแล้ว<input type="number" min="0" max={annualTarget} value={sold} onChange={(event) => setSold(Math.min(annualTarget, Math.max(0, Number(event.target.value) || 0)))} /></label></div></header>
+      <div className="v2-goal-summary"><article><span>ต้องขายเพิ่ม</span><strong>{remaining}</strong><small>เครื่อง ภายใน {monthsLeft} เดือน</small></article><article><span>รายได้ที่ต้องเพิ่ม</span><strong>฿{(targetRevenue - bookedRevenue).toLocaleString("th-TH")}</strong><small>จากเป้ารวม ฿{targetRevenue.toLocaleString("th-TH")}</small></article><article><span>เป้าต่อเดือน</span><strong>{Math.ceil(remaining / monthsLeft)}</strong><small>เครื่อง หรือ ฿{Math.ceil((targetRevenue - bookedRevenue) / monthsLeft).toLocaleString("th-TH")}</small></article></div>
+      <div className="v2-funnel-target">
+        {[["01", "ผู้สนใจใหม่", newLeadsNeeded, `${Math.ceil(newLeadsNeeded / monthsLeft)} ราย/เดือน`], ["02", "ผู้สนใจที่ผ่านเกณฑ์", qualifiedNeeded, `${Math.ceil(qualifiedNeeded / monthsLeft)} ราย/เดือน`], ["03", "นัดสาธิต", demosNeeded, `${Math.ceil(demosNeeded / monthsLeft)} ครั้ง/เดือน`], ["04", "ข้อเสนอที่มีโอกาส", remaining * 2, `${Math.ceil((remaining * 2) / monthsLeft)} ฉบับ/เดือน`], ["05", "ปิดการขาย", remaining, `${Math.ceil(remaining / monthsLeft)} เครื่อง/เดือน`]].map((item, index) => <article key={item[1]}><i>{item[0]}</i><span><b>{item[1]}</b><small>{item[3]}</small></span><strong>{item[2]}</strong>{index < 4 && <em>→</em>}</article>)}
+      </div>
+      <div className="v2-action-breakdown"><article><span>งานสัปดาห์นี้</span><b>สร้างผู้สนใจใหม่ {Math.ceil(newLeadsNeeded / 20)} ราย</b><small>จากกิจกรรม ออนไลน์ และการแนะนำ</small></article><article><span>งานสัปดาห์นี้</span><b>ยืนยันนัดสาธิต {Math.ceil(demosNeeded / 20)} ราย</b><small>ให้ผู้มีอำนาจเข้าร่วมอย่างน้อย 1 ราย</small></article><article><span>งานบริหาร</span><b>ทบทวน Pipeline ทุกวันจันทร์</b><small>ทุกดีลต้องมีผู้ดูแลและขั้นตอนถัดไป</small></article><article><span>จุดเตือน</span><b>Pipeline ปัจจุบันยังไม่พอ {Math.max(remaining * 2 - 5, 0)} ดีล</b><small>ต้องเติมดีลที่ผ่านเกณฑ์ก่อนเพิ่ม Forecast</small></article></div>
+      <footer><span>สมมติฐาน: ผู้สนใจใหม่ 50% ผ่านเกณฑ์ · 40% ได้นัดสาธิต · สาธิต 20% ปิดการขาย</span><button onClick={() => setSaved(true)}>{saved ? "✓ บันทึกแล้ว" : "บันทึกเป็นเป้าหมายทีม"}</button></footer>
+    </section>
+    <div className="v2-metrics">{[["฿8.9M", "รายได้ถ่วงน้ำหนัก", "Pipeline ฿21.4M"], ["42%", "กำไรขั้นต้น", "หลังค่าตอบแทนและบริการ"], ["฿3.2M", "รายได้แบ่งรายได้ต่อปี", "แบบ C, D และ D2"], ["฿326K", "ประมาณการค่าตอบแทน", "รออนุมัติ 4 รายการ"]].map((item, index) => <article key={item[1]}><i>0{index + 1}</i><strong>{item[0]}</strong><span>{item[1]}</span><small>{item[2]}</small></article>)}</div>
     <div className="v2-split"><section className="v2-panel v2-pnl"><header><div><span>FORECAST P&L</span><h3>ประมาณการ 12 เดือน</h3></div></header>{[["รายได้ขายเครื่อง", "฿12,900,000"], ["รายได้แบ่งรายได้", "฿3,240,000"], ["ต้นทุนและการส่งมอบ", "(฿8,020,000)"], ["ค่าตอบแทน", "(฿326,000)"], ["Training/Service", "(฿740,000)"], ["กำไรประมาณการ", "฿7,054,000"]].map((item, index) => <p className={index === 5 ? "total" : ""} key={item[0]}><span>{item[0]}</span><strong>{item[1]}</strong></p>)}</section><section className="v2-panel v2-quality"><header><div><span>SYSTEM QUALITY</span><h3>สิ่งที่ต้องแก้ก่อนใช้จริง</h3></div><em>3 รายการ</em></header>{[["สูง", "สูตร Lead Score ใน Airtable ขึ้น Error"], ["สูง", "Dr. J ยังไม่มีข้อมูลนิติบุคคล"], ["กลาง", "LINNA ยังไม่มี Serial Number"]].map((item) => <article key={item[1]}><b>{item[0]}</b><span>{item[1]}</span><em>เปิดรายการ</em></article>)}</section></div>
   </div>;
 }
