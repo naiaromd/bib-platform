@@ -91,26 +91,31 @@ export default function InternalPlatformPage() {
 }
 
 function TodayView({ changeView, toast }: { changeView: (view: InternalView) => void; toast: (text: string) => void }) {
+  const [tasks, setTasks] = useState([
+    { id: 1, account: "Dr. J Clinic", title: "ตรวจข้อมูลก่อนส่งสัญญาแบบ B", owner: "ผู้รับผิดชอบ", due: 1, status: "กำลังทำ", priority: "สูง" },
+    { id: 2, account: "LINNA", title: "ตรวจรายงานรายได้และข้อยกเว้น", owner: "ผู้รับผิดชอบ", due: 2, status: "รอตรวจ", priority: "สูง" },
+    { id: 3, account: "Modiolistics Clinic", title: "เชิญร่วมงาน CME และโทรติดตาม", owner: "ผู้รับผิดชอบ", due: 4, status: "ยังไม่เริ่ม", priority: "กลาง" },
+    { id: 4, account: "Citycare Clinic", title: "ยืนยันวันสาธิตนอกสถานที่", owner: "ผู้รับผิดชอบ", due: 5, status: "กำลังทำ", priority: "สูง" },
+    { id: 5, account: "Wholeness Way Clinic", title: "ติดตามคำเชิญทดลองเครื่อง", owner: "ผู้รับผิดชอบ", due: 6, status: "ยังไม่เริ่ม", priority: "กลาง" },
+  ]);
+  const [selectedDay, setSelectedDay] = useState(1);
+  const [newTask, setNewTask] = useState("");
+  const days = Array.from({ length: 31 }, (_, index) => index + 1);
+  const updateStatus = (id: number, status: string) => setTasks(tasks.map((task) => task.id === id ? { ...task, status } : task));
+  const addTask = () => { if (!newTask.trim()) return; setTasks([...tasks, { id: Date.now(), account: "งานทั่วไป", title: newTask.trim(), owner: "ผู้รับผิดชอบ", due: selectedDay, status: "ยังไม่เริ่ม", priority: "กลาง" }]); setNewTask(""); toast("เพิ่มงานลงปฏิทินแล้ว"); };
+  const openTasks = tasks.filter((task) => task.status !== "เสร็จแล้ว");
   return <div className="v2-view">
     <section className="v2-user-dashboard"><div className="v2-user-identity"><i>น</i><span><small>สวัสดี</small><h2>ไนน์</h2><p>ภาพรวมสำหรับผู้บริหารการขาย · 1 ส.ค. 2569</p></span></div><div className="v2-user-focus"><small>สิ่งที่ควรดูเป็นอันดับแรก</small><b>3 Lead ต้องยืนยันขั้นตอนถัดไป</b><button onClick={() => changeView("crm")}>เปิดรายการ →</button></div></section>
-    <section className="v2-kicker-row"><div><span>CURRENT DASHBOARD</span><h2>ภาพรวมของไนน์วันนี้</h2><p>เรียงตามกำหนดเวลา ความเสี่ยง และโอกาสสร้างรายได้</p></div><em>ข้อมูลต้นแบบ</em></section>
-    <div className="v2-metrics">
-      {[["14", "ผู้สนใจที่ต้องติดตาม", "Hot 5 · Warm 9"], ["8", "นัดสาธิตสัปดาห์นี้", "นอกสถานที่ 3"], ["฿8.9M", "Pipeline ที่มีน้ำหนัก", "เพิ่มขึ้น 12%"], ["6", "รายการรออนุมัติ", "ครบกำหนดวันนี้ 2"]].map((item, index) => <article key={item[1]}><i>0{index + 1}</i><strong>{item[0]}</strong><span>{item[1]}</span><small>{item[2]}</small></article>)}
-    </div>
-    <div className="v2-split">
-      <section className="v2-panel v2-action-list"><header><div><span>NEXT BEST ACTION</span><h3>สิ่งที่ต้องทำวันนี้</h3></div><button onClick={() => changeView("crm")}>ดูลูกค้าทั้งหมด</button></header>
-        {[
-          ["LINNA", "ตรวจข้อยกเว้นเงินประกัน", "การเงิน · วันนี้"],
-          ["Dr. J Clinic", "ตรวจข้อมูลก่อนส่งสัญญาแบบ B", "กฎหมาย · วันนี้"],
-          ["Bangkok Hospital Chiangmai", "ทบทวน Term Sheet แบบ A", "ฝ่ายขาย · 1 ส.ค."],
-          ["CCME Leads", "คัดเลือก 5 รายสำหรับการสาธิต", "ฝ่ายขาย · 2 ส.ค."],
-        ].map((item, index) => <button className="v2-action" key={item[1]} onClick={() => toast(`เปิดงาน ${item[0]}`)}><i>{index + 1}</i><span><small>{item[0]}</small><b>{item[1]}</b><em>{item[2]}</em></span><strong>→</strong></button>)}
+    <section className="v2-kicker-row"><div><span>CURRENT DASHBOARD</span><h2>งานและนัดหมายของไนน์</h2><p>เห็นสิ่งที่ต้องทำ สถานะ และกำหนดเวลาในหน้าเดียว</p></div><em>สิงหาคม 2569</em></section>
+    <div className="v2-today-metrics">{[[String(openTasks.length), "งานที่ยังเปิด"], [String(tasks.filter((task) => task.status === "กำลังทำ").length), "กำลังดำเนินการ"], [String(tasks.filter((task) => task.priority === "สูง" && task.status !== "เสร็จแล้ว").length), "งานสำคัญ"], [String(new Set(openTasks.map((task) => task.due)).size), "วันที่มีนัดหมาย"]].map((item) => <article key={item[1]}><strong>{item[0]}</strong><span>{item[1]}</span></article>)}</div>
+    <div className="v2-todo-calendar">
+      <section className="v2-panel v2-todo-list"><header><div><span>MY TO-DO LIST</span><h3>รายการงาน</h3></div><button onClick={() => changeView("crm")}>เปิดรายชื่อลูกค้า</button></header>
+        <div className="v2-todo-filters"><button className="active">ทั้งหมด {tasks.length}</button><button>สำคัญ {tasks.filter((task) => task.priority === "สูง").length}</button><button>เสร็จแล้ว {tasks.filter((task) => task.status === "เสร็จแล้ว").length}</button></div>
+        {tasks.map((task) => <article className={task.status === "เสร็จแล้ว" ? "done" : ""} key={task.id}><button className="check" aria-label={`ทำเครื่องหมาย ${task.title} ว่าเสร็จแล้ว`} onClick={() => updateStatus(task.id, task.status === "เสร็จแล้ว" ? "ยังไม่เริ่ม" : "เสร็จแล้ว")}>{task.status === "เสร็จแล้ว" ? "✓" : ""}</button><span><small>{task.account} · {task.owner}</small><b>{task.title}</b><em>ครบกำหนด {task.due} ส.ค. · ความสำคัญ{task.priority}</em></span><select aria-label={`สถานะ ${task.title}`} value={task.status} onChange={(event) => updateStatus(task.id, event.target.value)}><option>ยังไม่เริ่ม</option><option>กำลังทำ</option><option>รอตรวจ</option><option>เสร็จแล้ว</option></select></article>)}
       </section>
-      <section className="v2-panel v2-pipeline"><header><div><span>PIPELINE</span><h3>มูลค่าตามขั้นตอน</h3></div><button onClick={() => changeView("performance")}>ดูประมาณการ</button></header>
-        {[["นัดสาธิต", "฿6.45M", 82], ["เสนอราคา", "฿8.55M", 69], ["เจรจา", "฿4.30M", 48], ["ทำสัญญา", "฿2.15M", 34]].map((item) => <div key={item[0]}><span>{item[0]}</span><i><b style={{ width: `${item[2]}%` }} /></i><strong>{item[1]}</strong></div>)}
-      </section>
+      <section className="v2-panel v2-calendar"><header><div><span>CALENDAR</span><h3>สิงหาคม 2569</h3></div><button onClick={() => setSelectedDay(1)}>วันนี้</button></header><div className="week"><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span><span>อา</span></div><div className="days"><i /><i /><i /><i /><i />{days.map((day) => { const dayTasks = tasks.filter((task) => task.due === day); return <button className={`${selectedDay === day ? "active" : ""} ${dayTasks.length ? "has-task" : ""}`} onClick={() => setSelectedDay(day)} key={day}><b>{day}</b>{dayTasks.length > 0 && <small>{dayTasks.length}</small>}</button>; })}</div><div className="v2-calendar-detail"><span>{selectedDay} สิงหาคม</span>{tasks.filter((task) => task.due === selectedDay).map((task) => <p key={task.id}><i /><b>{task.title}</b><small>{task.status}</small></p>)}{!tasks.some((task) => task.due === selectedDay) && <em>ยังไม่มีงานในวันนี้</em>}<label><input value={newTask} onChange={(event) => setNewTask(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") addTask(); }} placeholder="เพิ่มงานในวันที่เลือก" /><button onClick={addTask}>＋ เพิ่ม</button></label></div></section>
     </div>
-    <section className="v2-panel v2-progress"><header><div><span>END-TO-END JOURNEY</span><h3>สถานะการทำงานทั้งระบบ</h3></div><em>8 ขั้นตอน</em></header><div>{["รับ Lead", "ประเมิน", "สาธิต", "เสนอเงื่อนไข", "ทำสัญญา", "ส่งมอบ", "ฝึกอบรม", "ดูแลต่อเนื่อง"].map((label, index) => <article className={index < 5 ? "done" : index === 5 ? "current" : ""} key={label}><i>{index < 5 ? "✓" : index + 1}</i><span>{label}</span></article>)}</div></section>
+    <div className="v2-split v2-dashboard-secondary"><section className="v2-panel v2-pipeline"><header><div><span>PIPELINE</span><h3>มูลค่าตามขั้นตอน</h3></div><button onClick={() => changeView("performance")}>ดูประมาณการ</button></header>{[["นัดสาธิต", "฿6.45M", 82], ["เสนอราคา", "฿8.55M", 69], ["เจรจา", "฿4.30M", 48], ["ทำสัญญา", "฿2.15M", 34]].map((item) => <div key={item[0]}><span>{item[0]}</span><i><b style={{ width: `${item[2]}%` }} /></i><strong>{item[1]}</strong></div>)}</section><section className="v2-panel v2-source-mini"><header><div><span>LEAD SOURCE</span><h3>ต้นทางที่ต้องติดตาม</h3></div><button onClick={() => changeView("campaigns")}>ดูกิจกรรม</button></header>{[["Phuket Roadshow", "10 Lead", "1 สนใจสาธิต"], ["Webinar", "27 Lead", "รอคัดกรอง"], ["CME Outreach", "1 Lead", "กำลังติดตาม"]].map((item) => <article key={item[0]}><span><b>{item[0]}</b><small>{item[2]}</small></span><strong>{item[1]}</strong></article>)}</section></div>
   </div>;
 }
 
