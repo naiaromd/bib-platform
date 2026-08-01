@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const portalUsers = sqliteTable(
   "portal_users",
@@ -508,3 +508,151 @@ export const workflowDefinitions = sqliteTable("workflow_definitions", {
   active: integer("active", { mode: "boolean" }).notNull().default(true),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const evidenceAssignments = sqliteTable(
+  "evidence_assignments",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    accountId: text("account_id").notNull(),
+    title: text("title").notNull(),
+    periodKey: text("period_key").notNull(),
+    instructions: text("instructions").notNull().default(""),
+    requiredCaseCount: integer("required_case_count").notNull().default(1),
+    dueAt: text("due_at").notNull().default(""),
+    assignedRole: text("assigned_role").notNull().default("Therapist"),
+    status: text("status").notNull().default("Draft"),
+    createdByEmail: text("created_by_email").notNull(),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => [
+    index("evidence_assignments_tenant_account_status_idx").on(table.tenantId, table.accountId, table.status),
+    index("evidence_assignments_tenant_period_idx").on(table.tenantId, table.periodKey),
+  ],
+);
+
+export const evidenceCases = sqliteTable(
+  "evidence_cases",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    accountId: text("account_id").notNull(),
+    assignmentId: text("assignment_id").notNull().default(""),
+    therapistContactId: text("therapist_contact_id").notNull().default(""),
+    createdByEmail: text("created_by_email").notNull(),
+    caseReference: text("case_reference").notNull(),
+    ageBand: text("age_band").notNull().default(""),
+    concernCode: text("concern_code").notNull(),
+    protocolCode: text("protocol_code").notNull().default(""),
+    programCodesJson: text("program_codes_json").notNull().default("[]"),
+    sessionCount: integer("session_count").notNull().default(0),
+    baselineDate: text("baseline_date").notNull().default(""),
+    followUpDate: text("follow_up_date").notNull().default(""),
+    outcomeMeasuresJson: text("outcome_measures_json").notNull().default("{}"),
+    customerFeedbackJson: text("customer_feedback_json").notNull().default("{}"),
+    therapistSummary: text("therapist_summary").notNull().default(""),
+    voiceTranscript: text("voice_transcript").notNull().default(""),
+    status: text("status").notNull().default("Draft"),
+    submittedAt: text("submitted_at").notNull().default(""),
+    approvedAt: text("approved_at").notNull().default(""),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => [
+    index("evidence_cases_tenant_account_status_idx").on(table.tenantId, table.accountId, table.status),
+    index("evidence_cases_tenant_assignment_idx").on(table.tenantId, table.assignmentId),
+    uniqueIndex("evidence_cases_tenant_account_reference_idx").on(table.tenantId, table.accountId, table.caseReference),
+  ],
+);
+
+export const evidenceSubmissions = sqliteTable(
+  "evidence_submissions",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    accountId: text("account_id").notNull(),
+    caseId: text("case_id").notNull(),
+    version: integer("version").notNull(),
+    status: text("status").notNull().default("Submitted"),
+    snapshotJson: text("snapshot_json").notNull(),
+    submittedByEmail: text("submitted_by_email").notNull(),
+    submittedAt: text("submitted_at").notNull(),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => [
+    uniqueIndex("evidence_submissions_tenant_case_version_idx").on(table.tenantId, table.caseId, table.version),
+    index("evidence_submissions_tenant_account_status_idx").on(table.tenantId, table.accountId, table.status),
+  ],
+);
+
+export const evidenceMedia = sqliteTable(
+  "evidence_media",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    accountId: text("account_id").notNull(),
+    caseId: text("case_id").notNull(),
+    submissionId: text("submission_id").notNull().default(""),
+    mediaType: text("media_type").notNull(),
+    captureStage: text("capture_stage").notNull(),
+    objectKey: text("object_key").notNull().default(""),
+    fileName: text("file_name").notNull(),
+    mimeType: text("mime_type").notNull(),
+    byteSize: integer("byte_size").notNull().default(0),
+    checksum: text("checksum").notNull().default(""),
+    uploadStatus: text("upload_status").notNull().default("Pending upload"),
+    takenAt: text("taken_at").notNull().default(""),
+    uploadedByEmail: text("uploaded_by_email").notNull(),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => [
+    index("evidence_media_tenant_case_idx").on(table.tenantId, table.caseId),
+    index("evidence_media_tenant_upload_status_idx").on(table.tenantId, table.uploadStatus),
+  ],
+);
+
+export const evidenceReviews = sqliteTable(
+  "evidence_reviews",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    accountId: text("account_id").notNull(),
+    caseId: text("case_id").notNull(),
+    submissionId: text("submission_id").notNull(),
+    reviewerEmail: text("reviewer_email").notNull(),
+    reviewerRole: text("reviewer_role").notNull(),
+    decision: text("decision").notNull(),
+    comment: text("comment").notNull().default(""),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => [
+    index("evidence_reviews_tenant_case_idx").on(table.tenantId, table.caseId, table.createdAt),
+  ],
+);
+
+export const consentRecords = sqliteTable(
+  "consent_records",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id").notNull(),
+    accountId: text("account_id").notNull(),
+    caseId: text("case_id").notNull(),
+    consentType: text("consent_type").notNull(),
+    status: text("status").notNull().default("Pending"),
+    scopeJson: text("scope_json").notNull().default("{}"),
+    consentedAt: text("consented_at").notNull().default(""),
+    expiresAt: text("expires_at").notNull().default(""),
+    withdrawnAt: text("withdrawn_at").notNull().default(""),
+    capturedByEmail: text("captured_by_email").notNull(),
+    evidenceDocumentId: text("evidence_document_id").notNull().default(""),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => [
+    index("consent_records_tenant_case_type_idx").on(table.tenantId, table.caseId, table.consentType),
+    index("consent_records_tenant_account_status_idx").on(table.tenantId, table.accountId, table.status),
+  ],
+);

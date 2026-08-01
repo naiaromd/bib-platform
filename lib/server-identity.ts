@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import { headers } from "next/headers";
 
-export const appRoles = ["Executive", "Finance", "Legal", "Sales", "Trainer", "Marketing", "After Sales", "Customer"] as const;
+export const appRoles = ["Executive", "Finance", "Legal", "Sales", "Trainer", "Therapist", "Marketing", "After Sales", "Customer"] as const;
 export type AppRole = (typeof appRoles)[number];
 
 export type RequestActor = {

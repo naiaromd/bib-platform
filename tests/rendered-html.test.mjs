@@ -9,6 +9,12 @@ const hostingUrl = new URL("../.openai/hosting.json", import.meta.url);
 const identityUrl = new URL("../lib/server-identity.ts", import.meta.url);
 const workspaceUrl = new URL("../app/api/workspace/route.ts", import.meta.url);
 const demoUrl = new URL("../app/api/public/demo-request/route.ts", import.meta.url);
+const crmWorkspaceUrl = new URL("../app/api/crm/workspace/route.ts", import.meta.url);
+const evidenceUrl = new URL("../app/api/evidence/route.ts", import.meta.url);
+const evidenceFilesUrl = new URL("../app/api/evidence/files/route.ts", import.meta.url);
+const workspaceV2Url = new URL("../app/workspace/WorkspaceClient.tsx", import.meta.url);
+const therapistUrl = new URL("../app/therapist/TherapistEvidenceApp.tsx", import.meta.url);
+const therapistCssUrl = new URL("../app/therapist/therapist.module.css", import.meta.url);
 
 test("ships the controlled review workflow", async () => {
   const [page, route] = await Promise.all([
@@ -53,4 +59,29 @@ test("enforces server-side identity and tenant-scoped CRM", async () => {
   assert.match(workspace, /WHERE l\.tenant_id = \?/);
   assert.match(demo, /INSERT INTO demo_appointments/);
   assert.match(demo, /INSERT INTO workspace_tasks/);
+});
+
+test("ships the focused CRM workspace and therapist evidence flow", async () => {
+  const [crm, evidence, files, workspace, therapist, therapistCss, hosting] = await Promise.all([
+    readFile(crmWorkspaceUrl, "utf8"),
+    readFile(evidenceUrl, "utf8"),
+    readFile(evidenceFilesUrl, "utf8"),
+    readFile(workspaceV2Url, "utf8"),
+    readFile(therapistUrl, "utf8"),
+    readFile(therapistCssUrl, "utf8"),
+    readFile(hostingUrl, "utf8"),
+  ]);
+  assert.match(crm, /tenantId/);
+  assert.match(crm, /accountScope/);
+  assert.match(workspace, /งานวันนี้/);
+  assert.match(workspace, /ลูกค้าและผู้สนใจ/);
+  assert.match(evidence, /ห้ามบันทึกชื่อ เบอร์โทร หรืออีเมล/);
+  assert.match(evidence, /Evidence case submitted/);
+  assert.match(therapist, /capture="environment"/);
+  assert.match(therapist, /MediaRecorder/);
+  assert.match(therapist, /External publication/);
+  assert.match(files, /filesBucket\(\)\.put/);
+  assert.match(files, /SHA-256/);
+  assert.match(therapistCss, /font-size:\s*16px/);
+  assert.equal(JSON.parse(hosting).r2, "FILES");
 });

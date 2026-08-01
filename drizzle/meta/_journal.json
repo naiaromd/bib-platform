@@ -57,6 +57,13 @@
       "when": 1785589449175,
       "tag": "0007_lyrical_scorpion",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1785592626755,
+      "tag": "0008_demonic_clint_barton",
+      "breakpoints": true
     }
   ]
 }
