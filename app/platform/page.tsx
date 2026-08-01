@@ -11,7 +11,7 @@ const workspaces: Array<[InternalView, string, string, string]> = [
   ["campaigns", "04", "กิจกรรมและแคมเปญ", "Event Promotion และ Campaign"],
   ["approval", "05", "ข้อเสนอและการอนุมัติ", "รูปแบบธุรกิจและเอกสาร"],
   ["performance", "06", "ผลการดำเนินงาน", "เป้าหมาย คุณภาพ และความเสี่ยง"],
-  ["settings", "07", "แม่แบบและการตั้งค่า", "ช่องข้อมูล เอกสาร งาน และขั้นอนุมัติ"],
+  ["settings", "07", "ตั้งค่าพื้นที่ BIB", "ช่องข้อมูล เอกสาร งาน และขั้นอนุมัติ"],
 ];
 
 const leads = [
@@ -336,7 +336,7 @@ function ConfigurationView({ toast }: { toast: (text: string) => void }) {
   const rows = kind === "field" ? data.fields : kind === "document" ? data.documents : kind === "task" ? data.tasks : data.workflows;
   const kindLabel = { field: "ช่องข้อมูล", document: "แม่แบบเอกสาร", task: "แม่แบบงาน", workflow: "ขั้นอนุมัติ" }[kind];
   return <div className="v2-view v2-configuration">
-    <section className="v2-kicker-row"><div><span>SYSTEM TEMPLATE</span><h2>แม่แบบและการตั้งค่า</h2><p>เพิ่มสิ่งที่ระบบต้องเก็บและใช้ซ้ำได้ โดยไม่สร้างหน้าใหม่ทุกครั้ง</p></div><em>บริษัทต้นแบบ · BIB</em></section>
+    <section className="v2-kicker-row"><div><span>BIB WORKSPACE CONFIGURATION</span><h2>ตั้งค่าพื้นที่ BIB</h2><p>ส่วนนี้ปรับข้อมูลของบริษัท BIB ไม่ใช่ศูนย์สร้างบริษัทใหม่</p></div><a href="/saas-admin">ดูโครงสร้าง SaaS</a></section>
     <section className="v2-template-map">
       {[['โมดูล', data.modules.length, 'กำหนดขอบเขตงาน'], ['ช่องข้อมูล', data.fields.length, 'กำหนดสิ่งที่ต้องกรอก'], ['เอกสาร', data.documents.length, 'กำหนดฉบับและการอนุมัติ'], ['งาน', data.tasks.length, 'กำหนดผู้รับผิดชอบและกำหนดเวลา'], ['ขั้นอนุมัติ', data.workflows.length, 'กำหนดลำดับและสิทธิ์']].map((item, index) => <article key={String(item[0])}><i>0{index + 1}</i><strong>{item[1]}</strong><b>{item[0]}</b><small>{item[2]}</small></article>)}
     </section>
@@ -351,7 +351,7 @@ function ConfigurationView({ toast }: { toast: (text: string) => void }) {
       </div><footer><span>รายการใหม่จะใช้กับข้อมูลที่สร้างหลังจากนี้ โดยไม่แก้ข้อมูลเดิมย้อนหลัง</span><button disabled={saving} onClick={save}>{saving ? 'กำลังบันทึก' : `＋ เพิ่ม${kindLabel}`}</button></footer></article>
       <aside className="v2-config-list"><header><span>{kindLabel}ที่ใช้งาน</span><strong>{rows.length}</strong></header>{rows.slice(0, 8).map((row) => <article key={String(row.id)}><b>{String(row.label || row.name)}</b><small>{String(row.module_key)} · {String(row.field_type || row.template_code || row.default_owner_role || row.workflow_code)}</small></article>)}</aside>
     </section>
-    <section className="v2-reuse-note"><div><span>นำไปใช้กับบริษัทอื่น</span><h3>เปลี่ยนเฉพาะข้อมูลบริษัท แบรนด์ โมดูล และสิทธิ์</h3></div><ol><li>คัดลอกแม่แบบระบบ</li><li>เลือกโมดูลที่ต้องใช้</li><li>กำหนดช่องข้อมูลและเอกสาร</li><li>กำหนดสิทธิ์และขั้นอนุมัติ</li><li>นำเข้าข้อมูลและเริ่มใช้งาน</li></ol></section>
+    <section className="v2-reuse-note"><div><span>ทิศทางผลิตภัณฑ์</span><h3>System Blueprint สำหรับสร้างพื้นที่บริษัทใหม่ทั้งระบบ</h3><p>ต้องแยกข้อมูล ผู้ใช้ สิทธิ โมดูล และตราสินค้ารายบริษัทก่อนเปิดใช้งานจริง</p><a href="/saas-admin">เปิดศูนย์ควบคุม SaaS →</a></div><ol><li>สร้างบริษัทจาก Blueprint รุ่นที่อนุมัติ</li><li>เลือกแพ็กเกจและโมดูล</li><li>กำหนดผู้ดูแลและสิทธิ</li><li>ปรับแบรนด์ ฟอร์ม เอกสาร และ Workflow</li><li>ทดสอบการแยกข้อมูลก่อนเปิดใช้</li></ol></section>
   </div>;
 }
 
