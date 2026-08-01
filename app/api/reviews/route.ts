@@ -6,7 +6,7 @@ type DocumentId = "linna" | "drj" | "memo";
 const documents = [
   ["linna", "LINNA Clinic", "Long-Term Revenue Share Agreement", "D2 · 40/60 · No MG", "v3.2", "Finance review", "Deposit waiver", "Nalin · Sales", 1, "Pending", "sha256:linna-v3.2"],
   ["drj", "Dr.J Clinic", "Rent-to-Own Agreement", "B · 24 months", "v1.4", "Open items", "KYC required", "Mook · Sales", 1, "Blocked", "sha256:drj-v1.4"],
-  ["memo", "BIB Internal", "Commission Policy Memo", "Model A–D2", "v1.1", "Executive approval", "Policy change", "Sunai · Policy owner", 0, "Pending", "sha256:memo-v1.1"],
+  ["memo", "BIB Internal", "Commission Policy Memo", "Model A–D2", "v2.0", "Executive approval", "Policy change", "Sunai · Policy owner", 0, "Pending", "sha256:6661add482e1ec0dad92b3013b5d127b7bddac226f22cdabf3f545a6a05a81d6"],
 ] as const;
 
 const actionRoles: Record<DocumentId, Record<string, Role[]>> = {
@@ -50,6 +50,11 @@ async function initialize() {
       id INTEGER PRIMARY KEY AUTOINCREMENT, document_id TEXT NOT NULL, version TEXT NOT NULL,
       actor_email TEXT NOT NULL, actor_role TEXT NOT NULL, decision TEXT NOT NULL,
       condition_text TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
+    d1.prepare(`CREATE TABLE IF NOT EXISTS approval_records (
+      id TEXT PRIMARY KEY, document_id TEXT NOT NULL, document_version TEXT NOT NULL,
+      version_hash TEXT NOT NULL, actor_email TEXT NOT NULL, actor_role TEXT NOT NULL,
+      decision TEXT NOT NULL, approval_scope TEXT NOT NULL DEFAULT 'Internal workflow',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
     d1.prepare(`CREATE TABLE IF NOT EXISTS audit_events (
       id INTEGER PRIMARY KEY AUTOINCREMENT, document_id TEXT NOT NULL, actor_email TEXT NOT NULL,
       actor_role TEXT NOT NULL, event_type TEXT NOT NULL, event_data TEXT NOT NULL DEFAULT '{}',
@@ -110,6 +115,9 @@ async function initialize() {
       (id, account, title, model, version, stage, risk, owner, customer_visible, decision, version_hash)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(...row).run();
   }
+  await d1.prepare(`UPDATE review_documents SET version = 'v2.0', stage = 'Executive approval',
+    risk = 'Policy change', version_hash = 'sha256:6661add482e1ec0dad92b3013b5d127b7bddac226f22cdabf3f545a6a05a81d6',
+    updated_at = CURRENT_TIMESTAMP WHERE id = 'memo' AND version <> 'v2.0'`).run();
   const count = await d1.prepare("SELECT COUNT(*) AS total FROM review_comments").first<{ total: number }>();
   if (!count?.total) {
     await d1.batch([
@@ -140,7 +148,8 @@ export async function GET(request: Request) {
     const docs = await d1.prepare("SELECT * FROM review_documents ORDER BY id").all();
     const comments = await d1.prepare("SELECT * FROM review_comments ORDER BY id").all();
     const audits = await d1.prepare("SELECT * FROM audit_events ORDER BY id DESC LIMIT 100").all();
-    return Response.json({ actor: currentActor, documents: docs.results, comments: comments.results, audits: audits.results });
+    const approvals = await d1.prepare("SELECT * FROM approval_records ORDER BY created_at DESC LIMIT 100").all();
+    return Response.json({ actor: currentActor, documents: docs.results, comments: comments.results, approvals: approvals.results, audits: audits.results });
   } catch (error) {
     return Response.json({ error: error instanceof Error ? error.message : "Unable to load reviews" }, { status: 500 });
   }
@@ -227,16 +236,24 @@ export async function POST(request: Request) {
         return Response.json({ error: "Dr.J is blocked until KYC and site documents are complete" }, { status: 409 });
       }
       const version = payload.version || "unknown";
+      const currentDocument = await d1.prepare("SELECT version, version_hash FROM review_documents WHERE id = ?").bind(payload.documentId).first<{ version: string; version_hash: string }>();
+      if (!currentDocument || version.replace("ฉบับที่ ", "v") !== currentDocument.version) {
+        return Response.json({ error: "ฉบับเอกสารบนหน้าจอไม่ตรงกับฉบับปัจจุบัน กรุณาโหลดใหม่" }, { status: 409 });
+      }
+      const approvalId = crypto.randomUUID();
       await d1.batch([
         d1.prepare(`INSERT INTO review_decisions
           (document_id, version, actor_email, actor_role, decision)
           VALUES (?, ?, ?, ?, ?)`).bind(payload.documentId, version, currentActor.email, currentActor.role, decision),
+        d1.prepare(`INSERT INTO approval_records
+          (id, document_id, document_version, version_hash, actor_email, actor_role, decision)
+          VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(approvalId, payload.documentId, currentDocument.version, currentDocument.version_hash, currentActor.email, currentActor.role, decision),
         d1.prepare("UPDATE review_documents SET decision = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(decision, payload.documentId),
         d1.prepare(`INSERT INTO audit_events
           (document_id, actor_email, actor_role, event_type, event_data)
           VALUES (?, ?, ?, ?, ?)`).bind(payload.documentId, currentActor.email, currentActor.role, "DECISION_RECORDED", JSON.stringify({ decision, version })),
       ]);
-      return Response.json({ ok: true, decision });
+      return Response.json({ ok: true, decision, approvalId, versionHash: currentDocument.version_hash, scope: "Internal workflow" });
     }
     return Response.json({ error: "Unsupported action" }, { status: 400 });
   } catch (error) {

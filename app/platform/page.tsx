@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type InternalView = "today" | "crm" | "account" | "customers" | "campaigns" | "approval" | "performance";
+type InternalView = "today" | "crm" | "account" | "customers" | "campaigns" | "approval" | "performance" | "settings";
 
 const workspaces: Array<[InternalView, string, string, string]> = [
   ["today", "01", "งานวันนี้", "สิ่งที่ต้องตัดสินใจและติดตาม"],
@@ -11,6 +11,7 @@ const workspaces: Array<[InternalView, string, string, string]> = [
   ["campaigns", "04", "กิจกรรมและแคมเปญ", "Event Promotion และ Campaign"],
   ["approval", "05", "ข้อเสนอและการอนุมัติ", "รูปแบบธุรกิจและเอกสาร"],
   ["performance", "06", "ผลการดำเนินงาน", "เป้าหมาย คุณภาพ และความเสี่ยง"],
+  ["settings", "07", "แม่แบบและการตั้งค่า", "ช่องข้อมูล เอกสาร งาน และขั้นอนุมัติ"],
 ];
 
 const leads = [
@@ -85,6 +86,7 @@ export default function InternalPlatformPage() {
           {view === "campaigns" && <CampaignView toast={toast} openAccount={openAccount} />}
           {view === "approval" && <ApprovalView toast={toast} />}
           {view === "performance" && <PerformanceView />}
+          {view === "settings" && <ConfigurationView toast={toast} />}
         </div>
       </section>
       {notice && <div className="v2-toast">✓ {notice}</div>}
@@ -250,7 +252,7 @@ function ApprovalView({ toast }: { toast: (text: string) => void }) {
   const reviewDocs: Record<ReviewId, { account: string; title: string; version: string; model: string; file: string; status: string; summary: string[]; issue: string }> = {
     linna: { account: "LINNA Clinic", title: "สัญญาแบ่งรายได้ระยะยาว", version: "ฉบับที่ 3.2", model: "D2 · 40/60 · ไม่มีรายได้ขั้นต่ำ", file: "/documents/linna-contract.pdf", status: "รอพิจารณา", summary: ["LINNA ร้อยละ 60 และ IPQ ร้อยละ 40", "ส่วนแบ่ง IPQ เป็นยอดรวมภาษีมูลค่าเพิ่มแล้ว", "ไม่มีรายได้ขั้นต่ำ และทบทวนเมื่อครบ 90 วัน", "หักค่าโฆษณาที่เข้าเกณฑ์ได้ไม่เกิน 50,000 บาทต่อเดือน โดยต้องมีหลักฐาน"], issue: "ยืนยันวิธีตรวจหลักฐานค่าโฆษณา การยกเว้นเงินประกัน และข้อมูลนิติบุคคลก่อนส่งลงนาม" },
     drj: { account: "Dr.J Clinic", title: "สัญญาเช่าเพื่อซื้อ", version: "ฉบับที่ 1.4", model: "B · 24 เดือน", file: "/documents/drj-contract.pdf", status: "ข้อมูลไม่ครบ", summary: ["เช่าเพื่อซื้อ 24 เดือน", "มีเงินประกันและเงื่อนไขโอนกรรมสิทธิ์", "คู่สัญญาเป็นบุคคล", "ต้องตรวจข้อมูลสถานที่และความพร้อมด้านการเงิน"], issue: "ยังไม่ควรส่งลงนามจนกว่าจะได้ข้อมูลยืนยันตัวตน สิทธิใช้สถานที่ และเอกสารประกอบครบ" },
-    memo: { account: "เอกสารภายใน BIB", title: "บันทึกนโยบายค่าตอบแทนการขาย", version: "ฉบับที่ 1.1", model: "รูปแบบ A–D2", file: "/documents/commission-memo.pdf", status: "รอผู้บริหาร", summary: ["รูปแบบ A ใช้อัตราค่าตอบแทนแบบขั้นบันได", "ฝ่ายขายร้อยละ 3 ผู้แนะนำร้อยละ 1 ผู้ฝึกอบรมร้อยละ 1", "หากไม่มีผู้แนะนำ ส่วนดังกล่าวให้ฝ่ายขาย", "ผู้ฝึกอบรมที่ขายเองได้รับตามเงื่อนไขในนโยบาย"], issue: "ต้องยืนยันวันที่เริ่มใช้ อัตราขั้นบันได และผู้มีอำนาจอนุมัติฉบับประกาศใช้" },
+    memo: { account: "เอกสารภายใน BIB", title: "บันทึกนโยบายค่าตอบแทนการขาย", version: "ฉบับที่ 2.0", model: "รูปแบบ A–D2", file: "/documents/commission-memo.pdf", status: "รอผู้บริหาร", summary: ["รูปแบบ A คงอัตราขั้นบันไดเดิมร้อยละ 2–10 ตามราคาก่อนภาษี", "รูปแบบ B–D2 มีวงเงินค่าตอบแทนรวมไม่เกินร้อยละ 5", "ค่าเริ่มต้นคือ ฝ่ายขายร้อยละ 3 ผู้แนะนำร้อยละ 1 ผู้ฝึกอบรมร้อยละ 1", "จ่ายเฉพาะยอดที่บริษัทได้รับเงินจริงและผ่านเงื่อนไขของรูปแบบธุรกิจ"], issue: "ยืนยันวันที่มีผล ผู้อนุมัตินโยบาย และให้ฝ่ายบัญชีรับทราบก่อนประกาศใช้" },
   };
   const [reviewId, setReviewId] = useState<ReviewId>("linna");
   const [reviewMode, setReviewMode] = useState<"summary" | "full">("summary");
@@ -275,7 +277,7 @@ function ApprovalView({ toast }: { toast: (text: string) => void }) {
   };
   const decideReview = async (decision: string) => {
     const response = await fetch("/api/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "decision", documentId: reviewId, role: "Executive", decision, version: current.version }) });
-    if (response.ok) { setReviewDecision({ ...reviewDecision, [reviewId]: decision }); toast(decision === "Approved" ? "อนุมัติเอกสารแล้ว" : "ส่งกลับเพื่อแก้ไขแล้ว"); }
+    if (response.ok) { setReviewDecision({ ...reviewDecision, [reviewId]: decision }); toast(decision === "Approved" ? "บันทึกการอนุมัติภายในแล้ว" : "ส่งกลับเพื่อแก้ไขแล้ว"); }
     else toast("รายการนี้ยังไม่ผ่านเงื่อนไขการอนุมัติ");
   };
   const visibleComments = reviewComments.filter((comment) => comment.document_id === reviewId);
@@ -286,8 +288,70 @@ function ApprovalView({ toast }: { toast: (text: string) => void }) {
       <article className="v2-review-document"><header><div><span>{current.account} · {current.version}</span><h3>{current.title}</h3><p>{current.model}</p></div><nav><button className={reviewMode === "summary" ? "active" : ""} onClick={() => setReviewMode("summary")}>สรุป</button><button className={reviewMode === "full" ? "active" : ""} onClick={() => setReviewMode("full")}>อ่านฉบับเต็ม</button></nav></header>
         {reviewMode === "summary" ? <div className="v2-review-summary"><span>สาระสำคัญ</span><ul>{current.summary.map((line) => <li key={line}>{line}</li>)}</ul><section><b>ประเด็นที่ต้องตัดสินใจ</b><p>{current.issue}</p></section><footer><small>สถานะเอกสาร</small><strong>{reviewDecision[reviewId] === "Pending" ? current.status : reviewDecision[reviewId]}</strong></footer></div> : <iframe title={`${current.title} ${current.version}`} src={`${current.file}#view=FitH&toolbar=1`} />}
       </article>
-      <aside className="v2-review-decision"><header><span>ความเห็นและคำตัดสิน</span><strong>{visibleComments.length}</strong></header><div className="v2-review-current"><small>ผลการพิจารณาปัจจุบัน</small><b>{reviewDecision[reviewId]}</b><em>{reviewId.toUpperCase()} · {current.version}</em></div><div className="v2-review-comments">{visibleComments.length ? visibleComments.map((comment, index) => <article key={`${comment.author_label}-${index}`}><b>{comment.author_label}</b><p>{comment.body}</p><small>{comment.visibility === "Internal" ? "ภายในเท่านั้น" : "ลูกค้าเห็นได้"}</small></article>) : <p>ยังไม่มีความเห็นในเอกสารนี้</p>}</div><div className="v2-review-compose"><textarea value={reviewComment} onChange={(event) => setReviewComment(event.target.value)} placeholder="พิมพ์ความเห็นหรือสิ่งที่ต้องแก้ไข" /><button onClick={saveReviewComment}>บันทึกความเห็น</button></div><footer><button onClick={() => decideReview("Changes requested")}>ส่งกลับเพื่อแก้ไข</button><button className="approve" disabled={reviewId === "drj"} onClick={() => decideReview("Approved")}>{reviewId === "drj" ? "รอข้อมูลให้ครบ" : "อนุมัติ"}</button></footer></aside>
+      <aside className="v2-review-decision"><header><span>ความเห็นและคำตัดสิน</span><strong>{visibleComments.length}</strong></header><div className="v2-review-current"><small>ผลการพิจารณาปัจจุบัน</small><b>{reviewDecision[reviewId]}</b><em>{reviewId.toUpperCase()} · {current.version}</em></div><div className="v2-review-comments">{visibleComments.length ? visibleComments.map((comment, index) => <article key={`${comment.author_label}-${index}`}><b>{comment.author_label}</b><p>{comment.body}</p><small>{comment.visibility === "Internal" ? "ภายในเท่านั้น" : "ลูกค้าเห็นได้"}</small></article>) : <p>ยังไม่มีความเห็นในเอกสารนี้</p>}</div><div className="v2-review-compose"><textarea value={reviewComment} onChange={(event) => setReviewComment(event.target.value)} placeholder="พิมพ์ความเห็นหรือสิ่งที่ต้องแก้ไข" /><button onClick={saveReviewComment}>บันทึกความเห็น</button></div><div className="v2-approval-scope"><b>การอนุมัติภายใน</b><span>ระบบบันทึกผู้อนุมัติ เวลา ฉบับเอกสาร และรหัสตรวจสอบ ไม่ใช่การลงนามอิเล็กทรอนิกส์</span></div><footer><button onClick={() => decideReview("Changes requested")}>ส่งกลับเพื่อแก้ไข</button><button className="approve" disabled={reviewId === "drj"} onClick={() => decideReview("Approved")}>{reviewId === "drj" ? "รอข้อมูลให้ครบ" : "อนุมัติภายใน"}</button></footer></aside>
     </section>
+  </div>;
+}
+
+type ConfigKind = "field" | "document" | "task" | "workflow";
+type ConfigRow = Record<string, string | number>;
+
+function ConfigurationView({ toast }: { toast: (text: string) => void }) {
+  const [kind, setKind] = useState<ConfigKind>("field");
+  const [data, setData] = useState<{ modules: ConfigRow[]; fields: ConfigRow[]; documents: ConfigRow[]; tasks: ConfigRow[]; workflows: ConfigRow[] }>({ modules: [], fields: [], documents: [], tasks: [], workflows: [] });
+  const [moduleKey, setModuleKey] = useState("crm");
+  const [label, setLabel] = useState("");
+  const [fieldType, setFieldType] = useState("text");
+  const [required, setRequired] = useState(false);
+  const [templateCode, setTemplateCode] = useState("");
+  const [approvalWorkflow, setApprovalWorkflow] = useState("ตรวจทาน → อนุมัติภายใน");
+  const [ownerRole, setOwnerRole] = useState("Sales");
+  const [dueOffsetDays, setDueOffsetDays] = useState(1);
+  const [triggerEvent, setTriggerEvent] = useState("Manual");
+  const [steps, setSteps] = useState("ร่าง, ตรวจทาน, ส่งกลับแก้ไข, อนุมัติภายใน, ลงนาม, ใช้งาน");
+  const [saving, setSaving] = useState(false);
+
+  const load = async () => {
+    const response = await fetch("/api/configuration", { cache: "no-store" });
+    if (!response.ok) return;
+    const payload = await response.json();
+    setData({ modules: payload.modules || [], fields: payload.fields || [], documents: payload.documents || [], tasks: payload.tasks || [], workflows: payload.workflows || [] });
+  };
+  useEffect(() => { load(); }, []);
+
+  const save = async () => {
+    if (!label.trim()) { toast("กรุณาระบุชื่อรายการ"); return; }
+    setSaving(true);
+    const payload: Record<string, unknown> = { kind, moduleKey, name: label.trim() };
+    if (kind === "field") Object.assign(payload, { label: label.trim(), fieldType, required });
+    if (kind === "document") Object.assign(payload, { templateCode: templateCode.trim() || `DOC-${Date.now()}`, approvalWorkflow });
+    if (kind === "task") Object.assign(payload, { ownerRole, dueOffsetDays, triggerEvent });
+    if (kind === "workflow") Object.assign(payload, { workflowCode: templateCode.trim() || `WF-${Date.now()}`, steps: steps.split(",").map((item) => item.trim()).filter(Boolean) });
+    const response = await fetch("/api/configuration", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    setSaving(false);
+    if (!response.ok) { const error = await response.json(); toast(error.error || "บันทึกไม่สำเร็จ"); return; }
+    setLabel(""); setTemplateCode(""); await load(); toast("เพิ่มแม่แบบและบันทึกในระบบแล้ว");
+  };
+
+  const rows = kind === "field" ? data.fields : kind === "document" ? data.documents : kind === "task" ? data.tasks : data.workflows;
+  const kindLabel = { field: "ช่องข้อมูล", document: "แม่แบบเอกสาร", task: "แม่แบบงาน", workflow: "ขั้นอนุมัติ" }[kind];
+  return <div className="v2-view v2-configuration">
+    <section className="v2-kicker-row"><div><span>SYSTEM TEMPLATE</span><h2>แม่แบบและการตั้งค่า</h2><p>เพิ่มสิ่งที่ระบบต้องเก็บและใช้ซ้ำได้ โดยไม่สร้างหน้าใหม่ทุกครั้ง</p></div><em>บริษัทต้นแบบ · BIB</em></section>
+    <section className="v2-template-map">
+      {[['โมดูล', data.modules.length, 'กำหนดขอบเขตงาน'], ['ช่องข้อมูล', data.fields.length, 'กำหนดสิ่งที่ต้องกรอก'], ['เอกสาร', data.documents.length, 'กำหนดฉบับและการอนุมัติ'], ['งาน', data.tasks.length, 'กำหนดผู้รับผิดชอบและกำหนดเวลา'], ['ขั้นอนุมัติ', data.workflows.length, 'กำหนดลำดับและสิทธิ์']].map((item, index) => <article key={String(item[0])}><i>0{index + 1}</i><strong>{item[1]}</strong><b>{item[0]}</b><small>{item[2]}</small></article>)}
+    </section>
+    <section className="v2-config-workbench">
+      <aside><span>เลือกสิ่งที่จะเพิ่ม</span>{([['field', 'ช่องข้อมูล'], ['document', 'แม่แบบเอกสาร'], ['task', 'แม่แบบงาน'], ['workflow', 'ขั้นอนุมัติ']] as Array<[ConfigKind, string]>).map(([id, text]) => <button key={id} className={kind === id ? 'active' : ''} onClick={() => setKind(id)}>{text}<em>→</em></button>)}</aside>
+      <article className="v2-config-form"><header><span>เพิ่ม{kindLabel}</span><h3>สร้างครั้งเดียว ใช้ได้หลายรายการ</h3></header><div className="v2-config-grid"><label>โมดูล<select value={moduleKey} onChange={(event) => setModuleKey(event.target.value)}>{data.modules.map((module) => <option key={String(module.module_key)} value={String(module.module_key)}>{String(module.name)}</option>)}</select></label><label>ชื่อ{kindLabel}<input value={label} onChange={(event) => setLabel(event.target.value)} placeholder={`เช่น ${kind === 'field' ? 'วันที่ติดตามครั้งถัดไป' : kind === 'task' ? 'ติดตามหลังสาธิตเครื่อง' : 'สัญญารูปแบบใหม่'}`} /></label>
+        {kind === 'field' && <><label>ชนิดข้อมูล<select value={fieldType} onChange={(event) => setFieldType(event.target.value)}><option value="text">ข้อความ</option><option value="number">ตัวเลข</option><option value="date">วันที่</option><option value="select">ตัวเลือก</option><option value="user">ผู้ใช้งาน</option><option value="file">ไฟล์เอกสาร</option></select></label><label className="check"><input type="checkbox" checked={required} onChange={(event) => setRequired(event.target.checked)} /> ต้องกรอก</label></>}
+        {(kind === 'document' || kind === 'workflow') && <label>รหัสแม่แบบ<input value={templateCode} onChange={(event) => setTemplateCode(event.target.value)} placeholder="ระบบสร้างให้อัตโนมัติได้" /></label>}
+        {kind === 'document' && <label>ขั้นอนุมัติ<input value={approvalWorkflow} onChange={(event) => setApprovalWorkflow(event.target.value)} /></label>}
+        {kind === 'task' && <><label>ผู้รับผิดชอบเริ่มต้น<select value={ownerRole} onChange={(event) => setOwnerRole(event.target.value)}><option value="Sales">ฝ่ายขาย</option><option value="Finance">ฝ่ายการเงิน</option><option value="Trainer">ผู้ฝึกอบรม</option><option value="After Sales">บริการหลังการขาย</option><option value="Marketing">ฝ่ายการตลาด</option></select></label><label>ครบกำหนดหลังเหตุการณ์<input type="number" min="0" value={dueOffsetDays} onChange={(event) => setDueOffsetDays(Number(event.target.value))} /></label><label>เหตุการณ์เริ่มงาน<input value={triggerEvent} onChange={(event) => setTriggerEvent(event.target.value)} /></label></>}
+        {kind === 'workflow' && <label className="wide">ลำดับขั้น คั่นด้วยเครื่องหมายจุลภาค<textarea value={steps} onChange={(event) => setSteps(event.target.value)} /></label>}
+      </div><footer><span>รายการใหม่จะใช้กับข้อมูลที่สร้างหลังจากนี้ โดยไม่แก้ข้อมูลเดิมย้อนหลัง</span><button disabled={saving} onClick={save}>{saving ? 'กำลังบันทึก' : `＋ เพิ่ม${kindLabel}`}</button></footer></article>
+      <aside className="v2-config-list"><header><span>{kindLabel}ที่ใช้งาน</span><strong>{rows.length}</strong></header>{rows.slice(0, 8).map((row) => <article key={String(row.id)}><b>{String(row.label || row.name)}</b><small>{String(row.module_key)} · {String(row.field_type || row.template_code || row.default_owner_role || row.workflow_code)}</small></article>)}</aside>
+    </section>
+    <section className="v2-reuse-note"><div><span>นำไปใช้กับบริษัทอื่น</span><h3>เปลี่ยนเฉพาะข้อมูลบริษัท แบรนด์ โมดูล และสิทธิ์</h3></div><ol><li>คัดลอกแม่แบบระบบ</li><li>เลือกโมดูลที่ต้องใช้</li><li>กำหนดช่องข้อมูลและเอกสาร</li><li>กำหนดสิทธิ์และขั้นอนุมัติ</li><li>นำเข้าข้อมูลและเริ่มใช้งาน</li></ol></section>
   </div>;
 }
 

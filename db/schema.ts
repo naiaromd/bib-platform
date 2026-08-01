@@ -56,6 +56,18 @@ export const reviewDecisions = sqliteTable("review_decisions", {
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const approvalRecords = sqliteTable("approval_records", {
+  id: text("id").primaryKey(),
+  documentId: text("document_id").notNull(),
+  documentVersion: text("document_version").notNull(),
+  versionHash: text("version_hash").notNull(),
+  actorEmail: text("actor_email").notNull(),
+  actorRole: text("actor_role").notNull(),
+  decision: text("decision").notNull(),
+  approvalScope: text("approval_scope").notNull().default("Internal workflow"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const auditEvents = sqliteTable("audit_events", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   documentId: text("document_id").notNull(),
@@ -256,4 +268,71 @@ export const partnerPerformanceSnapshots = sqliteTable("partner_performance_snap
   status: text("status").notNull().default("Needs Review"),
   sourceNote: text("source_note").notNull().default(""),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const tenantCompanies = sqliteTable("tenant_companies", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  brandCode: text("brand_code").notNull(),
+  status: text("status").notNull().default("Active"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const moduleDefinitions = sqliteTable("module_definitions", {
+  id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull(),
+  moduleKey: text("module_key").notNull(),
+  name: text("name").notNull(),
+  description: text("description").notNull().default(""),
+  sortOrder: integer("sort_order").notNull().default(0),
+  active: integer("active", { mode: "boolean" }).notNull().default(true),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const fieldDefinitions = sqliteTable("field_definitions", {
+  id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull(),
+  moduleKey: text("module_key").notNull(),
+  fieldKey: text("field_key").notNull(),
+  label: text("label").notNull(),
+  fieldType: text("field_type").notNull(),
+  required: integer("required", { mode: "boolean" }).notNull().default(false),
+  optionsJson: text("options_json").notNull().default("[]"),
+  active: integer("active", { mode: "boolean" }).notNull().default(true),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const documentTemplateRegistry = sqliteTable("document_template_registry", {
+  id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull(),
+  moduleKey: text("module_key").notNull(),
+  templateCode: text("template_code").notNull(),
+  name: text("name").notNull(),
+  approvalWorkflow: text("approval_workflow").notNull(),
+  currentVersion: text("current_version").notNull().default("1.0"),
+  active: integer("active", { mode: "boolean" }).notNull().default(true),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const taskTemplateRegistry = sqliteTable("task_template_registry", {
+  id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull(),
+  moduleKey: text("module_key").notNull(),
+  name: text("name").notNull(),
+  defaultOwnerRole: text("default_owner_role").notNull(),
+  dueOffsetDays: integer("due_offset_days").notNull().default(0),
+  triggerEvent: text("trigger_event").notNull().default("Manual"),
+  active: integer("active", { mode: "boolean" }).notNull().default(true),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const workflowDefinitions = sqliteTable("workflow_definitions", {
+  id: text("id").primaryKey(),
+  tenantId: text("tenant_id").notNull(),
+  moduleKey: text("module_key").notNull(),
+  workflowCode: text("workflow_code").notNull(),
+  name: text("name").notNull(),
+  stepsJson: text("steps_json").notNull(),
+  active: integer("active", { mode: "boolean" }).notNull().default(true),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
