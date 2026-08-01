@@ -15,7 +15,7 @@
   font-size: 15px;
 }
 
-.shell button, .shell input { font: inherit; }
+.shell button, .shell input, .shell select, .shell textarea { font: inherit; }
 .shell button, .shell a { -webkit-tap-highlight-color: transparent; }
 
 .sidebar {
@@ -139,6 +139,12 @@
 .signalList { display: grid; gap: 10px; margin: 0; padding: 18px 22px 22px 40px; }
 .signalList li { padding-left: 4px; font-size: 13px; }
 .signalList li::marker { color: #4e765f; }
+.timeline > div { min-height: 63px; display: grid; grid-template-columns: 54px minmax(0, 1fr); align-items: center; gap: 10px; padding: 10px 17px; border-bottom: 1px solid var(--line); }
+.timeline > div:last-child { border-bottom: 0; }
+.timeline b { color: var(--accent); font-size: 10px; font-weight: 500; }
+.timeline span, .timeline strong, .timeline small { display: block; }
+.timeline strong { font-size: 13px; font-weight: 500; }
+.timeline small { margin-top: 3px; color: var(--muted); font-size: 10px; }
 .riskText { min-height: 72px; margin: 0; padding: 18px; color: #684c2f; background: #fff6e7; font-size: 13px; line-height: 1.55; }
 .profileData { margin: 0; padding: 6px 18px 15px; }
 .profileData div { display: grid; grid-template-columns: 90px 1fr; padding: 9px 0; border-bottom: 1px solid var(--line); }
@@ -176,11 +182,13 @@
 .modal header button { border: 0; color: white; background: transparent; font-size: 25px; cursor: pointer; }
 .modal label { display: grid; gap: 7px; padding: 17px 20px 0; }
 .modal label span { color: var(--muted); font-size: 12px; }
-.modal input { height: 44px; padding: 0 11px; border: 1px solid #cec5bb; outline: 0; }
-.modal input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px #ead7cb; }
+.modal input, .modal select, .modal textarea { width: 100%; min-height: 44px; padding: 9px 11px; border: 1px solid #cec5bb; color: var(--ink); background: white; outline: 0; resize: vertical; }
+.modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px #ead7cb; }
 .modal footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; padding: 14px 20px; border-top: 1px solid var(--line); }
 .modal footer button { padding: 9px 14px; border: 1px solid #c7bcb0; color: #5f5047; background: white; cursor: pointer; }
 .modal footer button:last-child { color: white; background: var(--accent); border-color: var(--accent); }
+.activityModal { width: min(680px, 100%); max-height: calc(100vh - 36px); overflow: auto; }
+.formGrid { display: grid; grid-template-columns: 1fr 1fr; }
 
 @media (max-width: 1050px) {
   .shell { grid-template-columns: 210px minmax(0, 1fr); }
@@ -229,4 +237,5 @@
   .nextAction { display: block; }
   .nextAction button { width: 100%; margin-top: 15px; }
   .demoGrid { grid-template-columns: 1fr; }
+  .formGrid { grid-template-columns: 1fr; }
 }
