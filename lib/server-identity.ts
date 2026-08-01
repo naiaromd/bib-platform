@@ -64,7 +64,11 @@ export async function requireRequestActor(request: Request): Promise<RequestActo
   const authenticatedEmail = request.headers.get("oai-authenticated-user-email")?.trim().toLowerCase();
   const authenticatedUserId = request.headers.get("oai-authenticated-user-id")?.trim();
   const configuredOwnerId = String((env as unknown as Record<string, unknown>).SITE_OWNER_USER_ID || "").trim();
-  const isConfiguredOwner = Boolean(authenticatedUserId && configuredOwnerId && authenticatedUserId === configuredOwnerId);
+  const configuredOwnerEmail = String((env as unknown as Record<string, unknown>).SITE_OWNER_EMAIL || "").trim().toLowerCase();
+  const isConfiguredOwner = Boolean(
+    (authenticatedUserId && configuredOwnerId && authenticatedUserId === configuredOwnerId)
+    || (authenticatedEmail && configuredOwnerEmail && authenticatedEmail === configuredOwnerEmail),
+  );
   if (!authenticatedEmail && !isLocal) {
     throw new AccessError("กรุณาเข้าสู่ระบบก่อนใช้งาน", 401);
   }
