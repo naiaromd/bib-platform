@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type InternalView = "today" | "crm" | "approval" | "performance";
+type InternalView = "today" | "crm" | "account" | "approval" | "performance";
 
 const workspaces: Array<[InternalView, string, string, string]> = [
   ["today", "01", "งานวันนี้", "สิ่งที่ต้องตัดสินใจและติดตาม"],
@@ -12,11 +12,11 @@ const workspaces: Array<[InternalView, string, string, string]> = [
 ];
 
 const leads = [
-  ["โรงพยาบาลกรุงเทพ เชียงใหม่", "Demo", "75", "ส่ง Term Sheet แบบ A", "วันนี้"],
-  ["Dr. J Clinic", "Contract", "60", "ขอข้อมูลยืนยันตัวตน", "วันนี้"],
-  ["พญ.นภัส", "MQL", "45", "ส่ง Evidence Room", "1 ส.ค."],
-  ["LINNA Clinic", "Active", "100", "ตรวจรายงานรายได้", "2 ส.ค."],
-  ["Wellness Resort", "Negotiation", "55", "ยืนยันผู้ตัดสินใจ", "4 ส.ค."],
+  { name: "โรงพยาบาลกรุงเทพ เชียงใหม่", status: "นัดสาธิต", score: 75, next: "ส่ง Term Sheet แบบ A", due: "วันนี้", owner: "ผู้รับผิดชอบ", segment: "โรงพยาบาล", model: "A", evidence: ["ยืนยันนิติบุคคล", "ประชุมเบื้องต้น", "ผู้มีอำนาจร่วมสาธิต"], risk: "ต้องยืนยันงบประมาณและรอบจัดซื้อ" },
+  { name: "Dr. J Clinic", status: "ตรวจสัญญา", score: 60, next: "ขอข้อมูลยืนยันตัวตน", due: "วันนี้", owner: "ผู้รับผิดชอบ", segment: "คลินิกความงาม", model: "B", evidence: ["แพทย์เป็นผู้ตัดสินใจ", "ขอเอกสารสัญญา", "แจ้งสถานที่ติดตั้งแล้ว"], risk: "ทำสัญญาในนามบุคคล ต้องตรวจรายได้และเครดิต" },
+  { name: "พญ.นภัส", status: "ผู้สนใจที่ผ่านเกณฑ์", score: 45, next: "ส่งห้องข้อมูลหลักฐาน", due: "1 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "แพทย์", model: "ยังไม่เลือก", evidence: ["เปิดหลักฐานซ้ำ", "ขอวารสาร", "ยังไม่ยืนยันโครงการ"], risk: "ยังไม่มีวันเปิดหรือขยายคลินิก" },
+  { name: "LINNA Clinic", status: "ลูกค้าที่ใช้งาน", score: 100, next: "ตรวจรายงานรายได้", due: "2 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "เวลเนส", model: "D2", evidence: ["ลงนามสัญญาแล้ว", "ติดตั้งและฝึกอบรมแล้ว", "ส่งรายงานรายได้"], risk: "ยอดวันที่ 29 พ.ค. ไม่ตรงกับรายงานสรุป" },
+  { name: "Wellness Resort", status: "เจรจา", score: 55, next: "ยืนยันผู้มีอำนาจตัดสินใจ", due: "4 ส.ค.", owner: "ผู้รับผิดชอบ", segment: "เวลเนสรีสอร์ต", model: "C", evidence: ["สาธิตแล้ว", "เริ่มต่อรอง", "ยังไม่พบผู้มีอำนาจ"], risk: "ยังไม่มีข้อมูลปริมาณลูกค้าเพื่อประเมิน MG" },
 ];
 
 function BrandHeader({ area }: { area: string }) {
@@ -40,13 +40,15 @@ function BrandHeader({ area }: { area: string }) {
 
 export default function InternalPlatformPage() {
   const [view, setView] = useState<InternalView>("today");
+  const [selectedAccount, setSelectedAccount] = useState(leads[0]);
   const [query, setQuery] = useState("");
   const [notice, setNotice] = useState("");
   const toast = (text: string) => {
     setNotice(text);
     window.setTimeout(() => setNotice(""), 2200);
   };
-  const visibleLeads = leads.filter((lead) => lead.join(" ").toLowerCase().includes(query.toLowerCase()));
+  const visibleLeads = leads.filter((lead) => Object.values(lead).flat().join(" ").toLowerCase().includes(query.toLowerCase()));
+  const openAccount = (account: typeof leads[number]) => { setSelectedAccount(account); setView("account"); };
 
   return (
     <main className="v2-shell">
@@ -73,13 +75,14 @@ export default function InternalPlatformPage() {
             <label><i>⌕</i><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ค้นหาลูกค้า งาน หรือเอกสาร" /></label>
             <button onClick={() => toast("เปิดแบบฟอร์มสร้างรายการใหม่แล้ว")}>＋ สร้างรายการ</button>
           </header>
-          <section className="v2-intro v2-module-hero">
+          {view === "today" && <section className="v2-intro v2-module-hero">
             <div><span>ศูนย์ปฏิบัติงานภายใน</span><h1>เริ่มจากงาน<br />ที่ต้องทำ</h1><p>รวมลูกค้า ข้อเสนอ สัญญา และบริการหลังการขาย</p></div>
             <aside><b>6</b><span>เรื่องที่ต้องตัดสินใจวันนี้</span><button onClick={() => setView("approval")}>เปิดรายการอนุมัติ</button></aside>
-          </section>
+          </section>}
 
           {view === "today" && <TodayView changeView={setView} toast={toast} />}
-          {view === "crm" && <CrmView leads={visibleLeads} toast={toast} />}
+          {view === "crm" && <CrmView leads={visibleLeads} toast={toast} openAccount={openAccount} />}
+          {view === "account" && <AccountView account={selectedAccount} back={() => setView("crm")} toast={toast} />}
           {view === "approval" && <ApprovalView toast={toast} />}
           {view === "performance" && <PerformanceView />}
         </div>
@@ -112,15 +115,53 @@ function TodayView({ changeView, toast }: { changeView: (view: InternalView) => 
   </div>;
 }
 
-function CrmView({ leads, toast }: { leads: string[][]; toast: (text: string) => void }) {
+function CrmView({ leads: items, toast, openAccount }: { leads: typeof leads; toast: (text: string) => void; openAccount: (account: typeof leads[number]) => void }) {
   return <div className="v2-view">
     <section className="v2-kicker-row"><div><span>CRM · PERSON → ORGANIZATION → OPPORTUNITY</span><h2>ลูกค้าและโอกาสขาย</h2><p>ติดตามบุคคล องค์กร และขั้นตอนถัดไป</p></div><button onClick={() => toast("เปิดแบบฟอร์มเพิ่มผู้ติดต่อแล้ว")}>＋ เพิ่มผู้ติดต่อ</button></section>
-    <div className="v2-lifecycle">{[["ผู้สนใจ", "28"], ["MQL", "14"], ["นัดสาธิต", "8"], ["เสนอราคา", "5"], ["เจรจา", "3"], ["ทำสัญญา", "2"]].map((item, index) => <article key={item[0]}><i>0{index + 1}</i><strong>{item[1]}</strong><span>{item[0]}</span></article>)}</div>
+    <div className="v2-lifecycle">{[["ผู้สนใจ", "28"], ["ผ่านเกณฑ์", "14"], ["นัดสาธิต", "8"], ["เสนอราคา", "5"], ["เจรจา", "3"], ["ทำสัญญา", "2"]].map((item, index) => <article key={item[0]}><i>0{index + 1}</i><strong>{item[1]}</strong><span>{item[0]}</span></article>)}</div>
     <section className="v2-panel v2-table"><header><div><span>CONTACT & ACCOUNT VIEW</span><h3>รายการที่ต้องติดตาม</h3></div><em>{leads.length} รายการ</em></header>
       <div className="v2-table-head"><span>บุคคลหรือองค์กร</span><span>สถานะ</span><span>คะแนน</span><span>ขั้นตอนถัดไป</span><span>กำหนด</span></div>
-      {leads.map((lead) => <button key={lead[0]} onClick={() => toast(`เปิดข้อมูล ${lead[0]}`)}><span><b>{lead[0]}</b><small>เปิดข้อมูล 360°</small></span><em>{lead[1]}</em><strong>{lead[2]}</strong><span>{lead[3]}</span><time>{lead[4]}</time></button>)}
+      {items.map((lead) => <button key={lead.name} onClick={() => openAccount(lead)}><span><b>{lead.name}</b><small>{lead.owner} · {lead.segment}</small></span><em>{lead.status}</em><strong>{lead.score}</strong><span>{lead.next}</span><time>{lead.due}</time></button>)}
     </section>
     <section className="v2-segmentation"><article><span>PERSON</span><h3>บุคคล</h3><p>บทบาท อิทธิพลต่อการตัดสินใจ และความสนใจ</p></article><article><span>ORGANIZATION</span><h3>องค์กร</h3><p>ประเภทธุรกิจ สถานที่ และความพร้อม</p></article><article><span>RELATIONSHIP</span><h3>ความสัมพันธ์</h3><p>ผู้สนใจ ลูกค้า Supplier หรือ Ecosystem</p></article></section>
+  </div>;
+}
+
+function AccountView({ account, back, toast }: { account: typeof leads[number]; back: () => void; toast: (text: string) => void }) {
+  const [tab, setTab] = useState<"overview" | "demo" | "offer" | "activity">("overview");
+  const tabs: Array<[typeof tab, string]> = [["overview", "ภาพรวม"], ["demo", "การสาธิต"], ["offer", "ข้อเสนอและสัญญา"], ["activity", "บันทึกการติดต่อ"]];
+  return <div className="v2-view v2-account-view">
+    <button className="v2-back" onClick={back}>← กลับไปรายชื่อลูกค้า</button>
+    <section className="v2-account-head">
+      <div><span>{account.segment} · ผู้ดูแล {account.owner}</span><h2>{account.name}</h2><p>รูปแบบธุรกิจ {account.model} · {account.status}</p></div>
+      <aside><small>คะแนนความพร้อม</small><strong>{account.score}</strong><em>จากหลักฐาน {account.evidence.length} รายการ</em></aside>
+    </section>
+    <nav className="v2-account-tabs" aria-label="ข้อมูลลูกค้า">{tabs.map(([id, label]) => <button className={tab === id ? "active" : ""} onClick={() => setTab(id)} key={id}>{label}</button>)}</nav>
+
+    {tab === "overview" && <div className="v2-account-grid">
+      <section className="v2-panel v2-signal-list"><header><div><span>QUALIFICATION SIGNALS</span><h3>เหตุผลที่ระบบให้คะแนน</h3></div><em>ตรวจสอบได้</em></header>
+        {account.evidence.map((item, index) => <article key={item}><i>✓</i><span><b>{item}</b><small>{index === 0 ? "ข้อมูลที่ลูกค้ายืนยัน" : "บันทึกจากกิจกรรมล่าสุด"}</small></span><strong>+{index === 2 ? 10 : 5}</strong></article>)}
+        <article className="risk"><i>!</i><span><b>ความเสี่ยงที่ต้องจัดการ</b><small>{account.risk}</small></span><strong>ตรวจ</strong></article>
+      </section>
+      <section className="v2-panel v2-next-card"><header><div><span>NEXT BEST ACTION</span><h3>ขั้นตอนถัดไป</h3></div></header><strong>{account.next}</strong><p>กำหนด {account.due} · ผู้รับผิดชอบ {account.owner}</p><button onClick={() => toast(`บันทึกงาน ${account.next} แล้ว`)}>บันทึกว่าเริ่มดำเนินการ</button><button className="secondary" onClick={() => setTab("activity")}>เพิ่มบันทึกการติดต่อ</button></section>
+    </div>}
+
+    {tab === "demo" && <div className="v2-account-grid">
+      <section className="v2-panel v2-demo-readiness"><header><div><span>DEMO READINESS</span><h3>ประเมินก่อนออกสาธิตนอกสถานที่</h3></div><em>{account.score >= 60 ? "ผ่านเกณฑ์" : "ต้องทบทวน"}</em></header>
+        {["ยืนยันวันและเวลาจากลูกค้า", "ผู้มีอำนาจหรือผู้มีอิทธิพลเข้าร่วม", "มีโครงการเปิดหรือขยายบริการ", "สถานที่และใบอนุญาตมีความพร้อม"].map((item, index) => <label key={item}><input type="checkbox" defaultChecked={index < (account.score >= 60 ? 3 : 2)} /><span>{item}</span></label>)}
+      </section>
+      <section className="v2-panel v2-next-card"><header><div><span>DEMO OPTIONS</span><h3>รูปแบบการสาธิต</h3></div></header><button onClick={() => toast("สร้างคำเชิญสาธิตที่สำนักงานแล้ว")}>ที่สำนักงาน BIB</button><button className="secondary" onClick={() => toast("ส่งคำขออนุมัติสาธิตนอกสถานที่แล้ว")}>นอกสถานที่ · ขออนุมัติค่าใช้จ่าย</button><p>การสาธิตนอกสถานที่ต้องผ่านเกณฑ์ความพร้อมและระบุผู้เข้าร่วม</p></section>
+    </div>}
+
+    {tab === "offer" && <div className="v2-account-grid">
+      <section className="v2-panel v2-offer-summary"><header><div><span>APPROVED COMMERCIAL PATH</span><h3>เงื่อนไขที่เสนอได้</h3></div><em>แบบ {account.model}</em></header><div><span>สถานะ</span><b>{account.status}</b></div><div><span>รูปแบบธุรกิจ</span><b>{account.model}</b></div><div><span>ข้อยกเว้น</span><b>{account.model === "D2" ? "ไม่มี MG · VAT รวมในส่วนแบ่ง" : "ยังไม่มี"}</b></div><div><span>เอกสารฉบับล่าสุด</span><b>{account.model === "A" ? "Term Sheet A" : account.model === "B" ? "สัญญาเช่าเพื่อซื้อ" : "บันทึกเงื่อนไข"}</b></div></section>
+      <section className="v2-panel v2-next-card"><header><div><span>DOCUMENT ACTION</span><h3>จัดทำเอกสาร</h3></div></header><button onClick={() => toast("เปิดแบบสร้างเอกสารจากแม่แบบแล้ว")}>สร้างเอกสารจากแม่แบบ</button><button className="secondary" onClick={() => toast("เปิดขั้นตอนตรวจทานและแสดงความคิดเห็นแล้ว")}>ส่งให้ลูกค้าตรวจทาน</button><p>ลูกค้าเห็นเฉพาะฉบับที่ได้รับอนุมัติและข้อมูลของตนเอง</p></section>
+    </div>}
+
+    {tab === "activity" && <div className="v2-account-grid">
+      <section className="v2-panel v2-activity"><header><div><span>ACTIVITY TIMELINE</span><h3>ประวัติการติดต่อ</h3></div><button onClick={() => toast("เปิดแบบบันทึกด้วยเสียงแล้ว")}>🎙 บันทึกด้วยเสียง</button></header>{[["31 ก.ค.", account.next, account.owner], ["28 ก.ค.", "ส่งข้อมูลผลิตภัณฑ์และหลักฐาน", "ระบบ"], ["25 ก.ค.", "สนทนาหลังจบกิจกรรม", account.owner]].map((item) => <article key={item.join("")}><time>{item[0]}</time><span><b>{item[1]}</b><small>บันทึกโดย {item[2]}</small></span></article>)}</section>
+      <section className="v2-panel v2-next-card"><header><div><span>QUICK NOTE</span><h3>เพิ่มบันทึก</h3></div></header><textarea placeholder="สรุปสิ่งที่คุย ความกังวล และขั้นตอนถัดไป" /><button onClick={() => toast("บันทึกกิจกรรมและกำหนดงานถัดไปแล้ว")}>บันทึกพร้อมกำหนดงานถัดไป</button></section>
+    </div>}
   </div>;
 }
 

@@ -1177,3 +1177,50 @@ nav button.active span { color: #a56145; }
 .v2-support-grid h3,
 .v2-evidence-loop h3 { font-size: 20px; }
 .v2-simple-footer { font-size: 12px; }
+
+/* Account workspace — evidence-backed lead to demo to offer. */
+.v2-account-view { padding-top: 28px; }
+.v2-back { padding: 8px 0; color: #8e5941; border: 0; background: transparent; font: 600 14px "Kanit"; cursor: pointer; }
+.v2-account-head { min-height: 170px; display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 26px 0 30px; border-bottom: 1px solid #d8d0c5; }
+.v2-account-head > div > span { color: #ad6448; font: 600 12px "Muli"; letter-spacing: .08em; text-transform: uppercase; }
+.v2-account-head h2 { margin: 10px 0 4px; font-size: clamp(30px, 3.2vw, 50px); line-height: 1.15; }
+.v2-account-head p { margin: 0; color: #716d67; font-size: 15px; }
+.v2-account-head aside { min-width: 170px; padding: 18px 22px; border-left: 3px solid #b66a4c; background: #fbfaf7; }
+.v2-account-head aside small, .v2-account-head aside em { display: block; color: #716d67; font-size: 12px; font-style: normal; }
+.v2-account-head aside strong { display: block; margin: 2px 0; font: 600 43px "Muli"; }
+.v2-account-tabs { display: flex; gap: 26px; margin-bottom: 28px; border-bottom: 1px solid #d8d0c5; }
+.v2-account-tabs button { padding: 17px 2px 13px; color: #77736d; border: 0; border-bottom: 3px solid transparent; background: transparent; font: 500 14px "Kanit"; cursor: pointer; }
+.v2-account-tabs button.active { color: #242628; border-bottom-color: #b66a4c; }
+.v2-account-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, .75fr); gap: 18px; }
+.v2-signal-list article { display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: center; min-height: 70px; padding: 12px 22px; border-top: 1px solid #e4ded5; }
+.v2-signal-list article > i { width: 28px; height: 28px; display: grid; place-items: center; color: #fff; border-radius: 50%; background: #47745f; font-style: normal; }
+.v2-signal-list article span b, .v2-signal-list article span small { display: block; }
+.v2-signal-list article span b { font-size: 14px; }
+.v2-signal-list article span small { margin-top: 3px; color: #7b7770; font-size: 12px; }
+.v2-signal-list article > strong { color: #47745f; font: 600 13px "Muli"; }
+.v2-signal-list article.risk { background: #fff6ea; }
+.v2-signal-list article.risk > i { background: #a87822; }
+.v2-signal-list article.risk > strong { color: #8a611d; }
+.v2-next-card { padding-bottom: 20px; }
+.v2-next-card > strong, .v2-next-card > p, .v2-next-card > button, .v2-next-card > textarea { margin-inline: 22px; }
+.v2-next-card > strong { display: block; margin-top: 22px; font-size: 20px; }
+.v2-next-card > p { color: #716d67; font-size: 13px; line-height: 1.55; }
+.v2-next-card > button { width: calc(100% - 44px); min-height: 42px; margin-top: 8px; color: #fff; border: 1px solid #a86145; background: #a86145; font: 600 13px "Kanit"; cursor: pointer; }
+.v2-next-card > button.secondary { color: #6f4b3c; background: transparent; }
+.v2-next-card > textarea { width: calc(100% - 44px); min-height: 135px; margin-top: 20px; padding: 12px; resize: vertical; border: 1px solid #d8d0c5; background: #fff; font: 14px "Kanit"; }
+.v2-demo-readiness label { min-height: 58px; display: flex; gap: 12px; align-items: center; padding: 10px 22px; border-top: 1px solid #e4ded5; font-size: 14px; }
+.v2-demo-readiness input { width: 18px; height: 18px; accent-color: #a86145; }
+.v2-offer-summary > div { display: grid; grid-template-columns: 145px 1fr; gap: 16px; padding: 15px 22px; border-top: 1px solid #e4ded5; font-size: 14px; }
+.v2-offer-summary > div span { color: #77736d; }
+.v2-activity article { min-height: 70px; display: grid; grid-template-columns: 80px 1fr; gap: 16px; align-items: center; padding: 12px 22px; border-top: 1px solid #e4ded5; }
+.v2-activity article time { color: #ad6448; font: 600 12px "Muli"; }
+.v2-activity article b, .v2-activity article small { display: block; }
+.v2-activity article b { font-size: 14px; }.v2-activity article small { margin-top: 4px; color: #77736d; font-size: 12px; }
+
+@media (max-width: 820px) {
+  .v2-account-head { align-items: flex-start; flex-direction: column; }
+  .v2-account-head aside { width: 100%; }
+  .v2-account-tabs { gap: 12px; overflow-x: auto; }
+  .v2-account-tabs button { white-space: nowrap; }
+  .v2-account-grid { grid-template-columns: 1fr; }
+}
