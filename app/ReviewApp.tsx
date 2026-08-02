@@ -86,25 +86,22 @@ export default function Home() {
   const [fullDocumentOverride, setFullDocumentOverride] = useState<{ file: string; title: string; version: string } | null>(null);
   const [comment, setComment] = useState("");
   const [showReportForm, setShowReportForm] = useState(false);
-  const [profileForm, setProfileForm] = useState({ name: "ผู้รับผิดชอบ", phone: "", position: "ผู้ดูแลบัญชี LINNA", notificationEmail: "" });
+  const [profileForm, setProfileForm] = useState({ name: "ผู้รับผิดชอบ", phone: "", position: "กรรมการตามหนังสือรับรอง", notificationEmail: "" });
   const [treatmentForm, setTreatmentForm] = useState({ name: "icoone Signature Body", duration: "40", price: "5000", description: "โปรแกรมดูแลรูปร่างและเนื้อเยื่อแบบไม่รุกล้ำ" });
   const [protocolForm, setProtocolForm] = useState({ preparation: "ประเมินและคัดกรองก่อนรับบริการทุกครั้ง", followUp: "ติดตามความรู้สึกหลังรับบริการภายใน 24 ชั่วโมง", internalNote: "" });
   const [reportForm, setReportForm] = useState({
-    reportMonth: "2026-07",
-    paidSessions: "42",
-    packageSessions: "18",
-    complimentarySessions: "3",
-    grossRevenue: "227500",
+    reportMonth: "",
+    paidSessions: "0",
+    packageSessions: "0",
+    complimentarySessions: "0",
+    grossRevenue: "0",
     approvedRefunds: "0",
-    approvedMarketing: "50000",
-    openingHours: "1248",
-    closingHours: "1289",
+    approvedMarketing: "0",
+    openingHours: "0",
+    closingHours: "0",
     consumableNote: "",
   });
-  const [notes, setNotes] = useState([
-    { documentId: "linna", author: "ฝ่ายการเงิน · พิม", text: "กรุณาระบุเลขที่อนุมัติการยกเว้นเงินประกันในเอกสารแนบท้ายฉบับที่ 1", visibility: "ภายใน", time: "09:42" },
-    { documentId: "linna", author: "LINNA · ผู้ตรวจทาน", text: "ยืนยันส่วนแบ่ง 60/40 และไม่มีรายได้ขั้นต่ำ", visibility: "ลูกค้าเห็นได้", time: "10:18" },
-  ]);
+  const [notes, setNotes] = useState<Array<{ documentId: ItemId; author: string; text: string; visibility: string; time: string }>>([]);
   const [decisions, setDecisions] = useState<Record<ItemId, string>>({
     linna: "Pending",
     drj: "Blocked",
@@ -418,14 +415,14 @@ export default function Home() {
               <div>
                 <p>สวัสดี ผู้รับผิดชอบ</p>
                 <h2>ยินดีต้อนรับสู่พื้นที่ดูแล LINNA Clinic</h2>
-                <span>ข้อมูลรอบเดือนกรกฎาคม 2569 · ปรับปรุงล่าสุดเมื่อ 24 กรกฎาคม 2569</span>
+                <span>ข้อมูลนิติบุคคลยืนยันจากหนังสือรับรอง · ข้อมูลผลประกอบการล่าสุดรอตรวจสอบ</span>
               </div>
               <button onClick={() => setShowReportForm(true)}>ส่งรายงานประจำเดือน</button>
             </header>
 
             <div className="client-alert portal-module overview-module">
-              <div><span>กำหนดส่งรายงาน</span><strong>5 ส.ค. 2569</strong></div>
-              <p>กรุณาส่งยอดบริการ รายได้ และภาพชั่วโมงสะสมของเครื่องเพื่อให้ BIB ตรวจสอบส่วนแบ่งรายได้</p>
+              <div><span>รอบรายงานถัดไป</span><strong>ยังไม่กำหนด</strong></div>
+              <p>เมื่อเปิดรอบ กรุณาส่งยอดบริการ รายได้ และภาพชั่วโมงสะสมของเครื่องเพื่อให้ BIB ตรวจสอบส่วนแบ่งรายได้</p>
               <button onClick={() => setShowReportForm(true)}>เริ่มกรอกข้อมูล</button>
             </div>
 
@@ -437,50 +434,50 @@ export default function Home() {
             </div>
 
             <div className="client-metrics portal-module overview-module">
-              <article><i>฿</i><span>รายได้จากบริการ</span><strong>฿227,500</strong><small>รอยืนยันรอบเดือนนี้</small></article>
-              <article><i>60</i><span>ส่วนแบ่ง LINNA</span><strong>฿106,500</strong><small>ร้อยละ 60 ของรายได้สุทธิ</small></article>
-              <article><i>40</i><span>ส่วนแบ่ง IPQ</span><strong>฿71,000</strong><small>รวมภาษีมูลค่าเพิ่ม</small></article>
-              <article><i>63</i><span>จำนวนครั้งที่ให้บริการ</span><strong>63 ครั้ง</strong><small>ชำระเงิน 42 · ชุดบริการ 18 · ฟรี 3</small></article>
+              <article><i>฿</i><span>รายได้ที่นำเข้า</span><strong>฿19,940.80</strong><small>รายงาน มิ.ย. 2569 · รอตรวจสอบ</small></article>
+              <article><i>60</i><span>ส่วนแบ่ง LINNA</span><strong>฿9,348.36</strong><small>คำนวณจากยอดที่เข้าเกณฑ์ · รอตรวจสอบ</small></article>
+              <article><i>40</i><span>ส่วนแบ่ง IPQ</span><strong>฿6,232.24</strong><small>ยอดรวมภาษีมูลค่าเพิ่ม · รอตรวจสอบ</small></article>
+              <article><i>4</i><span>ครั้งที่เข้าเกณฑ์</span><strong>4 ครั้ง</strong><small>จาก 5 รายการที่รายงาน · มีข้อยกเว้น 2 จุด</small></article>
             </div>
 
             <div className="client-grid portal-module overview-module plan-module" id="plan-services">
               <article className="client-card machine-card">
-                <header><div><span>การใช้งานเครื่อง</span><h3>icoone Laser Med</h3></div><em>ทำงานปกติ</em></header>
+                <header><div><span>การใช้งานเครื่อง</span><h3>icoone Laser Med</h3></div><em>รอข้อมูลเครื่อง</em></header>
                 <div className="hour-reading">
-                  <div><span>ชั่วโมงสะสมล่าสุด</span><strong>1,289.0</strong></div>
-                  <div><span>ใช้ในเดือนนี้</span><strong>41.0 ชม.</strong></div>
+                  <div><span>ชั่วโมงสะสมล่าสุด</span><strong>ยังไม่มีข้อมูล</strong></div>
+                  <div><span>เวลาบริการที่รายงาน</span><strong>5.3 ชม.</strong></div>
                 </div>
-                <div className="usage-bar"><i style={{ width: "68%" }} /></div>
-                <p>เหลือประมาณ 711 ชั่วโมงก่อนถึงเกณฑ์ตรวจตามชั่วโมงใช้งาน</p>
+                <div className="usage-bar"><i style={{ width: "0%" }} /></div>
+                <p>ต้องยืนยันเลขเครื่อง วันติดตั้ง และภาพตัวนับชั่วโมงก่อนคำนวณรอบบำรุงรักษา</p>
                 <button onClick={() => setShowReportForm(true)}>บันทึกชั่วโมงและแนบภาพ</button>
               </article>
 
               <article className="client-card" id="warranty">
-                <header><div><span>สถานะรายงาน</span><h3>รอบเดือนกรกฎาคม 2569</h3></div><em className="amber-label">รอ LINNA ส่ง</em></header>
+                <header><div><span>สถานะรายงาน</span><h3>รอบล่าสุดที่นำเข้า: มิถุนายน 2569</h3></div><em className="amber-label">รอตรวจสอบ</em></header>
                 <ol className="report-steps">
-                  <li className="done"><i>✓</i><div><strong>เปิดรอบรายงาน</strong><span>1 ก.ค. 2569</span></div></li>
-                  <li className="current"><i>2</i><div><strong>LINNA กรอกข้อมูล</strong><span>กำหนดส่ง 5 ส.ค. 2569</span></div></li>
+                  <li className="done"><i>✓</i><div><strong>นำเข้ารายงาน</strong><span>มิถุนายน 2569</span></div></li>
+                  <li className="current"><i>2</i><div><strong>BIB ตรวจรายการผิดช่วงเวลา</strong><span>พบข้อยกเว้น 2 จุด</span></div></li>
                   <li><i>3</i><div><strong>BIB ตรวจสอบและรับรองยอด</strong><span>ภายใน 5 วันทำการ</span></div></li>
                   <li><i>4</i><div><strong>ชำระส่วนแบ่งและปิดรอบ</strong><span>ภายในวันที่ 10</span></div></li>
                 </ol>
               </article>
 
               <article className="client-card">
-                <header><div><span>การรับประกันและบริการ</span><h3>สถานะเครื่อง</h3></div><em>ปกติ</em></header>
+                <header><div><span>การรับประกันและบริการ</span><h3>สถานะเครื่อง</h3></div><em>รอยืนยัน</em></header>
                 <dl className="service-list">
                   <div><dt>หมายเลขเครื่อง</dt><dd>รอยืนยันหลังส่งมอบ</dd></div>
-                  <div><dt>ระยะเวลารับประกัน</dt><dd>12 เดือนนับจากวันที่ติดตั้ง</dd></div>
-                  <div><dt>ตรวจบำรุงรักษาครั้งถัดไป</dt><dd>15 ต.ค. 2569</dd></div>
+                  <div><dt>ระยะเวลารับประกัน</dt><dd>รอเอกสารที่ลงนามและวันเริ่มรับประกัน</dd></div>
+                  <div><dt>ตรวจบำรุงรักษาครั้งถัดไป</dt><dd>ยังคำนวณไม่ได้</dd></div>
                   <div><dt>รายการแจ้งปัญหาที่เปิดอยู่</dt><dd>ไม่มี</dd></div>
-                  <div><dt>ผู้ปฏิบัติงานที่ผ่านการรับรอง</dt><dd>2 คน</dd></div>
+                  <div><dt>ผู้ปฏิบัติงานที่ผ่านการรับรอง</dt><dd>ยังไม่มีข้อมูลยืนยัน</dd></div>
                 </dl>
                 <button>แจ้งปัญหาการใช้งาน</button>
               </article>
 
               <article className="client-card">
-                <header><div><span>วัสดุและการสั่งซื้อซ้ำ</span><h3>รายการที่ควรตรวจสอบ</h3></div><em className="amber-label">1 รายการ</em></header>
-                <div className="reorder-item"><div><strong>ชุดวัสดุสิ้นเปลือง icoone</strong><span>คงเหลือประมาณ 3 สัปดาห์</span></div><b>ควรสั่งเพิ่ม</b></div>
-                <div className="reorder-item"><div><strong>อุปกรณ์ทำความสะอาด</strong><span>ปริมาณเพียงพอ</span></div><b className="ok">ปกติ</b></div>
+                <header><div><span>วัสดุและการสั่งซื้อซ้ำ</span><h3>รายการที่ควรตรวจสอบ</h3></div><em className="amber-label">รอข้อมูลคงเหลือ</em></header>
+                <div className="reorder-item"><div><strong>ชุดวัสดุสิ้นเปลือง icoone</strong><span>ยังไม่มีข้อมูลจำนวนคงเหลือ</span></div><b>รอบันทึก</b></div>
+                <div className="reorder-item"><div><strong>อุปกรณ์ทำความสะอาด</strong><span>ยังไม่มีข้อมูลจำนวนคงเหลือ</span></div><b>รอบันทึก</b></div>
                 <button>ดูรายการและขอสั่งซื้อ</button>
               </article>
             </div>
@@ -526,7 +523,7 @@ export default function Home() {
                   <header><span>02</span><div><small>ประวัติการฝึกอบรม</small><h4>ผู้ปฏิบัติงานและความพร้อม</h4></div></header>
                   <ul>
                     <li><time>หลักสูตรเริ่มต้น</time><strong>การฝึกอบรมรวม 18 ชั่วโมง</strong><span>รอยืนยันวันอบรมและรายชื่อผู้เข้าอบรม</span></li>
-                    <li><time>ผู้เข้าอบรม 2 คน</time><strong>สถานะรอประเมินภาคปฏิบัติ</strong><span>ใบรับรองจะแสดงหลังผู้ฝึกสอนลงนามรับรอง</span></li>
+                    <li><time>ยังไม่มีรายชื่อยืนยัน</time><strong>รอบันทึกผู้เข้าอบรมและผลประเมิน</strong><span>ใบรับรองจะแสดงหลังผู้ฝึกสอนลงนามรับรอง</span></li>
                   </ul>
                   <button>จัดการรายชื่อผู้เข้าอบรม</button>
                 </article>
@@ -788,7 +785,7 @@ export default function Home() {
                 <label className="file-field"><span>ภาพหน้าจอแสดงชั่วโมง</span><input type="file" accept="image/*,.pdf" /><small>รับภาพถ่ายหรือเอกสาร PDF</small></label>
               </div></div>
               <label><span>หมายเหตุเกี่ยวกับวัสดุหรือการใช้งาน</span><textarea value={reportForm.consumableNote} onChange={(e) => setReportForm({ ...reportForm, consumableNote: e.target.value })} /></label>
-              <div className="calculation-preview"><div><span>รายได้สุทธิเบื้องต้น</span><strong>฿177,500</strong></div><div><span>ส่วนแบ่ง LINNA</span><strong>฿106,500</strong></div><div><span>ส่วนแบ่ง IPQ รวมภาษี</span><strong>฿71,000</strong></div></div>
+              <div className="calculation-preview"><div><span>รายได้สุทธิเบื้องต้น</span><strong>คำนวณเมื่อกรอกข้อมูล</strong></div><div><span>ส่วนแบ่ง LINNA</span><strong>รอตรวจสอบ</strong></div><div><span>ส่วนแบ่ง IPQ รวมภาษี</span><strong>รอตรวจสอบ</strong></div></div>
             </div>
             <footer><button onClick={() => setShowReportForm(false)}>บันทึกร่างไว้ก่อน</button><button className="submit-report" disabled={saveState === "saving"} onClick={submitMonthlyReport}>ยืนยันและส่งให้ BIB ตรวจสอบ</button></footer>
           </div>

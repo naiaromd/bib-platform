@@ -1,40 +1,71 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type ClientView = "home" | "business" | "academy" | "support";
+type Dashboard = {
+  account?: { legal_name: string; display_name: string; commercial_model: string; account_status: string };
+  performance?: { report_month: string; reported_gross_revenue: number; eligible_gross_revenue: number; linna_share: number; bib_share_vat_inclusive: number; eligible_paid_sessions: number; total_usage_minutes: number; exception_count: number; status: string };
+  deployment?: { model: string; serial_number: string; installed_at: string; cumulative_hours: number; status: string };
+  warranty?: { starts_at: string; ends_at: string; status: string };
+  training?: { total: number; completed: number };
+  service?: { total: number };
+  orders?: { total: number };
+};
+
+const money = (value?: number) => value == null ? "ยังไม่มีข้อมูล" : new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 2 }).format(value);
 
 export default function ClientPage() {
   const [view, setView] = useState<ClientView>("home");
+  const [data, setData] = useState<Dashboard | null>(null);
+  const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const toast = (text: string) => { setNotice(text); window.setTimeout(() => setNotice(""), 2200); };
   const nav: Array<[ClientView, string, string]> = [["home", "01", "ภาพรวม"], ["business", "02", "พัฒนาธุรกิจ"], ["academy", "03", "การฝึกอบรม"], ["support", "04", "บริการและอุปกรณ์"]];
+
+  useEffect(() => {
+    fetch("/api/client-dashboard", { cache: "no-store" })
+      .then(async (response) => {
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error || "โหลดข้อมูลไม่สำเร็จ");
+        setData(payload);
+      })
+      .catch((reason) => setError(reason instanceof Error ? reason.message : "โหลดข้อมูลไม่สำเร็จ"));
+  }, []);
+
+  const account = data?.account;
+  const report = data?.performance;
   return <main className="v2-shell v2-client">
     <header className="v2-brand-header">
       <a href="/client" className="v2-brand-lockup"><img src="/logos/bib-logo.png" alt="BIB" /><span /><img src="/logos/icoone-laser-med.png" alt="icoone laser med" /></a>
-      <div className="v2-brand-copy"><b>CLIENT INTELLIGENCE</b><span>ข้อมูลเพื่อพัฒนาบริการและผลประกอบการ</span></div>
+      <div className="v2-brand-copy"><b>พื้นที่ข้อมูลลูกค้า</b><span>ข้อมูลเพื่อพัฒนาบริการและผลประกอบการ</span></div>
       <nav><a href="/platform">สำหรับทีม BIB</a><a href="/explore">สำหรับผู้สนใจ</a><a className="active" href="/client">สำหรับลูกค้า</a></nav>
-      <em>LINNA · D2</em>
+      <em>{account ? `${account.display_name} · ${account.commercial_model}` : "กำลังโหลด"}</em>
     </header>
     <section className="v2-layout">
       <aside className="v2-job-nav">
-        <span>LINNA CLIENT PORTAL</span>
-        <h2>พื้นที่ของคุณ</h2>
-        <p>ข้อมูลและบริการตามแผน D2</p>
-        <nav>{nav.map(([id, no, label]) => <button className={view === id ? "active" : ""} onClick={() => setView(id)} key={id}><i>{no}</i><span><b>{label}</b><small>{id === "home" ? "ภาพรวมและสิ่งที่ต้องทำ" : id === "business" ? "บริการ รายได้ และโอกาส" : id === "academy" ? "ความรู้และความพร้อมของทีม" : "Warranty อุปกรณ์ และงานบริการ"}</small></span><em>↗</em></button>)}</nav>
-        <div className="v2-control-note"><b>บริษัท ซีเคแอล เฮลท์ แอนด์ บิวตี้ อินเตอร์เนชั่นแนล จำกัด</b><p>บัญชีนี้แสดงเฉพาะข้อมูลของ LINNA Clinic</p></div>
+        <span>พื้นที่ลูกค้า LINNA</span><h2>พื้นที่ของคุณ</h2><p>แสดงเฉพาะข้อมูลที่มีแหล่งอ้างอิงหรือบันทึกในระบบ</p>
+        <nav>{nav.map(([id, no, label]) => <button className={view === id ? "active" : ""} onClick={() => setView(id)} key={id}><i>{no}</i><span><b>{label}</b><small>{id === "home" ? "ภาพรวมและข้อมูลล่าสุด" : id === "business" ? "บริการและหลักฐาน" : id === "academy" ? "ความพร้อมของทีม" : "เครื่องและงานบริการ"}</small></span><em>↗</em></button>)}</nav>
+        <div className="v2-control-note"><b>{account?.legal_name || "กำลังตรวจข้อมูลนิติบุคคล"}</b><p>ยืนยันจากหนังสือรับรองบริษัท</p></div>
       </aside>
       <div className="v2-work">
-        <section className="v2-client-welcome v2-module-hero"><div><span>สวัสดี ทีม LINNA Clinic</span><h1>ข้อมูลสำคัญ<br />ของคุณ</h1><p>บริษัท ซีเคแอล เฮลท์ แอนด์ บิวตี้ อินเตอร์เนชั่นแนล จำกัด</p></div><aside><span>สถานะ</span><b>ปกติ</b><small>ทบทวน 30 ก.ย. 2569</small><button onClick={() => toast("เปิดข้อมูลบัญชีแล้ว")}>แก้ไขข้อมูลบัญชี</button></aside></section>
-    <section className="v2-client-body">
-      {view === "home" && <><section className="v2-kicker-row"><div><span>YOUR PRACTICE AT A GLANCE</span><h2>สรุปเดือนนี้</h2><p>ยอดขาย การใช้งาน การฝึกอบรม และบริการ</p></div><em>กรกฎาคม 2569</em></section>
-        <div className="v2-metrics client-metrics-v2">{[["฿227,500", "รายได้ที่รายงาน", "รอตรวจ 1 รายการ"], ["76.5 ชม.", "ชั่วโมงการใช้งาน", "เพิ่มขึ้น 12%"], ["4 คน", "ผู้ผ่านการฝึกอบรม", "ต้องทบทวน 1 คน"], ["1 รายการ", "งานบริการที่เปิดอยู่", "อยู่ใน Warranty"]].map((item, index) => <article key={item[1]}><i>0{index + 1}</i><strong>{item[0]}</strong><span>{item[1]}</span><small>{item[2]}</small></article>)}</div>
-        <div className="v2-split"><section className="v2-panel v2-client-next"><header><div><span>NEXT ACTION</span><h3>งานถัดไป</h3></div></header>{[["ส่งยอดเดือนกรกฎาคม", "ภายใน 5 ส.ค.", "ส่งข้อมูล"], ["รับทราบ Warranty", "รอผู้มีอำนาจ", "เปิดเอกสาร"], ["ทบทวนผู้ปฏิบัติงาน 1 คน", "ครบกำหนด 18 ส.ค.", "นัดฝึกอบรม"]].map((item) => <article key={item[0]}><i>○</i><span><b>{item[0]}</b><small>{item[1]}</small></span><button onClick={() => toast(item[2])}>{item[2]}</button></article>)}</section><section className="v2-panel v2-program-preview"><header><div><span>PERSONALISED SERVICE</span><h3>โอกาสใหม่</h3></div><button onClick={() => setView("business")}>ดูทั้งหมด</button></header><strong>40</strong><span>โปรแกรมในคลัง</span><p>แนะนำ 3 แนวทางตามบริการและความพร้อมของทีม</p><button onClick={() => setView("business")}>ดูคำแนะนำ</button></section></div>
-      </>}
-      {view === "business" && <><section className="v2-kicker-row"><div><span>CLIENT INTELLIGENCE</span><h2>พัฒนาบริการจากข้อมูลจริง</h2><p>เชื่อม Treatment Menu, Protocol, Conversion และ Use Case Evidence</p></div><a href="/linna">เปิดข้อมูล LINNA ฉบับเต็ม</a></section><div className="v2-client-opportunities">{[["01", "Body Shape Journey", "ความพร้อมสูง", "แนะนำแพ็กเกจ 6–10 ครั้ง พร้อมข้อความสื่อสารที่อนุมัติแล้ว"], ["02", "Post-procedure Care", "ควรทำ Pilot", "เริ่มจากกรณีที่แพทย์คัดเลือกและเก็บ Outcome อย่างเป็นระบบ"], ["03", "Facial Contouring", "มีหลักฐานไทย", "ใช้ Evidence Brief และ Demo Protocol สำหรับทีมแพทย์"]].map((item) => <article key={item[0]}><i>{item[0]}</i><span>{item[2]}</span><h3>{item[1]}</h3><p>{item[3]}</p><button onClick={() => toast(`ส่ง ${item[1]} ให้ผู้เชี่ยวชาญตรวจแล้ว`)}>ขอคำแนะนำจาก BIB</button></article>)}</div><section className="v2-evidence-loop"><span>USE-CASE EVIDENCE</span><h3>ใช้บริการจริง → เก็บผลลัพธ์ → ตรวจคุณภาพ → นำไปพัฒนาบริการ</h3><p>ข้อมูลต้องมีความยินยอม ใช้ Protocol ที่ควบคุม และผ่านการตรวจทานก่อนเผยแพร่</p></section></>}
-      {view === "academy" && <><section className="v2-kicker-row"><div><span>BIB ACADEMY</span><h2>Training ไม่จบเมื่อได้รับ Certificate</h2><p>ติดตามความรู้ การปฏิบัติจริง และกำหนดทบทวนของทีม LINNA</p></div><em>4 Operators</em></section><div className="v2-academy-progress">{[["Safety & contraindications", "Complete", 100], ["Setup, cleaning & care", "Complete", 100], ["Approved treatment workflow", "In progress", 72], ["Practical observation", "Locked", 25]].map((item, index) => <article key={item[0]}><i>0{index + 1}</i><span><b>{item[0]}</b><small>{item[1]}</small></span><em><b style={{ width: `${item[2]}%` }} /></em></article>)}</div></>}
-      {view === "support" && <><section className="v2-kicker-row"><div><span>AFTER-SALES SUPPORT</span><h2>เครื่อง อุปกรณ์ Warranty และบริการ</h2><p>ติดตามประวัติและขอความช่วยเหลือโดยไม่ต้องค้นเอกสารหลายแหล่ง</p></div><button onClick={() => toast("เปิดแบบฟอร์มแจ้งปัญหาแล้ว")}>＋ แจ้งปัญหา</button></section><div className="v2-support-grid">{[["เครื่องและ Warranty", "icoone Laser Med", "Warranty 12 เดือนหลังตรวจรับ", "ดูรายละเอียด"], ["ประวัติบริการ", "1 รายการเปิดอยู่", "นัดตรวจ 8 ส.ค. 2569", "ติดตามสถานะ"], ["วัสดุสิ้นเปลือง", "3 รายการควรตรวจ", "Bodywear · Filter · Flaps", "เปิดรายการสั่งซื้อ"], ["คลังความรู้", "12 เอกสารสำหรับ LINNA", "คู่มือ · Protocol · Toolkit", "เปิดคลังความรู้"]].map((item, index) => <article key={item[0]}><i>0{index + 1}</i><span>{item[0]}</span><h3>{item[1]}</h3><p>{item[2]}</p><button onClick={() => toast(item[3])}>{item[3]}</button></article>)}</div></>}
-    </section></div></section>
+        <section className="v2-client-welcome v2-module-hero"><div><span>พื้นที่ข้อมูล LINNA Clinic</span><h1>ข้อมูลจริง<br />พร้อมแหล่งที่มา</h1><p>{account?.legal_name || "กำลังโหลดข้อมูล"}</p></div><aside><span>สถานะข้อมูล</span><b>{error ? "โหลดไม่สำเร็จ" : data ? "เชื่อมฐานระบบแล้ว" : "กำลังโหลด"}</b><small>ไม่มีการแสดงตัวเลขจำลอง</small><a href="/documents/linna-company-certificate.pdf" target="_blank">ดูหนังสือรับรอง</a></aside></section>
+        <section className="v2-client-body">
+          {error && <section className="v2-evidence-loop"><span>ไม่สามารถโหลดข้อมูล</span><h3>{error}</h3><p>กรุณาเข้าสู่ระบบใหม่หรือติดต่อ BIB</p></section>}
+          {view === "home" && <><section className="v2-kicker-row"><div><span>ข้อมูลล่าสุด</span><h2>สรุปจากฐานระบบ</h2><p>ข้อมูลนิติบุคคลยืนยันแล้ว ส่วนรายงานผลยังรอตรวจสอบ</p></div><em>{report?.report_month || "ยังไม่มีรอบรายงาน"}</em></section>
+            <div className="v2-metrics client-metrics-v2">
+              {[[money(report?.reported_gross_revenue), "รายได้ที่นำเข้า", report ? "รอตรวจสอบยอด" : "ยังไม่มีข้อมูล"], [report ? `${(report.total_usage_minutes / 60).toFixed(1)} ชม.` : "ยังไม่มีข้อมูล", "เวลาบริการที่รายงาน", report ? `${report.exception_count} รายการต้องตรวจ` : "ยังไม่มีข้อมูล"], [data ? `${data.training?.completed || 0}/${data.training?.total || 0} คน` : "กำลังโหลด", "ผลการฝึกอบรม", data?.training?.total ? "จากประวัติในระบบ" : "ยังไม่มีประวัติยืนยัน"], [data ? `${data.service?.total || 0} รายการ` : "กำลังโหลด", "งานบริการที่เปิดอยู่", "จากรายการในระบบ"]].map((item, index) => <article key={item[1]}><i>0{index + 1}</i><strong>{item[0]}</strong><span>{item[1]}</span><small>{item[2]}</small></article>)}
+            </div>
+            <div className="v2-split"><section className="v2-panel v2-client-next"><header><div><span>สิ่งที่ต้องยืนยัน</span><h3>ข้อมูลที่ยังขาด</h3></div></header>{[["หมายเลขเครื่องและวันติดตั้ง", data?.deployment?.serial_number ? "บันทึกแล้ว" : "รอข้อมูล", "เปิดข้อมูลเครื่อง"], ["วันเริ่มและสิ้นสุดการรับประกัน", data?.warranty ? "บันทึกแล้ว" : "รอเอกสาร", "เปิดเอกสาร"], ["รายชื่อและผลประเมินผู้ปฏิบัติงาน", data?.training?.total ? "มีข้อมูล" : "รอบันทึก", "เปิดการฝึกอบรม"]].map((item) => <article key={item[0]}><i>○</i><span><b>{item[0]}</b><small>{item[1]}</small></span><button onClick={() => toast(item[2])}>{item[2]}</button></article>)}</section><section className="v2-panel v2-program-preview"><header><div><span>แหล่งข้อมูล</span><h3>สถานะความน่าเชื่อถือ</h3></div></header><strong>3</strong><span>ระดับข้อมูล</span><p>ยืนยันจากเอกสาร · นำเข้ารอตรวจ · บันทึกในระบบ</p><a href="/linna?view=documents">ดูเอกสาร</a></section></div>
+          </>}
+          {view === "business" && <><section className="v2-kicker-row"><div><span>บริการและหลักฐาน</span><h2>ใช้เฉพาะข้อมูลที่ผ่านการยืนยัน</h2><p>เมนูและแนวทางที่ยังเป็นฉบับร่างต้องให้ LINNA และ BIB ตรวจทานก่อนใช้</p></div><a href="/linna?view=treatments">เปิดเมนูฉบับร่าง</a></section><section className="v2-evidence-loop"><span>การเก็บผลลัพธ์</span><h3>บริการจริง → ขอความยินยอม → เก็บผล → ตรวจคุณภาพ → ใช้เป็นหลักฐาน</h3><p>ระบบจะไม่สรุปผลหรือคำกล่าวอ้างจนกว่าผู้รับผิดชอบจะตรวจและอนุมัติ</p></section></>}
+          {view === "academy" && <><section className="v2-kicker-row"><div><span>การฝึกอบรม</span><h2>ความพร้อมของผู้ปฏิบัติงาน</h2><p>แสดงเฉพาะรายชื่อ ผลประเมิน และใบรับรองที่บันทึกจริง</p></div><em>{data?.training?.total ? `${data.training.total} คน` : "ยังไม่มีข้อมูลยืนยัน"}</em></section><section className="v2-evidence-loop"><span>สถานะ</span><h3>{data?.training?.total ? `ผ่านการประเมิน ${data.training.completed || 0} จาก ${data.training.total} คน` : "รอบันทึกรายชื่อและผลประเมิน"}</h3><p>กรุณาเพิ่มผู้ปฏิบัติงานและแนบผลการฝึกอบรมก่อนแสดงความพร้อม</p></section></>}
+          {view === "support" && <><section className="v2-kicker-row"><div><span>บริการหลังการขาย</span><h2>เครื่อง การรับประกัน และบริการ</h2><p>แสดงสถานะจากทะเบียนเครื่องและประวัติงานจริง</p></div><button onClick={() => toast("เปิดแบบฟอร์มแจ้งปัญหาแล้ว")}>＋ แจ้งปัญหา</button></section><div className="v2-support-grid">
+            {[["เครื่องและการรับประกัน", data?.deployment?.model || "icoone Laser Med", data?.warranty ? `${data.warranty.starts_at} – ${data.warranty.ends_at}` : "รอหมายเลขเครื่อง วันติดตั้ง และเอกสารรับประกัน"], ["ประวัติบริการ", `${data?.service?.total || 0} รายการเปิดอยู่`, "นับจากรายการที่บันทึกในระบบ"], ["การสั่งซื้อ", `${data?.orders?.total || 0} รายการ`, "ยังไม่คาดการณ์สต็อกจนกว่าจะมีข้อมูลการใช้จริง"], ["คลังความรู้", "เอกสารที่ได้รับสิทธิ์", "คู่มือและแนวทางที่ผ่านการควบคุม"]].map((item, index) => <article key={item[0]}><i>0{index + 1}</i><span>{item[0]}</span><h3>{item[1]}</h3><p>{item[2]}</p><button onClick={() => toast(`เปิด${item[0]}แล้ว`)}>เปิดข้อมูล</button></article>)}
+          </div></>}
+        </section>
+      </div>
+    </section>
     {notice && <div className="v2-toast">✓ {notice}</div>}
   </main>;
 }

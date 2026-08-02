@@ -118,17 +118,8 @@ async function initialize() {
   await d1.prepare(`UPDATE review_documents SET version = 'v2.0', stage = 'Executive approval',
     risk = 'Policy change', version_hash = 'sha256:6661add482e1ec0dad92b3013b5d127b7bddac226f22cdabf3f545a6a05a81d6',
     updated_at = CURRENT_TIMESTAMP WHERE id = 'memo' AND version <> 'v2.0'`).run();
-  const count = await d1.prepare("SELECT COUNT(*) AS total FROM review_comments").first<{ total: number }>();
-  if (!count?.total) {
-    await d1.batch([
-      d1.prepare(`INSERT INTO review_comments
-        (document_id, author_email, author_label, role, body, visibility)
-        VALUES (?, ?, ?, ?, ?, ?)`).bind("linna", "finance@bib.local", "Finance · Pim", "Finance", "ขอระบุ Deposit Waiver Approval ID ใน Schedule 1", "Internal"),
-      d1.prepare(`INSERT INTO review_comments
-        (document_id, author_email, author_label, role, body, visibility)
-        VALUES (?, ?, ?, ?, ?, ?)`).bind("linna", "reviewer@linna.local", "LINNA · Reviewer", "Customer", "ยืนยันส่วนแบ่ง 60/40 และไม่มี Minimum Guarantee", "Customer-visible"),
-    ]);
-  }
+  // Comments and decisions must come from an authenticated user action.
+  // Do not seed example review activity into a live tenant.
 }
 
 export async function GET(request: Request) {

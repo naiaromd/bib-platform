@@ -278,7 +278,7 @@ async function initialize() {
   }
   await d1.prepare(`INSERT OR IGNORE INTO device_deployments
     (id, account_id, model, serial_number, installed_at, cumulative_hours, status)
-    VALUES ('deployment-linna', 'linna', 'icoone Laser Med', '', '', 0, 'ใช้งานภายใต้ D2')`).run();
+    VALUES ('deployment-linna', 'linna', 'icoone Laser Med', '', '', 0, 'รอหมายเลขเครื่องและวันติดตั้ง')`).run();
   await d1.prepare(`INSERT OR REPLACE INTO partner_performance_snapshots
     (id, account_id, report_month, reported_paid_sessions, eligible_paid_sessions,
      complimentary_sessions, training_sessions, reported_gross_revenue, eligible_gross_revenue,
