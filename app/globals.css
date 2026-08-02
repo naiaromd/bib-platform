@@ -1426,6 +1426,11 @@ nav button.active span { color: #a56145; }
 .v2-linna-head-actions { display: flex; align-items: center; gap: 8px; }
 .v2-linna-head-actions em { padding: 8px 12px; color: #925236; background: #fff0df; font: 600 12px "Kanit"; font-style: normal; }
 .v2-linna-head-actions button { min-height: 36px; padding: 0 13px; color: #fff; border: 0; background: #292b2b; font: 600 11px "Kanit"; }
+.v2-linna-months { display: flex; gap: 0; overflow-x: auto; border-bottom: 1px solid #ded7cd; background: #f1ece5; }
+.v2-linna-months button { min-width: 190px; min-height: 64px; display: grid; align-content: center; gap: 3px; padding: 10px 20px; color: #514d48; border: 0; border-right: 1px solid #ded7cd; border-bottom: 3px solid transparent; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+.v2-linna-months button.active { color: #292b2b; border-bottom-color: #ad6448; background: #fff; }
+.v2-linna-months b { font-size: 13px; }
+.v2-linna-months small { color: #7e766e; font-size: 10px; }
 .v2-linna-marketing-form { border-bottom: 1px solid #ded7cd; background: #f7f1e9; }
 .v2-linna-marketing-form > header { min-height: 62px; display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #ded7cd; }
 .v2-linna-marketing-form header span { color: #ad6448; font: 600 10px "Muli"; letter-spacing: .08em; }
@@ -1481,6 +1486,15 @@ nav button.active span { color: #a56145; }
 .v2-linna-review-history article span, .v2-linna-review-history article small { display: block; }
 .v2-linna-review-history article span { font-size: 11px; font-weight: 600; }
 .v2-linna-review-history article small, .v2-linna-review-history p { margin-top: 3px; color: #79726b; font-size: 10px; }
+.v2-linna-period-summary { border-bottom: 1px solid #ded7cd; background: #fff; }
+.v2-linna-period-summary > header { min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 20px; border-bottom: 1px solid #ded7cd; }
+.v2-linna-period-summary > header span, .v2-linna-no-performance > span { color: #ad6448; font: 600 10px "Muli"; letter-spacing: .08em; }
+.v2-linna-period-summary > header h3, .v2-linna-no-performance h3 { margin: 4px 0 0; font-size: 19px; }
+.v2-linna-period-summary > header em { color: #80523f; font-size: 11px; font-style: normal; }
+.v2-linna-no-performance { padding: 24px 20px; border-bottom: 1px solid #ded7cd; background: #fff9ef; }
+.v2-linna-no-performance p { max-width: 780px; margin: 7px 0 0; color: #746e66; font-size: 11px; line-height: 1.65; }
+.v2-linna-no-ads { min-height: 120px; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 24px 20px; color: #6f6962; font-size: 12px; }
+.v2-linna-no-ads button { min-height: 38px; padding: 0 14px; color: #fff; border: 0; background: #292b2b; font: 600 11px "Kanit"; }
 .v2-linna-metrics { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid #ded7cd; }
 .v2-linna-metrics.five { grid-template-columns: repeat(5, 1fr); }
 .v2-linna-metrics article { min-height: 122px; padding: 20px; border-right: 1px solid #ded7cd; }
@@ -1655,6 +1669,7 @@ nav button.active span { color: #a56145; }
   .v2-linna-metrics, .v2-linna-grid { grid-template-columns: 1fr; }
   .v2-linna-metrics.five { grid-template-columns: 1fr; }
   .v2-linna-head, .v2-linna-head-actions { align-items: flex-start; flex-direction: column; }
+  .v2-linna-period-summary > header, .v2-linna-no-ads { align-items: flex-start; flex-direction: column; }
   .v2-linna-marketing-form > div { grid-template-columns: 1fr 1fr; }
   .v2-linna-marketing-form label.wide { grid-column: 1 / -1; }
   .v2-linna-ads-layout { grid-template-columns: 1fr; }
