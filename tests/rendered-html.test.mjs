@@ -24,6 +24,8 @@ const clientDashboardUrl = new URL("../app/api/client-dashboard/route.ts", impor
 const marketingClaimUrl = new URL("../app/api/finance/marketing/route.ts", import.meta.url);
 const demoSessionUrl = new URL("../lib/demo-session.ts", import.meta.url);
 const loginUrl = new URL("../app/login/page.tsx", import.meta.url);
+const platformUrl = new URL("../app/platform/page.tsx", import.meta.url);
+const platformErrorUrl = new URL("../app/platform/error.tsx", import.meta.url);
 
 test("ships the controlled review workflow", async () => {
   const [page, route] = await Promise.all([
@@ -139,4 +141,18 @@ test("records the named internal approver and limits the test profile to approva
   assert.match(await readFile(new URL("../app/platform/layout.tsx", import.meta.url), "utf8"), /"Approver"/);
   assert.match(reviews, /actor_display_name/);
   assert.match(reviews, /actorDisplayName: currentActor\.displayName/);
+});
+
+test("keeps every platform module visible and recovers from rendering errors", async () => {
+  const [platform, platformError, css] = await Promise.all([
+    readFile(platformUrl, "utf8"),
+    readFile(platformErrorUrl, "utf8"),
+    readFile(cssUrl, "utf8"),
+  ]);
+  assert.match(platform, /<em>\{items\.length\} รายการ<\/em>/);
+  assert.doesNotMatch(platform, /<em>\{leads\.length\} รายการ<\/em>/);
+  assert.match(platformError, /เปิดหน้านี้ไม่สำเร็จ/);
+  assert.match(platformError, /ลองเปิดอีกครั้ง/);
+  assert.match(css, /\.app-shell nav button:not\(\.active\)/);
+  assert.doesNotMatch(css, /(?<!\.app-shell )nav button:not\(\.active\)/);
 });
