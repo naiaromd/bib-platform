@@ -1412,7 +1412,21 @@ nav button.active span { color: #a56145; }
 .v2-linna-performance { border: 1px solid #d8d0c5; background: #fbfaf7; }
 .v2-linna-head p { margin: 4px 0 0; color: #726d66; font-size: 12px; }
 .v2-linna-head > em { padding: 8px 12px; background: #fff0df; }
+.v2-linna-head-actions { display: flex; align-items: center; gap: 8px; }
+.v2-linna-head-actions em { padding: 8px 12px; color: #925236; background: #fff0df; font: 600 12px "Kanit"; font-style: normal; }
+.v2-linna-head-actions button { min-height: 36px; padding: 0 13px; color: #fff; border: 0; background: #292b2b; font: 600 11px "Kanit"; }
+.v2-linna-marketing-form { border-bottom: 1px solid #ded7cd; background: #f7f1e9; }
+.v2-linna-marketing-form > header { min-height: 62px; display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #ded7cd; }
+.v2-linna-marketing-form header span { color: #ad6448; font: 600 10px "Muli"; letter-spacing: .08em; }
+.v2-linna-marketing-form header h3 { margin: 4px 0 0; font-size: 18px; }
+.v2-linna-marketing-form header em { color: #8b6655; font-size: 11px; font-style: normal; }
+.v2-linna-marketing-form > div { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding: 15px 20px; }
+.v2-linna-marketing-form label { color: #716c66; font-size: 11px; }
+.v2-linna-marketing-form label.wide { grid-column: span 3; }
+.v2-linna-marketing-form input, .v2-linna-marketing-form select { width: 100%; min-height: 39px; margin-top: 5px; padding: 0 10px; border: 1px solid #d4cabf; background: #fff; font: 12px "Kanit"; }
+.v2-linna-marketing-form button { align-self: end; min-height: 39px; color: #fff; border: 0; background: #a76347; font: 600 12px "Kanit"; }
 .v2-linna-metrics { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid #ded7cd; }
+.v2-linna-metrics.five { grid-template-columns: repeat(5, 1fr); }
 .v2-linna-metrics article { min-height: 122px; padding: 20px; border-right: 1px solid #ded7cd; }
 .v2-linna-metrics article:last-child { border-right: 0; }
 .v2-linna-metrics article.review { background: #fff5e8; }
@@ -1510,6 +1524,53 @@ nav button.active span { color: #a56145; }
 .v2-imported-list article strong.active { color: #a05b3f; }
 .v2-data-quality-note { display: flex; gap: 15px; padding: 14px 17px; color: #6f6961; border: 1px solid #e0c9ae; background: #fff8ed; font-size: 11px; }
 .v2-data-quality-note b { flex: 0 0 auto; color: #9b5f42; }
+.v2-finance-actions { display: flex; gap: 8px; }
+.v2-finance-actions button { min-height: 40px; padding: 0 16px; color: #5e4a40; border: 1px solid #cbb9aa; background: #fbfaf7; font: 600 12px "Kanit"; }
+.v2-finance-actions button.primary { color: #fff; border-color: #a76347; background: #a76347; }
+.v2-finance-filter { min-height: 62px; display: flex; align-items: center; gap: 14px; margin-bottom: 16px; padding: 10px 14px; border: 1px solid #d6cec2; background: #fbfaf7; }
+.v2-finance-filter > div { display: flex; gap: 4px; }
+.v2-finance-filter button { min-height: 34px; padding: 0 13px; color: #57524d; border: 1px solid transparent; background: transparent; font: 500 12px "Kanit"; }
+.v2-finance-filter button.active { color: #fff; background: #292b2b; }
+.v2-finance-filter label { display: flex; align-items: center; gap: 7px; color: #716c66; font-size: 11px; }
+.v2-finance-filter select { min-height: 34px; padding: 0 28px 0 9px; border: 1px solid #d6cec2; background: #fff; font: 12px "Kanit"; }
+.v2-finance-filter > em { margin-left: auto; color: #3f745d; font-size: 11px; font-style: normal; }
+.v2-finance-form { margin-bottom: 16px; border: 1px solid #d6cec2; background: #fbfaf7; }
+.v2-finance-form > header { min-height: 65px; display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; border-bottom: 1px solid #ded7cd; }
+.v2-finance-form header span { color: #ad6448; font: 600 10px "Muli"; letter-spacing: .08em; }
+.v2-finance-form header h3 { margin: 4px 0 0; font-size: 18px; }
+.v2-finance-form header em { color: #8b6655; font-size: 11px; font-style: normal; }
+.v2-finance-form > div { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding: 15px 18px; }
+.v2-finance-form label { color: #726d66; font-size: 11px; }
+.v2-finance-form label.wide { grid-column: span 3; }
+.v2-finance-form input { width: 100%; min-height: 40px; margin-top: 5px; padding: 0 10px; border: 1px solid #d6cec2; background: #fff; font: 12px "Kanit"; }
+.v2-finance-form > div > button { align-self: end; min-height: 40px; color: #fff; border: 0; background: #292b2b; font: 600 12px "Kanit"; }
+.v2-finance-metrics strong.negative, .v2-finance-table .negative { color: #a34e42; }
+.v2-finance-table .positive { color: #3f745d; }
+.v2-finance-table, .v2-finance-documents { margin-bottom: 18px; border: 1px solid #d6cec2; background: #fbfaf7; overflow: hidden; }
+.v2-finance-table > header, .v2-finance-documents > header { min-height: 72px; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid #ded7cd; }
+.v2-finance-table header span, .v2-finance-documents header span { color: #ad6448; font: 600 10px "Muli"; letter-spacing: .08em; }
+.v2-finance-table header h3, .v2-finance-documents header h3 { margin: 4px 0 0; font-size: 20px; }
+.v2-finance-table header em, .v2-finance-documents header em { color: #746f68; font-size: 11px; font-style: normal; }
+.v2-finance-table .head, .v2-finance-table > article { display: grid; grid-template-columns: 1.2fr repeat(5, .85fr) 1fr; gap: 12px; align-items: center; }
+.v2-finance-table .head { min-height: 42px; padding: 8px 16px; color: #746f68; background: #f0ebe4; font-size: 10px; }
+.v2-finance-table > article { min-height: 72px; padding: 10px 16px; border-top: 1px solid #e3ddd5; font-size: 11px; }
+.v2-finance-table > article > span:first-child b { display: block; font-size: 12px; }
+.v2-finance-table > article > span:first-child i { width: 100%; height: 3px; display: block; margin-top: 7px; background: #e4ddd4; }
+.v2-finance-table > article > span:first-child i em { height: 100%; display: block; background: #b66c4e; }
+.v2-finance-table article span small { display: block; margin-top: 3px; color: #7a746e; font-size: 9px; }
+.v2-finance-table article > em { color: #8b6655; font-size: 10px; font-style: normal; }
+.v2-finance-table > p { padding: 24px; color: #716c66; }
+.v2-finance-documents .head, .v2-finance-documents > article { display: grid; grid-template-columns: 1.5fr .8fr 1fr .75fr; gap: 14px; align-items: center; }
+.v2-finance-documents .head { min-height: 40px; padding: 8px 16px; color: #746f68; background: #f0ebe4; font-size: 10px; }
+.v2-finance-documents > article { min-height: 66px; padding: 10px 16px; border-top: 1px solid #e3ddd5; font-size: 11px; }
+.v2-finance-documents article b, .v2-finance-documents article small { display: block; }
+.v2-finance-documents article small { margin-top: 3px; color: #7a746e; font-size: 9px; }
+.v2-finance-documents article em { color: #8b6655; font-style: normal; }
+.v2-client-contract-rule { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-bottom: 16px; border: 1px solid #d8d0c5; background: #d8d0c5; }
+.v2-client-contract-rule > div { padding: 18px 20px; background: #fbfaf7; }
+.v2-client-contract-rule span { color: #ad6448; font-size: 11px; }
+.v2-client-contract-rule h3 { margin: 6px 0 3px; font-size: 16px; }
+.v2-client-contract-rule p { margin: 0; color: #716c66; font-size: 11px; line-height: 1.5; }
 .v2-import-overview { margin-bottom: 18px; border: 1px solid #d6cec2; background: #fbfaf7; }
 .v2-import-overview > header { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 14px 18px; border-bottom: 1px solid #ded7cd; }
 .v2-import-overview > header span { color: #ad6448; font: 600 11px "Muli"; letter-spacing: .08em; }
@@ -1528,11 +1589,18 @@ nav button.active span { color: #a56145; }
   .v2-funnel-target { grid-template-columns: repeat(3, 1fr); }
   .v2-funnel-target article:nth-child(3) { border-right: 0; }
   .v2-action-breakdown { grid-template-columns: repeat(2, 1fr); }
+  .v2-linna-metrics.five { grid-template-columns: repeat(3, 1fr); }
+  .v2-finance-table { overflow-x: auto; }
+  .v2-finance-table .head, .v2-finance-table > article { min-width: 900px; }
 }
 @media (max-width: 760px) {
   .v2-installed-customers .head { display: none; }
   .v2-installed-customers article { grid-template-columns: 1fr 1fr; }
   .v2-linna-metrics, .v2-linna-grid { grid-template-columns: 1fr; }
+  .v2-linna-metrics.five { grid-template-columns: 1fr; }
+  .v2-linna-head, .v2-linna-head-actions { align-items: flex-start; flex-direction: column; }
+  .v2-linna-marketing-form > div { grid-template-columns: 1fr 1fr; }
+  .v2-linna-marketing-form label.wide { grid-column: 1 / -1; }
   .v2-linna-metrics article { border-right: 0; border-bottom: 1px solid #ded7cd; }
   .v2-home-target .inputs { grid-template-columns: repeat(2, 1fr); }
   .v2-home-target .inputs > * { border-bottom: 1px solid #ded7cd; }
@@ -1546,4 +1614,11 @@ nav button.active span { color: #a56145; }
   .v2-import-overview > div { grid-template-columns: repeat(2, 1fr); }
   .v2-imported-list .head, .v2-imported-events .head { display: none; }
   .v2-imported-list > article, .v2-imported-events > article { grid-template-columns: 1fr 1fr; }
+  .v2-finance-filter { align-items: flex-start; flex-wrap: wrap; }
+  .v2-finance-filter > em { width: 100%; margin-left: 0; }
+  .v2-finance-form > div { grid-template-columns: 1fr 1fr; }
+  .v2-finance-form label.wide { grid-column: 1 / -1; }
+  .v2-finance-documents .head { display: none; }
+  .v2-finance-documents > article { grid-template-columns: 1fr; }
+  .v2-client-contract-rule { grid-template-columns: 1fr; }
 }

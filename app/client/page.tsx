@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 type ClientView = "home" | "business" | "academy" | "support";
 type Dashboard = {
   account?: { legal_name: string; display_name: string; commercial_model: string; account_status: string };
-  performance?: { report_month: string; reported_gross_revenue: number; eligible_gross_revenue: number; linna_share: number; bib_share_vat_inclusive: number; eligible_paid_sessions: number; total_usage_minutes: number; exception_count: number; status: string };
+  performance?: { report_month: string; reported_gross_revenue: number; eligible_gross_revenue: number; linna_share: number; bib_share_vat_inclusive: number; deductible_marketing: number; approved_refunds: number; eligible_paid_sessions: number; total_usage_minutes: number; exception_count: number; status: string };
+  marketing?: { report_month: string; submitted_amount_satang: number; eligible_amount_satang: number; excluded_amount_satang: number; monthly_cap_satang: number; evidence_status: string; review_status: string; review_note: string };
   deployment?: { model: string; serial_number: string; installed_at: string; cumulative_hours: number; status: string };
   warranty?: { starts_at: string; ends_at: string; status: string };
   training?: { total: number; completed: number };
@@ -14,6 +15,14 @@ type Dashboard = {
 };
 
 const money = (value?: number) => value == null ? "ยังไม่มีข้อมูล" : new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 2 }).format(value);
+const moneySatang = (value?: number) => value == null ? "ยังไม่มีข้อมูล" : money(value / 100);
+function reportPeriod(value?: string) {
+  if (!value || !/^20\d{2}-\d{2}$/.test(value)) return "ยังไม่มีรอบรายงาน";
+  const [year, month] = value.split("-").map(Number);
+  const lastDay = new Date(year, month, 0).getDate();
+  const monthName = new Intl.DateTimeFormat("th-TH", { month: "long", year: "numeric" }).format(new Date(year, month - 1, 1));
+  return `1–${lastDay} ${monthName}`;
+}
 
 export default function ClientPage() {
   const [view, setView] = useState<ClientView>("home");
@@ -35,6 +44,7 @@ export default function ClientPage() {
 
   const account = data?.account;
   const report = data?.performance;
+  const marketing = data?.marketing;
   return <main className="v2-shell v2-client">
     <header className="v2-brand-header">
       <a href="/client" className="v2-brand-lockup"><img src="/logos/bib-logo.png" alt="BIB" /><span /><img src="/logos/icoone-laser-med.png" alt="icoone laser med" /></a>
@@ -52,10 +62,11 @@ export default function ClientPage() {
         <section className="v2-client-welcome v2-module-hero"><div><span>พื้นที่ข้อมูล LINNA Clinic</span><h1>ข้อมูลจริง<br />พร้อมแหล่งที่มา</h1><p>{account?.legal_name || "กำลังโหลดข้อมูล"}</p></div><aside><span>สถานะข้อมูล</span><b>{error ? "โหลดไม่สำเร็จ" : data ? "เชื่อมฐานระบบแล้ว" : "กำลังโหลด"}</b><small>ไม่มีการแสดงตัวเลขจำลอง</small><a href="/documents/linna-company-certificate.pdf" target="_blank">ดูหนังสือรับรอง</a></aside></section>
         <section className="v2-client-body">
           {error && <section className="v2-evidence-loop"><span>ไม่สามารถโหลดข้อมูล</span><h3>{error}</h3><p>กรุณาเข้าสู่ระบบใหม่หรือติดต่อ BIB</p></section>}
-          {view === "home" && <><section className="v2-kicker-row"><div><span>ข้อมูลล่าสุด</span><h2>สรุปจากฐานระบบ</h2><p>ข้อมูลนิติบุคคลยืนยันแล้ว ส่วนรายงานผลยังรอตรวจสอบ</p></div><em>{report?.report_month || "ยังไม่มีรอบรายงาน"}</em></section>
+          {view === "home" && <><section className="v2-kicker-row"><div><span>ข้อมูลล่าสุด</span><h2>รอบรายงาน: {reportPeriod(report?.report_month)}</h2><p>ข้อมูลนิติบุคคลยืนยันแล้ว ส่วนรายงานผลยังรอตรวจสอบ</p></div><em>{report ? `นำเข้ารอบ ${report.report_month}` : "ยังไม่มีรอบรายงาน"}</em></section>
             <div className="v2-metrics client-metrics-v2">
-              {[[money(report?.reported_gross_revenue), "รายได้ที่นำเข้า", report ? "รอตรวจสอบยอด" : "ยังไม่มีข้อมูล"], [report ? `${(report.total_usage_minutes / 60).toFixed(1)} ชม.` : "ยังไม่มีข้อมูล", "เวลาบริการที่รายงาน", report ? `${report.exception_count} รายการต้องตรวจ` : "ยังไม่มีข้อมูล"], [data ? `${data.training?.completed || 0}/${data.training?.total || 0} คน` : "กำลังโหลด", "ผลการฝึกอบรม", data?.training?.total ? "จากประวัติในระบบ" : "ยังไม่มีประวัติยืนยัน"], [data ? `${data.service?.total || 0} รายการ` : "กำลังโหลด", "งานบริการที่เปิดอยู่", "จากรายการในระบบ"]].map((item, index) => <article key={item[1]}><i>0{index + 1}</i><strong>{item[0]}</strong><span>{item[1]}</span><small>{item[2]}</small></article>)}
+              {[[money(report?.reported_gross_revenue), "รายได้ที่นำเข้า", report ? reportPeriod(report.report_month) : "ยังไม่มีข้อมูล"], [moneySatang(marketing?.eligible_amount_satang), "ค่าโฆษณาที่หักได้", marketing ? `ยื่น ${moneySatang(marketing.submitted_amount_satang)} · เพดาน ${moneySatang(marketing.monthly_cap_satang)}` : "ยังไม่มีข้อมูล"], [report ? `${(report.total_usage_minutes / 60).toFixed(1)} ชม.` : "ยังไม่มีข้อมูล", "เวลาบริการที่รายงาน", report ? `${report.exception_count} รายการต้องตรวจ` : "ยังไม่มีข้อมูล"], [data ? `${data.training?.completed || 0}/${data.training?.total || 0} คน` : "กำลังโหลด", "ผลการฝึกอบรม", data?.training?.total ? "จากประวัติในระบบ" : "ยังไม่มีประวัติยืนยัน"]].map((item, index) => <article key={item[1]}><i>0{index + 1}</i><strong>{item[0]}</strong><span>{item[1]}</span><small>{item[2]}</small></article>)}
             </div>
+            {report && <section className="v2-client-contract-rule"><div><span>เงื่อนไขค่าโฆษณา</span><h3>{marketing?.review_status || "รอตรวจข้อมูล"}</h3><p>หักได้เฉพาะค่าโฆษณาดิจิทัลที่ชำระจริง มีใบเสร็จและหลักฐานการชำระ ไม่เกิน 50,000 บาทต่อเดือน</p></div><div><span>คำนวณรายได้สุทธิ</span><h3>รายได้รวม − ค่าโฆษณาที่ผ่านเกณฑ์ − เงินคืนที่อนุมัติ</h3><p>ค่าใช้จ่ายทั่วไปของ LINNA และค่าใช้จ่ายที่ไม่มีหลักฐานไม่นำมาหัก</p></div></section>}
             <div className="v2-split"><section className="v2-panel v2-client-next"><header><div><span>สิ่งที่ต้องยืนยัน</span><h3>ข้อมูลที่ยังขาด</h3></div></header>{[["หมายเลขเครื่องและวันติดตั้ง", data?.deployment?.serial_number ? "บันทึกแล้ว" : "รอข้อมูล", "เปิดข้อมูลเครื่อง"], ["วันเริ่มและสิ้นสุดการรับประกัน", data?.warranty ? "บันทึกแล้ว" : "รอเอกสาร", "เปิดเอกสาร"], ["รายชื่อและผลประเมินผู้ปฏิบัติงาน", data?.training?.total ? "มีข้อมูล" : "รอบันทึก", "เปิดการฝึกอบรม"]].map((item) => <article key={item[0]}><i>○</i><span><b>{item[0]}</b><small>{item[1]}</small></span><button onClick={() => toast(item[2])}>{item[2]}</button></article>)}</section><section className="v2-panel v2-program-preview"><header><div><span>แหล่งข้อมูล</span><h3>สถานะความน่าเชื่อถือ</h3></div></header><strong>3</strong><span>ระดับข้อมูล</span><p>ยืนยันจากเอกสาร · นำเข้ารอตรวจ · บันทึกในระบบ</p><a href="/linna?view=documents">ดูเอกสาร</a></section></div>
           </>}
           {view === "business" && <><section className="v2-kicker-row"><div><span>บริการและหลักฐาน</span><h2>ใช้เฉพาะข้อมูลที่ผ่านการยืนยัน</h2><p>เมนูและแนวทางที่ยังเป็นฉบับร่างต้องให้ LINNA และ BIB ตรวจทานก่อนใช้</p></div><a href="/linna?view=treatments">เปิดเมนูฉบับร่าง</a></section><section className="v2-evidence-loop"><span>การเก็บผลลัพธ์</span><h3>บริการจริง → ขอความยินยอม → เก็บผล → ตรวจคุณภาพ → ใช้เป็นหลักฐาน</h3><p>ระบบจะไม่สรุปผลหรือคำกล่าวอ้างจนกว่าผู้รับผิดชอบจะตรวจและอนุมัติ</p></section></>}

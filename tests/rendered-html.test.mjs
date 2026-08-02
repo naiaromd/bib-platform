@@ -17,6 +17,11 @@ const evidenceFilesUrl = new URL("../app/api/evidence/files/route.ts", import.me
 const workspaceV2Url = new URL("../app/workspace/WorkspaceClient.tsx", import.meta.url);
 const therapistUrl = new URL("../app/therapist/TherapistEvidenceApp.tsx", import.meta.url);
 const therapistCssUrl = new URL("../app/therapist/therapist.module.css", import.meta.url);
+const financeUrl = new URL("../app/api/finance/route.ts", import.meta.url);
+const financeFilesUrl = new URL("../app/api/finance/files/route.ts", import.meta.url);
+const financeModuleUrl = new URL("../app/platform/FinanceModule.tsx", import.meta.url);
+const clientDashboardUrl = new URL("../app/api/client-dashboard/route.ts", import.meta.url);
+const marketingClaimUrl = new URL("../app/api/finance/marketing/route.ts", import.meta.url);
 
 test("ships the controlled review workflow", async () => {
   const [page, route] = await Promise.all([
@@ -93,4 +98,26 @@ test("ships the focused CRM workspace and therapist evidence flow", async () => 
   assert.match(files, /SHA-256/);
   assert.match(therapistCss, /font-size:\s*16px/);
   assert.equal(JSON.parse(hosting).r2, "FILES");
+});
+
+test("ships period-based executive finance and LINNA marketing controls", async () => {
+  const [finance, files, module, client, marketing] = await Promise.all([
+    readFile(financeUrl, "utf8"),
+    readFile(financeFilesUrl, "utf8"),
+    readFile(financeModuleUrl, "utf8"),
+    readFile(clientDashboardUrl, "utf8"),
+    readFile(marketingClaimUrl, "utf8"),
+  ]);
+  assert.match(finance, /requireRole\(actor, \["Executive", "Finance"\]\)/);
+  assert.match(finance, /period_month/);
+  assert.match(finance, /กรอกเอง · รอตรวจ/);
+  assert.match(files, /finance_document_registry/);
+  assert.match(files, /filesBucket\(\)\.put/);
+  assert.match(module, /รายเดือน/);
+  assert.match(module, /รายไตรมาส/);
+  assert.match(module, /รายปี/);
+  assert.match(module, /แยกข้อมูลจริงออกจากงบประมาณและประมาณการ/);
+  assert.match(client, /partner_marketing_claims/);
+  assert.match(marketing, /ยอดที่หักได้เกินเพดาน 50,000 บาทต่อเดือน/);
+  assert.match(marketing, /ได้รับใบเสร็จและหลักฐานการชำระครบ/);
 });

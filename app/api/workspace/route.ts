@@ -1,6 +1,7 @@
 import { env } from "cloudflare:workers";
 import { afterSalesActivities, businessIssues, companyContacts, eventRecords, kpiSource, trainingActivities } from "@/lib/kpi-import-data";
 import { accessErrorResponse, requireRequestActor, requireRole } from "@/lib/server-identity";
+import { ensureFinanceStorage } from "@/lib/finance-storage";
 
 function db() {
   if (!env.DB) throw new Error("D1 binding DB is unavailable");
@@ -316,6 +317,7 @@ export async function GET(request: Request) {
     await ensureInitialized();
     const actor = await requireRequestActor(request);
     requireRole(actor, ["Executive", "Finance", "Legal", "Sales", "Trainer", "Marketing", "After Sales"]);
+    await ensureFinanceStorage();
     const d1 = db();
     const showAll = ["Executive", "Finance", "Legal"].includes(actor.role);
     const tasks = showAll
@@ -334,6 +336,9 @@ export async function GET(request: Request) {
       ORDER BY CASE WHEN a.id = 'linna' THEN 1 ELSE 0 END, a.display_name`)
       .bind(actor.tenantId, actor.accountScope, actor.accountScope).all();
     const linnaPerformance = await d1.prepare(`SELECT * FROM partner_performance_snapshots
+      WHERE tenant_id = ? AND account_id = 'linna' ORDER BY report_month DESC LIMIT 1`)
+      .bind(actor.tenantId).first();
+    const linnaMarketing = await d1.prepare(`SELECT * FROM partner_marketing_claims
       WHERE tenant_id = ? AND account_id = 'linna' ORDER BY report_month DESC LIMIT 1`)
       .bind(actor.tenantId).first();
     const leadQuery = await d1.prepare(`SELECT l.id, l.status, l.score, l.temperature, l.evidence_json,
@@ -382,7 +387,7 @@ export async function GET(request: Request) {
     const sourceImport = await d1.prepare("SELECT * FROM source_imports WHERE tenant_id = ? AND id = ?").bind(actor.tenantId, kpiSource.id).first();
     return Response.json({
       user: { email: actor.email, displayName: actor.displayName, role: actor.role, tenantId: actor.tenantId },
-      tasks: tasks.results, target, customers: customers.results, linnaPerformance,
+      tasks: tasks.results, target, customers: customers.results, linnaPerformance, linnaMarketing,
       events: events.results, training: training.results, afterSales: afterSales.results,
       team: team.results, issues: issues.results, sourceImport, leads, funnel: funnel.results,
       forecast: { ...forecast, source: "CRM Opportunities", status: "Calculated", currency: "THB", amountUnit: "satang" },

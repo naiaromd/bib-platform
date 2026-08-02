@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import FinanceModule from "./FinanceModule";
 
-type InternalView = "today" | "crm" | "account" | "customers" | "campaigns" | "operations" | "approval" | "performance" | "settings";
+type InternalView = "today" | "crm" | "account" | "customers" | "campaigns" | "operations" | "approval" | "performance" | "finance" | "settings";
 
 const workspaces: Array<[InternalView, string, string, string]> = [
   ["today", "01", "งานวันนี้", "สิ่งที่ต้องตัดสินใจและติดตาม"],
@@ -12,7 +13,8 @@ const workspaces: Array<[InternalView, string, string, string]> = [
   ["operations", "05", "ฝึกอบรมและบริการ", "กิจกรรม Trainer และงานหลังการขาย"],
   ["approval", "06", "ข้อเสนอและการอนุมัติ", "รูปแบบธุรกิจและเอกสาร"],
   ["performance", "07", "ผลการดำเนินงาน", "เป้าหมาย คุณภาพ และความเสี่ยง"],
-  ["settings", "08", "ตั้งค่าพื้นที่ BIB", "ช่องข้อมูล เอกสาร งาน และขั้นอนุมัติ"],
+  ["finance", "08", "การเงินผู้บริหาร", "รายเดือน ไตรมาส และรายปี"],
+  ["settings", "09", "ตั้งค่าพื้นที่ BIB", "ช่องข้อมูล เอกสาร งาน และขั้นอนุมัติ"],
 ];
 
 type LeadRecord = {
@@ -69,8 +71,8 @@ export default function InternalPlatformPage() {
     window.setTimeout(() => setNotice(""), 2200);
   };
   const roleViews: Record<string, InternalView[]> = {
-    Executive: ["today", "crm", "account", "customers", "campaigns", "operations", "approval", "performance", "settings"],
-    Finance: ["today", "customers", "approval", "performance"],
+    Executive: ["today", "crm", "account", "customers", "campaigns", "operations", "approval", "performance", "finance", "settings"],
+    Finance: ["today", "customers", "approval", "performance", "finance"],
     Legal: ["today", "approval"],
     Sales: ["today", "crm", "account", "customers", "campaigns", "approval"],
     Trainer: ["today", "customers", "operations"],
@@ -121,12 +123,13 @@ export default function InternalPlatformPage() {
           </header>
           {view === "today" && <TodayView changeView={setView} toast={toast} user={currentUser} />}
           {view === "crm" && <CrmView leads={visibleLeads} toast={toast} openAccount={openAccount} />}
-          {view === "customers" && <CustomersView />}
+          {view === "customers" && <CustomersView toast={toast} />}
           {view === "account" && <AccountView account={selectedAccount} back={() => setView("crm")} openSource={() => setView("campaigns")} toast={toast} />}
           {view === "campaigns" && <CampaignView leads={leads} toast={toast} openAccount={openAccount} />}
           {view === "operations" && <OperationsView />}
           {view === "approval" && <ApprovalView toast={toast} />}
           {view === "performance" && <PerformanceView />}
+          {view === "finance" && <FinanceModule toast={toast} />}
           {view === "settings" && <ConfigurationView toast={toast} />}
         </div>
       </section>
@@ -136,22 +139,36 @@ export default function InternalPlatformPage() {
 }
 
 type CustomerRecord = { id: string; legal_name: string; display_name: string; business_segment: string; commercial_model: string; device_model: string; serial_number: string; installed_at: string; deployment_status: string };
-type LinnaPerformance = { report_month: string; reported_paid_sessions: number; eligible_paid_sessions: number; complimentary_sessions: number; training_sessions: number; reported_gross_revenue: number; eligible_gross_revenue: number; bib_share_vat_inclusive: number; linna_share: number; total_usage_minutes: number; exception_count: number; status: string };
+type LinnaPerformance = { report_month: string; reported_paid_sessions: number; eligible_paid_sessions: number; complimentary_sessions: number; training_sessions: number; reported_gross_revenue: number; eligible_gross_revenue: number; bib_share_vat_inclusive: number; linna_share: number; deductible_marketing: number; approved_refunds: number; total_usage_minutes: number; exception_count: number; status: string };
+type LinnaMarketing = { report_month: string; submitted_amount_satang: number; eligible_amount_satang: number; excluded_amount_satang: number; monthly_cap_satang: number; evidence_status: string; review_status: string; review_note: string };
 
-function CustomersView() {
+function CustomersView({ toast }: { toast: (message: string) => void }) {
   const [customers, setCustomers] = useState<CustomerRecord[]>([]);
   const [linna, setLinna] = useState<LinnaPerformance | null>(null);
+  const [marketing, setMarketing] = useState<LinnaMarketing | null>(null);
+  const [userRole, setUserRole] = useState("");
+  const [showMarketingForm, setShowMarketingForm] = useState(false);
+  const [marketingForm, setMarketingForm] = useState({ reportMonth: "2026-06", submittedAmount: "0", eligibleAmount: "0", evidenceStatus: "ไม่มีรายการในรอบนี้", reviewNote: "" });
   const [tab, setTab] = useState<"installed" | "linna">("installed");
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     fetch("/api/workspace").then((response) => response.json()).then((payload) => {
       setCustomers(Array.isArray(payload.customers) ? payload.customers : []);
       setLinna(payload.linnaPerformance || null);
+      setMarketing(payload.linnaMarketing || null);
+      setUserRole(String(payload.user?.role || ""));
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
   const installed = customers.filter((customer) => customer.id !== "linna");
   const currency = (value: number) => `฿${Number(value || 0).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const saveMarketing = async () => {
+    const response = await fetch("/api/finance/marketing", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accountId: "linna", ...marketingForm }) });
+    const payload = await response.json();
+    if (!response.ok) return toast(payload.error || "บันทึกไม่สำเร็จ");
+    setMarketing({ report_month: marketingForm.reportMonth, submitted_amount_satang: payload.submitted, eligible_amount_satang: payload.eligible, excluded_amount_satang: payload.excluded, monthly_cap_satang: payload.cap, evidence_status: payload.evidenceStatus, review_status: payload.reviewStatus, review_note: marketingForm.reviewNote });
+    setShowMarketingForm(false); toast("บันทึกค่าโฆษณาและประวัติการตรวจแล้ว");
+  };
   return <div className="v2-view v2-customers-view">
     <section className="v2-kicker-row"><div><span>ACTIVE CUSTOMER REGISTRY</span><h2>ลูกค้าที่ใช้งาน icoone</h2><p>แยกลูกค้าที่ซื้อเครื่องออกจากพันธมิตร Revenue Share</p></div><em>{loading ? "กำลังโหลด" : `พบ ${customers.length} บัญชี`}</em></section>
     <nav className="v2-customer-tabs"><button className={tab === "installed" ? "active" : ""} onClick={() => setTab("installed")}>ลูกค้าที่ซื้อเครื่อง · {installed.length}</button><button className={tab === "linna" ? "active" : ""} onClick={() => setTab("linna")}>LINNA · รายงานผลงาน</button></nav>
@@ -161,11 +178,12 @@ function CustomersView() {
       {installed.map((customer) => <article key={customer.id}><span><i>{customer.display_name.slice(0, 2)}</i><b>{customer.display_name}</b></span><span>{customer.business_segment}</span><strong>{customer.commercial_model}</strong><span>{customer.device_model}</span><em>{customer.serial_number ? "ข้อมูลเครื่องครบ" : "รอ Serial/วันติดตั้ง"}</em></article>)}
     </section>}
     {tab === "linna" && linna && <div className="v2-linna-performance">
-      <section className="v2-linna-head"><div><span>LINNA · D2 STRATEGIC REVENUE SHARE</span><h3>ผลการดำเนินงานเดือนมิถุนายน 2569</h3><p>40% ของ BIB เป็นยอดรวม VAT แล้ว · ไม่มี Minimum Guarantee</p></div><em>ต้องตรวจสอบ {linna.exception_count} จุด</em></section>
-      <div className="v2-linna-metrics"><article><span>รายได้ตามไฟล์ลูกค้า</span><strong>{currency(linna.reported_gross_revenue)}</strong><small>{linna.reported_paid_sessions} รายการ</small></article><article className="review"><span>รายได้ที่อยู่ในเดือน</span><strong>{currency(linna.eligible_gross_revenue)}</strong><small>{linna.eligible_paid_sessions} รายการ · รอตรวจ</small></article><article><span>ส่วนแบ่ง BIB 40%</span><strong>{currency(linna.bib_share_vat_inclusive)}</strong><small>รวม VAT แล้ว ไม่บวก 7% เพิ่ม</small></article><article><span>ส่วนแบ่ง LINNA 60%</span><strong>{currency(linna.linna_share)}</strong><small>จากยอดที่อยู่ในเดือน</small></article></div>
+      <section className="v2-linna-head"><div><span>LINNA · D2 STRATEGIC REVENUE SHARE</span><h3>รอบรายงาน: 1–30 มิถุนายน 2569</h3><p>40% ของ BIB เป็นยอดรวม VAT แล้ว · ไม่มี Minimum Guarantee</p></div><div className="v2-linna-head-actions"><em>ต้องตรวจสอบ {linna.exception_count} จุด</em>{["Executive", "Finance"].includes(userRole) && <button onClick={() => setShowMarketingForm(!showMarketingForm)}>บันทึกค่าโฆษณา</button>}</div></section>
+      {showMarketingForm && <section className="v2-linna-marketing-form"><header><div><span>ADVERTISING COST REVIEW</span><h3>ค่าโฆษณาประจำรอบ</h3></div><em>เพดาน 50,000 บาท/เดือน</em></header><div><label>รอบเดือน<input type="month" value={marketingForm.reportMonth} onChange={(event) => setMarketingForm({ ...marketingForm, reportMonth: event.target.value })} /></label><label>ยอดที่ยื่น<input type="number" min="0" value={marketingForm.submittedAmount} onChange={(event) => setMarketingForm({ ...marketingForm, submittedAmount: event.target.value })} /></label><label>ยอดที่หักได้<input type="number" min="0" max="50000" value={marketingForm.eligibleAmount} onChange={(event) => setMarketingForm({ ...marketingForm, eligibleAmount: event.target.value })} /></label><label>หลักฐาน<select value={marketingForm.evidenceStatus} onChange={(event) => setMarketingForm({ ...marketingForm, evidenceStatus: event.target.value })}><option>ไม่มีรายการในรอบนี้</option><option>ยังไม่ได้รับหลักฐาน</option><option>หลักฐานไม่ครบ</option><option>ได้รับหลักฐานครบ</option></select></label><label className="wide">หมายเหตุ<input value={marketingForm.reviewNote} onChange={(event) => setMarketingForm({ ...marketingForm, reviewNote: event.target.value })} placeholder="เลขที่ใบเสร็จ รายการที่ไม่ผ่าน หรือเหตุผลประกอบ" /></label><button onClick={saveMarketing}>บันทึกผลการตรวจ</button></div></section>}
+      <div className="v2-linna-metrics five"><article><span>รายได้ตามไฟล์ลูกค้า</span><strong>{currency(linna.reported_gross_revenue)}</strong><small>{linna.reported_paid_sessions} รายการ · รอบ มิ.ย. 2569</small></article><article className="review"><span>รายได้ที่อยู่ในรอบ</span><strong>{currency(linna.eligible_gross_revenue)}</strong><small>{linna.eligible_paid_sessions} รายการ · รอตรวจ</small></article><article><span>ค่าโฆษณาที่หักได้</span><strong>{currency(linna.deductible_marketing)}</strong><small>เพดานตามสัญญา 50,000 บาท/เดือน</small></article><article><span>ส่วนแบ่ง BIB 40%</span><strong>{currency(linna.bib_share_vat_inclusive)}</strong><small>รวม VAT แล้ว ไม่บวก 7% เพิ่ม</small></article><article><span>ส่วนแบ่ง LINNA 60%</span><strong>{currency(linna.linna_share)}</strong><small>จากรายได้สุทธิที่อยู่ในรอบ</small></article></div>
       <div className="v2-linna-grid"><section className="v2-panel v2-linna-usage"><header><div><span>USAGE MIX</span><h3>การใช้เครื่อง</h3></div></header><article><span>Paid Session</span><b>{linna.reported_paid_sessions}</b></article><article><span>Complimentary</span><b>{linna.complimentary_sessions}</b></article><article><span>Training</span><b>{linna.training_sessions}</b></article><article><span>เวลารวมจากไฟล์</span><b>{(linna.total_usage_minutes / 60).toFixed(2)} ชั่วโมง</b></article></section>
-      <section className="v2-panel v2-linna-check"><header><div><span>CONTRACT CHECK</span><h3>ตรวจตามเงื่อนไข</h3></div><em>{linna.status}</em></header><article className="pass"><i>✓</i><span><b>มี Paid Session ในเดือน</b><small>ไม่เข้าเงื่อนไขไม่มีรายได้ติดต่อกัน 3 เดือน</small></span></article><article className="pass"><i>✓</i><span><b>ใช้อัตรา 40/60</b><small>ส่วนแบ่ง BIB เป็นยอดรวม VAT</small></span></article><article className="alert"><i>!</i><span><b>พบรายการวันที่ 29 พฤษภาคม</b><small>4,360.20 บาทอยู่ในไฟล์เดือนมิถุนายน ต้องยืนยันรอบรับรู้รายได้</small></span></article><article className="alert"><i>!</i><span><b>วันที่ในไฟล์ถูกอ่านเป็นปี 1969</b><small>ต้องแก้รูปแบบวันที่เป็น 2569/2026 ก่อนปิดรอบ</small></span></article></section></div>
-      <footer className="v2-linna-source">แหล่งข้อมูล: Paid Session, Complimentary Session และ Training Session ประจำเดือนมิถุนายน 2569 · สถานะยังไม่ Reconciled</footer>
+      <section className="v2-panel v2-linna-check"><header><div><span>CONTRACT CHECK</span><h3>ตรวจตามเงื่อนไข</h3></div><em>{linna.status}</em></header><article className="pass"><i>✓</i><span><b>มี Paid Session ในเดือน</b><small>ไม่เข้าเงื่อนไขไม่มีรายได้ติดต่อกัน 3 เดือน</small></span></article><article className="pass"><i>✓</i><span><b>ค่าโฆษณาที่ขอหักเป็นศูนย์</b><small>หากมีรายการ ต้องแนบใบเสร็จและหลักฐานการชำระก่อนหัก</small></span></article><article className="alert"><i>!</i><span><b>พบรายการวันที่ 29 พฤษภาคม</b><small>4,360.20 บาทอยู่ในไฟล์เดือนมิถุนายน ต้องยืนยันรอบรับรู้รายได้</small></span></article><article className="alert"><i>!</i><span><b>วันที่ในไฟล์ถูกอ่านเป็นปี 1969</b><small>ต้องแก้รูปแบบวันที่เป็น 2569/2026 ก่อนปิดรอบ</small></span></article></section></div>
+      <footer className="v2-linna-source">แหล่งข้อมูล: Paid Session, Complimentary Session และ Training Session ประจำเดือนมิถุนายน 2569 · ค่าโฆษณา {marketing?.review_status || "รอตรวจ"} · สถานะยังไม่ Reconciled</footer>
     </div>}
     {tab === "linna" && !linna && !loading && <section className="v2-empty">ยังไม่พบรายงาน LINNA</section>}
   </div>;

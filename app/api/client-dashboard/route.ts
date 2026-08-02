@@ -1,5 +1,6 @@
 import { env } from "cloudflare:workers";
 import { accessErrorResponse, requireRequestActor } from "@/lib/server-identity";
+import { ensureFinanceStorage } from "@/lib/finance-storage";
 
 function db() {
   if (!env.DB) throw new Error("D1 binding DB is unavailable");
@@ -9,10 +10,11 @@ function db() {
 export async function GET(request: Request) {
   try {
     const actor = await requireRequestActor(request);
+    await ensureFinanceStorage();
     const accountId = actor.accountScope === "*" ? "linna" : actor.accountScope;
     const d1 = db();
 
-    const [account, performance, deployment, warranty, training, service, orders, reports] = await Promise.all([
+    const [account, performance, marketing, deployment, warranty, training, service, orders, reports] = await Promise.all([
       d1.prepare(`SELECT id, legal_name, display_name, business_segment, commercial_model, account_status
         FROM client_accounts WHERE tenant_id = ? AND id = ? LIMIT 1`).bind(actor.tenantId, accountId).first(),
       d1.prepare(`SELECT report_month, reported_paid_sessions, eligible_paid_sessions,
@@ -20,6 +22,10 @@ export async function GET(request: Request) {
         bib_share_vat_inclusive, linna_share, deductible_marketing, approved_refunds,
         total_usage_minutes, exception_count, status, source_note
         FROM partner_performance_snapshots WHERE tenant_id = ? AND account_id = ?
+        ORDER BY report_month DESC LIMIT 1`).bind(actor.tenantId, accountId).first(),
+      d1.prepare(`SELECT report_month, submitted_amount_satang, eligible_amount_satang,
+        excluded_amount_satang, monthly_cap_satang, evidence_status, review_status, review_note
+        FROM partner_marketing_claims WHERE tenant_id = ? AND account_id = ?
         ORDER BY report_month DESC LIMIT 1`).bind(actor.tenantId, accountId).first(),
       d1.prepare(`SELECT model, serial_number, installed_at, cumulative_hours, status
         FROM device_deployments WHERE tenant_id = ? AND account_id = ? LIMIT 1`).bind(actor.tenantId, accountId).first(),
@@ -41,6 +47,7 @@ export async function GET(request: Request) {
     return Response.json({
       account,
       performance,
+      marketing,
       deployment,
       warranty,
       training,
