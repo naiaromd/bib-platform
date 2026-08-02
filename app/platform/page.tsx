@@ -168,7 +168,7 @@ function CustomersView({ toast }: { toast: (message: string) => void }) {
   const [marketingForm, setMarketingForm] = useState({ reportMonth: "2026-07", submittedAmount: "1640", eligibleAmount: "0", evidenceStatus: "ได้รับตารางสรุปแล้ว", reviewNote: "" });
   const [invoiceFile, setInvoiceFile] = useState<File | null>(null);
   const [paymentFile, setPaymentFile] = useState<File | null>(null);
-  const [tab, setTab] = useState<"installed" | "linna">("installed");
+  const [tab, setTab] = useState<"installed" | "linna">("linna");
   const [selectedMonth, setSelectedMonth] = useState("2026-06");
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -249,7 +249,7 @@ function CustomersView({ toast }: { toast: (message: string) => void }) {
   };
   return <div className="v2-view v2-customers-view">
     <section className="v2-kicker-row"><div><span>ฐานลูกค้าและเครื่องที่ติดตั้ง</span><h2>ฐานลูกค้า icoone</h2><p>ติดตามสัญญา เครื่องที่ติดตั้ง และผลการดำเนินงานของลูกค้าแต่ละราย</p></div><em>{loading ? "กำลังโหลด" : `ทั้งหมด ${customers.length} บัญชี`}</em></section>
-    <nav className="v2-customer-tabs"><button className={tab === "installed" ? "active" : ""} onClick={() => setTab("installed")}>ลูกค้าซื้อเครื่อง · {installed.length}</button><button className={tab === "linna" ? "active" : ""} onClick={() => setTab("linna")}>LINNA · สัญญาแบ่งรายได้</button></nav>
+    <nav className="v2-customer-tabs"><button className={tab === "linna" ? "active" : ""} onClick={() => setTab("linna")}>LINNA · สัญญาแบ่งรายได้</button><button className={tab === "installed" ? "active" : ""} onClick={() => setTab("installed")}>ลูกค้ารายอื่น · {installed.length}</button></nav>
     {tab === "installed" && <section className="v2-installed-customers">
       <header><div><span>เครื่องที่จำหน่ายแล้ว</span><h3>ลูกค้าและเครื่องที่ส่งมอบแล้ว</h3></div><em>ข้อมูลที่ขาดจะแสดงเพื่อให้ทีมติดตาม</em></header>
       <div className="head"><span>ลูกค้า</span><span>ประเภทธุรกิจ</span><span>เงื่อนไขการค้า</span><span>รุ่นเครื่อง</span><span>สถานะข้อมูล</span></div>
