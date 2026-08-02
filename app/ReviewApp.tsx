@@ -75,10 +75,12 @@ export default function Home() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const dedicatedClient = pathname === "/linna";
+  const requestedDocument = searchParams.get("document");
+  const initialDocument: ItemId = requestedDocument === "drj" || requestedDocument === "memo" ? requestedDocument : "linna";
   const requestedView = searchParams.get("view") || "overview";
   const clientView = ["overview", "profile", "plan", "treatments", "protocols", "orders", "training", "service", "warranty", "knowledge", "toolkit", "documents"].includes(requestedView) ? requestedView : "overview";
   const [role, setRole] = useState<Role>(dedicatedClient ? "Customer" : "Executive");
-  const [active, setActive] = useState<ItemId>("linna");
+  const [active, setActive] = useState<ItemId>(initialDocument);
   const [tab, setTab] = useState<"summary" | "history">("summary");
   const [fullView, setFullView] = useState(false);
   const [fullDocumentOverride, setFullDocumentOverride] = useState<{ file: string; title: string; version: string } | null>(null);

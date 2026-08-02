@@ -217,6 +217,18 @@
 .evidenceJourney p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .primaryLink { display: inline-flex; margin-top: 18px; padding: 11px 15px; color: white; background: var(--accent); text-decoration: none; }
 .empty { padding: 28px; color: var(--muted); text-align: center; }
+.approvalGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; margin-top: 20px; }
+.approvalGrid article { min-width: 0; padding: 20px; border: 1px solid var(--line); background: var(--paper); }
+.approvalGrid header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.approvalGrid header span { color: var(--accent); font-size: 11px; }
+.approvalGrid header em { padding: 5px 8px; color: #7b5c2d; background: #f6ead5; font-size: 10px; font-style: normal; }
+.approvalGrid h2 { min-height: 54px; margin: 19px 0 5px; font-size: 20px; font-weight: 500; line-height: 1.35; }
+.approvalGrid > article > p { min-height: 42px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.approvalGrid dl { margin: 18px 0; border-top: 1px solid var(--line); }
+.approvalGrid dl div { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 8px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.approvalGrid dt { color: var(--muted); font-size: 11px; }
+.approvalGrid dd { margin: 0; font-size: 12px; }
+.approvalGrid a { display: flex; min-height: 40px; align-items: center; justify-content: center; border: 1px solid var(--accent); color: white; background: var(--accent); text-decoration: none; font-size: 13px; }
 
 .modalBackdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: #171816aa; }
 .modal { width: min(440px, 100%); padding: 0; border: 1px solid #c9b9aa; background: var(--paper); box-shadow: 0 24px 70px #0005; }
@@ -248,6 +260,7 @@
   .contactGrid > article:nth-last-child(-n + 2) { border-bottom: 1px solid var(--line); }
   .contactGrid > article:last-child { border-bottom: 0; }
   .demoGrid { grid-template-columns: 1fr 1fr; }
+  .approvalGrid { grid-template-columns: 1fr; }
   .evidenceJourney { grid-template-columns: 1fr; }
   .evidenceJourney article { min-height: auto; display: grid; grid-template-columns: 40px 1fr; gap: 12px; border-right: 0; border-bottom: 1px solid var(--line); }
   .evidenceJourney h2 { margin: 0 0 5px; }
@@ -264,7 +277,7 @@
   .shell { display: block; padding-bottom: 72px; }
   .sidebar { position: static; width: 100%; height: auto; display: block; padding: 12px; }
   .workspaceTitle, .identity { display: none; }
-  .nav { position: fixed; z-index: 30; right: 0; bottom: 0; left: 0; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 0; padding-bottom: env(safe-area-inset-bottom); background: #252724; }
+  .nav { position: fixed; z-index: 30; right: 0; bottom: 0; left: 0; grid-template-columns: repeat(5, minmax(72px, 1fr)); gap: 0; margin: 0; padding-bottom: env(safe-area-inset-bottom); overflow-x: auto; background: #252724; }
   .sidebar .nav button { min-height: 66px; display: block; padding: 8px 4px; border-left: 0; border-top: 3px solid transparent; text-align: center; }
   .sidebar .nav button > b, .sidebar .nav button > span { width: auto; text-align: center; }
   .nav button b, .nav button strong { display: block; }

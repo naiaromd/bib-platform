@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import styles from "./workspace.module.css";
 
-type View = "today" | "crm" | "demos" | "evidence";
+type View = "today" | "crm" | "demos" | "evidence" | "approval";
 
 type Lead = {
   id: string;
@@ -67,6 +67,7 @@ const menu: Array<{ key: View; icon: string; label: string; hint: string }> = [
   { key: "crm", icon: "02", label: "CRM", hint: "ลูกค้า ผู้ติดต่อ และโอกาสขาย" },
   { key: "demos", icon: "03", label: "นัดสาธิต", hint: "คัดกรอง วางแผน และสรุปผล" },
   { key: "evidence", icon: "04", label: "หลักฐานผลลัพธ์", hint: "การบ้าน Therapist และคิวตรวจ" },
+  { key: "approval", icon: "05", label: "อนุมัติเอกสาร", hint: "สัญญา บันทึก และความเห็น" },
 ];
 
 const money = new Intl.NumberFormat("th-TH", {
@@ -365,6 +366,7 @@ export default function WorkspaceClient({ initialPayload = null }: { initialPayl
             <strong>{menu.find((item) => item.key === view)?.label}</strong>
           </div>
           <div className={styles.topActions}>
+            <a href="/?document=linna">อนุมัติเอกสาร</a>
             <button onClick={() => setShowTaskForm(true)}>+ เพิ่มงาน</button>
           </div>
         </header>
@@ -545,6 +547,39 @@ export default function WorkspaceClient({ initialPayload = null }: { initialPayl
               ].map(([number, title, description]) => <article key={number}><b>{number}</b><div><h2>{title}</h2><p>{description}</p></div></article>)}
             </section>
             <a className={styles.primaryLink} href="/therapist">เปิดหน้าส่งการบ้านสำหรับ Therapist</a>
+          </div>
+        )}
+
+        {!loading && data && view === "approval" && (
+          <div className={styles.page}>
+            <section className={styles.pageHeading}>
+              <span>เอกสารที่ต้องตัดสินใจ</span>
+              <h1>ตรวจทานและอนุมัติเอกสาร</h1>
+              <p>อ่านฉบับเต็ม แสดงความคิดเห็น ส่งกลับให้แก้ไข หรือยืนยันเพื่อดำเนินการลงนาม</p>
+            </section>
+            <section className={styles.approvalGrid}>
+              <article>
+                <header><span>LINNA Clinic</span><em>รอพิจารณา</em></header>
+                <h2>สัญญาแบ่งรายได้ระยะยาว</h2>
+                <p>รูปแบบ D2 · ส่วนแบ่ง 40/60 · ไม่มีรายได้ขั้นต่ำ</p>
+                <dl><div><dt>ฉบับ</dt><dd>3.2</dd></div><div><dt>ประเด็น</dt><dd>เงินประกันและหลักฐานค่าโฆษณา</dd></div></dl>
+                <a href="/?document=linna">เปิดตรวจทาน</a>
+              </article>
+              <article>
+                <header><span>Dr.J Clinic</span><em>ข้อมูลไม่ครบ</em></header>
+                <h2>สัญญาเช่าเพื่อซื้อ</h2>
+                <p>รูปแบบ B · ระยะเวลา 24 เดือน</p>
+                <dl><div><dt>ฉบับ</dt><dd>1.4</dd></div><div><dt>ประเด็น</dt><dd>ข้อมูลคู่สัญญาและการตรวจเครดิต</dd></div></dl>
+                <a href="/?document=drj">เปิดตรวจทาน</a>
+              </article>
+              <article>
+                <header><span>เอกสารภายใน BIB</span><em>รอผู้บริหาร</em></header>
+                <h2>บันทึกนโยบายค่าตอบแทนการขาย</h2>
+                <p>ครอบคลุมรูปแบบการค้า A–D2</p>
+                <dl><div><dt>ฉบับ</dt><dd>2.0</dd></div><div><dt>ประเด็น</dt><dd>วันที่มีผลและผู้อนุมัตินโยบาย</dd></div></dl>
+                <a href="/?document=memo">เปิดตรวจทาน</a>
+              </article>
+            </section>
           </div>
         )}
       </section>
