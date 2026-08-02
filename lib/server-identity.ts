@@ -57,10 +57,10 @@ async function initializeIdentity() {
 }
 
 export async function requireRequestActor(request: Request): Promise<RequestActor> {
-  await initializeIdentity();
-  const d1 = database();
   const url = new URL(request.url);
   const isLocal = url.hostname === "localhost" || url.hostname === "127.0.0.1";
+  if (isLocal) await initializeIdentity();
+  const d1 = database();
   const authenticatedEmail = request.headers.get("oai-authenticated-user-email")?.trim().toLowerCase();
   const authenticatedUserId = request.headers.get("oai-authenticated-user-id")?.trim();
   const configuredOwnerId = String((env as unknown as Record<string, unknown>).SITE_OWNER_USER_ID || "").trim();
@@ -123,5 +123,8 @@ export function accessErrorResponse(error: unknown) {
 
 export async function requirePageActor(pathname: string) {
   const requestHeaders = await headers();
-  return requireRequestActor(new Request(`https://protected.local${pathname}`, { headers: new Headers(requestHeaders) }));
+  const requestedHost = requestHeaders.get("host") || "protected.local";
+  const host = /^[a-z0-9.:[\]-]+$/i.test(requestedHost) ? requestedHost : "protected.local";
+  const protocol = host.startsWith("localhost") || host.startsWith("127.0.0.1") ? "http" : "https";
+  return requireRequestActor(new Request(`${protocol}://${host}${pathname}`, { headers: new Headers(requestHeaders) }));
 }

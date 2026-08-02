@@ -290,9 +290,30 @@ async function initialize() {
       "Paid Session_ICOONE.xlsx; one paid row dated 1969-05-29 is outside June and all workbook dates use 1969 instead of 2569/2026").run();
 }
 
+let initializationPromise: Promise<void> | null = null;
+
+async function ensureInitialized() {
+  if (!initializationPromise) {
+    initializationPromise = (async () => {
+      try {
+        const ready = await db().prepare("SELECT id FROM source_imports WHERE id = ? LIMIT 1")
+          .bind(kpiSource.id).first();
+        if (ready) return;
+      } catch {
+        // A new environment may not have the tables yet; initialize them below.
+      }
+      await initialize();
+    })().catch((error) => {
+      initializationPromise = null;
+      throw error;
+    });
+  }
+  return initializationPromise;
+}
+
 export async function GET(request: Request) {
   try {
-    await initialize();
+    await ensureInitialized();
     const actor = await requireRequestActor(request);
     requireRole(actor, ["Executive", "Finance", "Legal", "Sales", "Trainer", "Marketing", "After Sales"]);
     const d1 = db();
@@ -375,7 +396,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    await initialize();
+    await ensureInitialized();
     const actor = await requireRequestActor(request);
     requireRole(actor, ["Executive", "Sales", "Marketing", "Trainer", "After Sales"]);
     const payload = await request.json() as Record<string, unknown>;

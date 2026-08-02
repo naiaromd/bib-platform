@@ -93,76 +93,70 @@ function temperatureLabel(value: string) {
   return "เริ่มต้น";
 }
 
-export default function WorkspaceClient() {
+function mapCrmPayload(payload: Record<string, unknown>): WorkspaceData {
+  const accounts = (payload.accounts || []) as Array<Record<string, unknown>>;
+  const crmLeads = (payload.leads || []) as Array<Record<string, unknown>>;
+  const opportunities = (payload.opportunities || []) as Array<Record<string, unknown>>;
+  const actor = (payload.actor || {}) as Record<string, unknown>;
+  const mappedLeads = crmLeads.map((lead) => {
+    const account = accounts.find((item) => item.id === lead.accountId) || {};
+    const opportunity = opportunities.find((item) => item.accountId === lead.accountId) || {};
+    let evidence: string[] = [];
+    try {
+      const parsed = JSON.parse(String(lead.evidenceJson || "[]"));
+      evidence = Array.isArray(parsed) ? parsed.map(String) : [];
+    } catch { evidence = []; }
+    return {
+      id: String(lead.id || ""), accountId: String(lead.accountId || ""),
+      name: String(lead.accountName || lead.contactName || "ยังไม่ระบุชื่อ"),
+      status: String(lead.status || "New"), score: Number(lead.score || 0),
+      temperature: String(lead.temperature || "Cold"),
+      next: String(opportunity.nextAction || lead.nextAction || "กำหนดขั้นตอนถัดไป"),
+      nextActionAt: String(opportunity.nextActionAt || lead.nextActionAt || ""),
+      owner: String(opportunity.ownerUserId || lead.ownerUserId || "ยังไม่มอบหมาย"),
+      segment: String(account.businessSegment || "ยังไม่จัดกลุ่ม"),
+      model: String(opportunity.commercialModel || account.commercialModel || "ยังไม่เสนอ"),
+      contact: String(lead.contactName || "ยังไม่ระบุผู้ติดต่อ"),
+      role: String(lead.buyingRole || "ยังไม่ระบุบทบาท"),
+      city: String(account.province || "ยังไม่ระบุจังหวัด"),
+      source: String(lead.sourceName || "ยังไม่ระบุแหล่งที่มา"),
+      lastContactAt: String(lead.lastContactAt || ""), evidence,
+      risk: String(opportunity.riskNote || "ยังไม่มีบันทึกความเสี่ยง"),
+      stage: String(opportunity.stage || lead.status || "New"),
+      opportunityId: String(opportunity.id || ""),
+      expectedValueSatang: Number(opportunity.expectedValueSatang || 0),
+      probabilityBps: Number(opportunity.probabilityBps || 0),
+    } satisfies Lead;
+  });
+  const weightedSatang = opportunities.reduce((sum, item) =>
+    sum + (Number(item.expectedValueSatang || 0) * Number(item.probabilityBps || 0) / 10_000), 0);
+  return {
+    user: { email: "", displayName: String(actor.displayName || "ผู้ใช้งาน"), role: String(actor.role || "—") },
+    tasks: (payload.tasks || []) as Array<Record<string, unknown>>,
+    leads: mappedLeads,
+    forecast: { weighted_satang: weightedSatang },
+    demos: (payload.demos || []) as Array<Record<string, unknown>>,
+    activities: (payload.activities || []) as Array<Record<string, unknown>>,
+  };
+}
+
+export default function WorkspaceClient({ initialPayload = null }: { initialPayload?: Record<string, unknown> | null }) {
+  const initialData = initialPayload ? mapCrmPayload(initialPayload) : null;
   const [view, setView] = useState<View>("today");
-  const [data, setData] = useState<WorkspaceData | null>(null);
-  const [selectedLeadId, setSelectedLeadId] = useState("");
+  const [data, setData] = useState<WorkspaceData | null>(initialData);
+  const [selectedLeadId, setSelectedLeadId] = useState(initialData?.leads[0]?.id || "");
   const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialData);
   const [message, setMessage] = useState("");
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showActivityForm, setShowActivityForm] = useState(false);
   const [editingContact, setEditingContact] = useState<CrmContact | null>(null);
   const [accountDetail, setAccountDetail] = useState<AccountDetail | null>(null);
 
-  function mapCrmPayload(payload: Record<string, unknown>): WorkspaceData {
-    const accounts = (payload.accounts || []) as Array<Record<string, unknown>>;
-    const crmLeads = (payload.leads || []) as Array<Record<string, unknown>>;
-    const opportunities = (payload.opportunities || []) as Array<Record<string, unknown>>;
-    const actor = (payload.actor || {}) as Record<string, unknown>;
-    const mappedLeads = crmLeads.map((lead) => {
-      const account = accounts.find((item) => item.id === lead.accountId) || {};
-      const opportunity = opportunities.find((item) => item.accountId === lead.accountId) || {};
-      let evidence: string[] = [];
-      try {
-        const parsed = JSON.parse(String(lead.evidenceJson || "[]"));
-        evidence = Array.isArray(parsed) ? parsed.map(String) : [];
-      } catch { evidence = []; }
-      return {
-        id: String(lead.id || ""),
-        accountId: String(lead.accountId || ""),
-        name: String(lead.accountName || lead.contactName || "ยังไม่ระบุชื่อ"),
-        status: String(lead.status || "New"),
-        score: Number(lead.score || 0),
-        temperature: String(lead.temperature || "Cold"),
-        next: String(opportunity.nextAction || lead.nextAction || "กำหนดขั้นตอนถัดไป"),
-        nextActionAt: String(opportunity.nextActionAt || lead.nextActionAt || ""),
-        owner: String(opportunity.ownerUserId || lead.ownerUserId || "ยังไม่มอบหมาย"),
-        segment: String(account.businessSegment || "ยังไม่จัดกลุ่ม"),
-        model: String(opportunity.commercialModel || account.commercialModel || "ยังไม่เสนอ"),
-        contact: String(lead.contactName || "ยังไม่ระบุผู้ติดต่อ"),
-        role: String(lead.buyingRole || "ยังไม่ระบุบทบาท"),
-        city: String(account.province || "ยังไม่ระบุจังหวัด"),
-        source: String(lead.sourceName || "ยังไม่ระบุแหล่งที่มา"),
-        lastContactAt: String(lead.lastContactAt || ""),
-        evidence,
-        risk: String(opportunity.riskNote || "ยังไม่มีบันทึกความเสี่ยง"),
-        stage: String(opportunity.stage || lead.status || "New"),
-        opportunityId: String(opportunity.id || ""),
-        expectedValueSatang: Number(opportunity.expectedValueSatang || 0),
-        probabilityBps: Number(opportunity.probabilityBps || 0),
-      } satisfies Lead;
-    });
-    const weightedSatang = opportunities.reduce((sum, item) =>
-      sum + (Number(item.expectedValueSatang || 0) * Number(item.probabilityBps || 0) / 10_000), 0);
-    return {
-      user: {
-        email: "",
-        displayName: String(actor.displayName || "ผู้ใช้งาน"),
-        role: String(actor.role || "—"),
-      },
-      tasks: (payload.tasks || []) as Array<Record<string, unknown>>,
-      leads: mappedLeads,
-      forecast: { weighted_satang: weightedSatang },
-      demos: (payload.demos || []) as Array<Record<string, unknown>>,
-      activities: (payload.activities || []) as Array<Record<string, unknown>>,
-    };
-  }
-
-  async function loadWorkspace() {
+  async function loadWorkspace(fresh = false) {
     setLoading(true);
     try {
-      const response = await fetch("/api/crm/workspace?limit=100", { cache: "no-store" });
+      const response = await fetch("/api/crm/workspace?limit=100", { cache: fresh ? "no-store" : "default" });
       const raw = (await response.json()) as Record<string, unknown> & { error?: string };
       if (!response.ok) throw new Error(raw.error || "ไม่สามารถเปิดพื้นที่ทำงานได้");
       const payload = mapCrmPayload(raw);
@@ -176,8 +170,9 @@ export default function WorkspaceClient() {
   }
 
   useEffect(() => {
+    if (initialPayload) return;
     let active = true;
-    fetch("/api/crm/workspace?limit=100", { cache: "no-store" })
+    fetch("/api/crm/workspace?limit=100")
       .then(async (response) => {
         const raw = (await response.json()) as Record<string, unknown> & { error?: string };
         if (!response.ok) throw new Error(raw.error || "ไม่สามารถเปิดพื้นที่ทำงานได้");
@@ -191,7 +186,7 @@ export default function WorkspaceClient() {
       })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, []);
+  }, [initialPayload]);
 
   const leads = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -207,7 +202,7 @@ export default function WorkspaceClient() {
   const weightedPipeline = Number(data?.forecast?.weighted_satang || 0);
 
   useEffect(() => {
-    if (!selectedLead?.accountId) { setAccountDetail(null); return; }
+    if (view !== "crm" || !selectedLead?.accountId) { setAccountDetail(null); return; }
     let active = true;
     fetch(`/api/crm/accounts/${encodeURIComponent(selectedLead.accountId)}`, { cache: "no-store" })
       .then(async (response) => {
@@ -217,7 +212,7 @@ export default function WorkspaceClient() {
       })
       .catch((error: unknown) => { if (active) setMessage(error instanceof Error ? error.message : "ไม่สามารถเปิดประวัติลูกค้าได้"); });
     return () => { active = false; };
-  }, [selectedLead?.accountId]);
+  }, [selectedLead?.accountId, view]);
 
   async function reloadAccountDetail(accountId = selectedLead?.accountId || "") {
     if (!accountId) return;
@@ -248,7 +243,7 @@ export default function WorkspaceClient() {
     }
     setShowTaskForm(false);
     setMessage("เพิ่มงานแล้ว");
-    await loadWorkspace();
+    await loadWorkspace(true);
   }
 
   async function recordActivity(event: FormEvent<HTMLFormElement>) {
@@ -287,7 +282,7 @@ export default function WorkspaceClient() {
     }
     setShowActivityForm(false);
     setMessage("บันทึกการติดตามและขั้นตอนถัดไปแล้ว");
-    await loadWorkspace();
+    await loadWorkspace(true);
   }
 
   async function updateContact(event: FormEvent<HTMLFormElement>) {
@@ -315,17 +310,31 @@ export default function WorkspaceClient() {
     setEditingContact(null);
     setMessage("บันทึกข้อมูลผู้ติดต่อแล้ว");
     await reloadAccountDetail();
-    await loadWorkspace();
+    await loadWorkspace(true);
   }
 
   return (
-    <main className={styles.shell}>
-      <aside className={styles.sidebar}>
-        <a href="/workspace" className={styles.brand} aria-label="BIB icoone Workspace">
+    <main className={styles.application}>
+      <header className={styles.brandHeader}>
+        <a href="/workspace" className={styles.headerBrand} aria-label="BIB icoone Practice Intelligence">
           <img src="/logos/bib-logo.png" alt="BIB" />
           <span />
           <img src="/logos/icoone-laser-med.png" alt="icoone laser med" />
         </a>
+        <div className={styles.brandCopy}>
+          <strong>PRACTICE INTELLIGENCE</strong>
+          <span>Knowledge to decision · Decision to better practice</span>
+        </div>
+        <nav className={styles.audienceNav} aria-label="พื้นที่ใช้งาน">
+          <a className={styles.activeAudience} href="/workspace">สำหรับทีม BIB</a>
+          <a href="/explore">สำหรับผู้สนใจ</a>
+          <a href="/client">สำหรับลูกค้า</a>
+        </nav>
+        <em>{data?.user.role || "INTERNAL"}</em>
+      </header>
+
+      <div className={styles.shell}>
+      <aside className={styles.sidebar}>
         <div className={styles.workspaceTitle}>
           <p>BIB WORKSPACE</p>
           <strong>พื้นที่ทำงาน</strong>
@@ -357,7 +366,6 @@ export default function WorkspaceClient() {
           </div>
           <div className={styles.topActions}>
             <button onClick={() => setShowTaskForm(true)}>+ เพิ่มงาน</button>
-            <a href="/platform">เปิดต้นแบบเดิม</a>
           </div>
         </header>
 
@@ -540,6 +548,7 @@ export default function WorkspaceClient() {
           </div>
         )}
       </section>
+      </div>
 
       {showTaskForm && (
         <div className={styles.modalBackdrop} role="presentation" onMouseDown={() => setShowTaskForm(false)}>
