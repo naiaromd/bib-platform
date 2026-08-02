@@ -7,7 +7,10 @@ export async function requireAuthorizedPage(pathname: string, allowed?: AppRole[
     if (allowed) requireRole(actor, allowed);
     return actor;
   } catch (error) {
-    if (error instanceof AccessError && error.status === 401) {
+    // The public prototype uses its own short-lived demo session. Any stale
+    // Sites/ChatGPT identity or role mismatch should return visitors to the
+    // BIB login screen instead of escaping as an unhandled Worker error.
+    if (error instanceof AccessError) {
       redirect(`/login?next=${encodeURIComponent(pathname)}`);
     }
     throw error;
