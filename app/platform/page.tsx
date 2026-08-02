@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import FinanceModule from "./FinanceModule";
 
 type InternalView = "today" | "crm" | "account" | "customers" | "campaigns" | "operations" | "approval" | "performance" | "finance" | "settings";
@@ -60,7 +61,8 @@ function BrandHeader({ area }: { area: string }) {
 }
 
 export default function InternalPlatformPage() {
-  const [view, setView] = useState<InternalView>("today");
+  const searchParams = useSearchParams();
+  const [view, setView] = useState<InternalView>(() => searchParams.get("view") === "approval" ? "approval" : "today");
   const [leads, setLeads] = useState<LeadRecord[]>([]);
   const [selectedAccount, setSelectedAccount] = useState<LeadRecord>(emptyLead);
   const [currentUser, setCurrentUser] = useState({ displayName: "กำลังโหลด", role: "" });
@@ -74,6 +76,7 @@ export default function InternalPlatformPage() {
     Executive: ["today", "crm", "account", "customers", "campaigns", "operations", "approval", "performance", "finance", "settings"],
     Finance: ["today", "customers", "approval", "performance", "finance"],
     Legal: ["today", "approval"],
+    Approver: ["approval"],
     Sales: ["today", "crm", "account", "customers", "campaigns", "approval"],
     Trainer: ["today", "customers", "operations"],
     Marketing: ["today", "crm", "account", "campaigns"],
@@ -91,7 +94,15 @@ export default function InternalPlatformPage() {
         setLeads(records);
         if (records.length) setSelectedAccount(records[0]);
         if (payload.user) setCurrentUser({ displayName: String(payload.user.displayName || payload.user.email), role: String(payload.user.role || "") });
-      }).catch(() => toast("ยังโหลดข้อมูล CRM ไม่สำเร็จ"));
+      }).catch(async () => {
+        const response = await fetch("/api/reviews", { cache: "no-store" });
+        if (!response.ok) throw new Error("ไม่สามารถยืนยันผู้ใช้งานได้");
+        const payload = await response.json();
+        if (payload.actor) {
+          setCurrentUser({ displayName: String(payload.actor.displayName || payload.actor.email), role: String(payload.actor.role || "") });
+          setView("approval");
+        }
+      }).catch(() => toast("ยังโหลดข้อมูลผู้ใช้งานไม่สำเร็จ"));
   }, []);
   const visibleLeads = leads.filter((lead) => Object.values(lead).flat().join(" ").toLowerCase().includes(query.toLowerCase()));
   const openAccount = (account: LeadRecord) => { if (!account.id) return; setSelectedAccount(account); setView("account"); };
@@ -365,6 +376,7 @@ function CampaignView({ leads, toast, openAccount }: { leads: LeadRecord[]; toas
 
 function ApprovalView({ toast }: { toast: (text: string) => void }) {
   type ReviewId = "linna" | "drj" | "memo";
+  type ApprovalRecord = { id: string; document_id: ReviewId; document_version: string; actor_display_name: string; actor_email: string; actor_role: string; decision: string; created_at: string };
   const reviewDocs: Record<ReviewId, { account: string; title: string; version: string; model: string; file: string; status: string; summary: string[]; issue: string }> = {
     linna: { account: "LINNA Clinic", title: "สัญญาแบ่งรายได้ระยะยาว", version: "ฉบับที่ 3.2", model: "D2 · 40/60 · ไม่มีรายได้ขั้นต่ำ", file: "/documents/linna-contract.pdf", status: "รอพิจารณา", summary: ["LINNA ร้อยละ 60 และ IPQ ร้อยละ 40", "ส่วนแบ่ง IPQ เป็นยอดรวมภาษีมูลค่าเพิ่มแล้ว", "ไม่มีรายได้ขั้นต่ำ และทบทวนเมื่อครบ 90 วัน", "หักค่าโฆษณาที่เข้าเกณฑ์ได้ไม่เกิน 50,000 บาทต่อเดือน โดยต้องมีหลักฐาน"], issue: "ยืนยันวิธีตรวจหลักฐานค่าโฆษณา การยกเว้นเงินประกัน และข้อมูลนิติบุคคลก่อนส่งลงนาม" },
     drj: { account: "Dr.J Clinic", title: "สัญญาเช่าเพื่อซื้อ", version: "ฉบับที่ 1.4", model: "B · 24 เดือน", file: "/documents/drj-contract.pdf", status: "ข้อมูลไม่ครบ", summary: ["เช่าเพื่อซื้อ 24 เดือน", "มีเงินประกันและเงื่อนไขโอนกรรมสิทธิ์", "คู่สัญญาเป็นบุคคล", "ต้องตรวจข้อมูลสถานที่และความพร้อมด้านการเงิน"], issue: "ยังไม่ควรส่งลงนามจนกว่าจะได้ข้อมูลยืนยันตัวตน สิทธิใช้สถานที่ และเอกสารประกอบครบ" },
@@ -374,11 +386,15 @@ function ApprovalView({ toast }: { toast: (text: string) => void }) {
   const [reviewMode, setReviewMode] = useState<"summary" | "full">("summary");
   const [reviewComment, setReviewComment] = useState("");
   const [reviewComments, setReviewComments] = useState<Array<{ document_id: string; author_label: string; body: string; visibility: string }>>([]);
+  const [reviewApprovals, setReviewApprovals] = useState<ApprovalRecord[]>([]);
+  const [reviewActor, setReviewActor] = useState({ displayName: "ผู้ตรวจทาน", role: "" });
   const [reviewDecision, setReviewDecision] = useState<Record<ReviewId, string>>({ linna: "Pending", drj: "Blocked", memo: "Pending" });
   const current = reviewDocs[reviewId];
   useEffect(() => {
     fetch("/api/reviews").then((response) => response.json()).then((payload) => {
       if (Array.isArray(payload.comments)) setReviewComments(payload.comments);
+      if (Array.isArray(payload.approvals)) setReviewApprovals(payload.approvals);
+      if (payload.actor) setReviewActor({ displayName: String(payload.actor.displayName || payload.actor.email), role: String(payload.actor.role || "") });
       if (Array.isArray(payload.documents)) {
         const next = { linna: "Pending", drj: "Blocked", memo: "Pending" };
         payload.documents.forEach((document: { id: ReviewId; decision: string }) => { if (document.id in next) next[document.id] = document.decision; });
@@ -389,14 +405,21 @@ function ApprovalView({ toast }: { toast: (text: string) => void }) {
   const saveReviewComment = async () => {
     if (!reviewComment.trim()) return;
     const response = await fetch("/api/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "comment", documentId: reviewId, body: reviewComment, visibility: "Internal" }) });
-    if (response.ok) { setReviewComments([...reviewComments, { document_id: reviewId, author_label: "ผู้บริหาร · ผู้ตรวจทาน", body: reviewComment, visibility: "Internal" }]); setReviewComment(""); toast("บันทึกความเห็นแล้ว"); }
+    if (response.ok) { setReviewComments([...reviewComments, { document_id: reviewId, author_label: `${reviewActor.displayName} · ผู้อนุมัติ`, body: reviewComment, visibility: "Internal" }]); setReviewComment(""); toast("บันทึกความเห็นแล้ว"); }
   };
   const decideReview = async (decision: string) => {
     const response = await fetch("/api/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "decision", documentId: reviewId, decision, version: current.version }) });
-    if (response.ok) { setReviewDecision({ ...reviewDecision, [reviewId]: decision }); toast(decision === "Approved" ? "บันทึกการอนุมัติภายในแล้ว" : "ส่งกลับเพื่อแก้ไขแล้ว"); }
+    if (response.ok) {
+      const result = await response.json() as { approvalId: string; actorDisplayName: string; actorRole: string; createdAt: string };
+      setReviewDecision({ ...reviewDecision, [reviewId]: decision });
+      setReviewApprovals([{ id: result.approvalId, document_id: reviewId, document_version: current.version.replace("ฉบับที่ ", "v"), actor_display_name: result.actorDisplayName, actor_email: "", actor_role: result.actorRole, decision, created_at: result.createdAt }, ...reviewApprovals]);
+      toast(decision === "Approved" ? `บันทึกชื่อผู้อนุมัติ ${result.actorDisplayName} แล้ว` : "ส่งกลับเพื่อแก้ไขแล้ว");
+    }
     else toast("รายการนี้ยังไม่ผ่านเงื่อนไขการอนุมัติ");
   };
   const visibleComments = reviewComments.filter((comment) => comment.document_id === reviewId);
+  const latestApproval = reviewApprovals.find((approval) => approval.document_id === reviewId && approval.decision === reviewDecision[reviewId]);
+  const approvalTime = latestApproval?.created_at ? new Intl.DateTimeFormat("th-TH", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Bangkok" }).format(new Date(latestApproval.created_at.replace(" ", "T") + (latestApproval.created_at.includes("Z") ? "" : "Z"))) : "";
   return <div className="v2-view v2-integrated-review">
     <section className="v2-kicker-row"><div><span>COMMERCIAL & DOCUMENT CONTROL</span><h2>ตรวจทานและอนุมัติเอกสาร</h2><p>รายการเอกสาร สาระสำคัญ และคำตัดสินอยู่ในหน้าเดียว</p></div><a href="/term-templates">สร้างเอกสารจากแม่แบบ</a></section>
     <section className="v2-review-workbench">
@@ -404,7 +427,7 @@ function ApprovalView({ toast }: { toast: (text: string) => void }) {
       <article className="v2-review-document"><header><div><span>{current.account} · {current.version}</span><h3>{current.title}</h3><p>{current.model}</p></div><nav><button className={reviewMode === "summary" ? "active" : ""} onClick={() => setReviewMode("summary")}>สรุป</button><button className={reviewMode === "full" ? "active" : ""} onClick={() => setReviewMode("full")}>อ่านฉบับเต็ม</button></nav></header>
         {reviewMode === "summary" ? <div className="v2-review-summary"><span>สาระสำคัญ</span><ul>{current.summary.map((line) => <li key={line}>{line}</li>)}</ul><section><b>ประเด็นที่ต้องตัดสินใจ</b><p>{current.issue}</p></section><footer><small>สถานะเอกสาร</small><strong>{reviewDecision[reviewId] === "Pending" ? current.status : reviewDecision[reviewId]}</strong></footer></div> : <iframe title={`${current.title} ${current.version}`} src={`${current.file}#view=FitH&toolbar=1`} />}
       </article>
-      <aside className="v2-review-decision"><header><span>ความเห็นและคำตัดสิน</span><strong>{visibleComments.length}</strong></header><div className="v2-review-current"><small>ผลการพิจารณาปัจจุบัน</small><b>{reviewDecision[reviewId]}</b><em>{reviewId.toUpperCase()} · {current.version}</em></div><div className="v2-review-comments">{visibleComments.length ? visibleComments.map((comment, index) => <article key={`${comment.author_label}-${index}`}><b>{comment.author_label}</b><p>{comment.body}</p><small>{comment.visibility === "Internal" ? "ภายในเท่านั้น" : "ลูกค้าเห็นได้"}</small></article>) : <p>ยังไม่มีความเห็นในเอกสารนี้</p>}</div><div className="v2-review-compose"><textarea value={reviewComment} onChange={(event) => setReviewComment(event.target.value)} placeholder="พิมพ์ความเห็นหรือสิ่งที่ต้องแก้ไข" /><button onClick={saveReviewComment}>บันทึกความเห็น</button></div><div className="v2-approval-scope"><b>การอนุมัติภายใน</b><span>ระบบบันทึกผู้อนุมัติ เวลา ฉบับเอกสาร และรหัสตรวจสอบ ไม่ใช่การลงนามอิเล็กทรอนิกส์</span></div><footer><button onClick={() => decideReview("Changes requested")}>ส่งกลับเพื่อแก้ไข</button><button className="approve" disabled={reviewId === "drj"} onClick={() => decideReview("Approved")}>{reviewId === "drj" ? "รอข้อมูลให้ครบ" : "อนุมัติภายใน"}</button></footer></aside>
+      <aside className="v2-review-decision"><header><span>ความเห็นและคำตัดสิน</span><strong>{visibleComments.length}</strong></header><div className="v2-review-current"><small>ผลการพิจารณาปัจจุบัน</small><b>{reviewDecision[reviewId]}</b><em>{reviewId.toUpperCase()} · {current.version}</em></div>{latestApproval && <div className="v2-approval-record"><small>{latestApproval.decision === "Approved" ? "อนุมัติโดย" : "บันทึกคำตัดสินโดย"}</small><b>{latestApproval.actor_display_name || latestApproval.actor_email}</b><span>{approvalTime} · {latestApproval.document_version}</span></div>}<div className="v2-review-comments">{visibleComments.length ? visibleComments.map((comment, index) => <article key={`${comment.author_label}-${index}`}><b>{comment.author_label}</b><p>{comment.body}</p><small>{comment.visibility === "Internal" ? "ภายในเท่านั้น" : "ลูกค้าเห็นได้"}</small></article>) : <p>ยังไม่มีความเห็นในเอกสารนี้</p>}</div><div className="v2-review-compose"><textarea value={reviewComment} onChange={(event) => setReviewComment(event.target.value)} placeholder="พิมพ์ความเห็นหรือสิ่งที่ต้องแก้ไข" /><button onClick={saveReviewComment}>บันทึกความเห็น</button></div><div className="v2-approval-scope"><b>การอนุมัติภายใน</b><span>ระบบบันทึกผู้อนุมัติ เวลา ฉบับเอกสาร และรหัสตรวจสอบ ไม่ใช่การลงนามอิเล็กทรอนิกส์</span></div><footer><button onClick={() => decideReview("Changes requested")}>ส่งกลับเพื่อแก้ไข</button><button className="approve" disabled={reviewId === "drj"} onClick={() => decideReview("Approved")}>{reviewId === "drj" ? "รอข้อมูลให้ครบ" : "อนุมัติภายใน"}</button></footer></aside>
     </section>
   </div>;
 }

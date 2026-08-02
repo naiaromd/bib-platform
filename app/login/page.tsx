@@ -5,17 +5,19 @@ import type { FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import styles from "./login.module.css";
 
-type Profile = "internal" | "client" | "prospect";
+type Profile = "internal" | "approver" | "client" | "prospect";
 
 const profiles: Array<{ id: Profile; number: string; title: string; description: string }> = [
   { id: "internal", number: "01", title: "ทีม BIB", description: "งานวันนี้ CRM นัดสาธิต และหลักฐานผลลัพธ์" },
-  { id: "client", number: "02", title: "ลูกค้า LINNA", description: "ข้อมูลบัญชี ผลการดำเนินงาน การฝึกอบรม และบริการ" },
-  { id: "prospect", number: "03", title: "ผู้สนใจ icoone", description: "ข้อมูลประกอบการตัดสินใจและการขอนัดสาธิต" },
+  { id: "approver", number: "02", title: "ผู้อนุมัติเอกสาร", description: "ตรวจทาน แสดงความคิดเห็น ส่งกลับแก้ไข หรืออนุมัติภายใน" },
+  { id: "client", number: "03", title: "ลูกค้า LINNA", description: "ข้อมูลบัญชี ผลการดำเนินงาน การฝึกอบรม และบริการ" },
+  { id: "prospect", number: "04", title: "ผู้สนใจ icoone", description: "ข้อมูลประกอบการตัดสินใจและการขอนัดสาธิต" },
 ];
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
-  const [profile, setProfile] = useState<Profile>("internal");
+  const requestedProfile = searchParams.get("profile");
+  const [profile, setProfile] = useState<Profile>(() => profiles.some((item) => item.id === requestedProfile) ? requestedProfile as Profile : "internal");
   const [pin, setPin] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);

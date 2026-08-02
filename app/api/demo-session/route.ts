@@ -7,17 +7,20 @@ import {
 
 const destinations = {
   internal: "/workspace",
+  approver: "/platform?view=approval",
   client: "/client",
   prospect: "/explore",
 } as const;
 
-function safeDestination(value: unknown, profile: "internal" | "client") {
+function safeDestination(value: unknown, profile: "internal" | "approver" | "client") {
   const fallback = destinations[profile];
   const destination = String(value || "");
   if (!destination.startsWith("/") || destination.startsWith("//")) return fallback;
   const allowed = profile === "client"
     ? ["/client", "/linna", "/therapist", "/"]
-    : ["/workspace", "/platform", "/client", "/linna", "/therapist", "/term-templates", "/"];
+    : profile === "approver"
+      ? ["/platform", "/platform?view=approval"]
+      : ["/workspace", "/platform", "/client", "/linna", "/therapist", "/term-templates", "/"];
   return allowed.includes(destination) ? destination : fallback;
 }
 

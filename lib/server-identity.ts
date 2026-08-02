@@ -2,7 +2,7 @@ import { env } from "cloudflare:workers";
 import { headers } from "next/headers";
 import { demoActorFromRequest } from "@/lib/demo-session";
 
-export const appRoles = ["Executive", "Finance", "Legal", "Sales", "Trainer", "Therapist", "Marketing", "After Sales", "Customer"] as const;
+export const appRoles = ["Executive", "Approver", "Finance", "Legal", "Sales", "Trainer", "Therapist", "Marketing", "After Sales", "Customer"] as const;
 export type AppRole = (typeof appRoles)[number];
 
 export type RequestActor = {

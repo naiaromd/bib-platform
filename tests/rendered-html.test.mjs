@@ -22,6 +22,8 @@ const financeFilesUrl = new URL("../app/api/finance/files/route.ts", import.meta
 const financeModuleUrl = new URL("../app/platform/FinanceModule.tsx", import.meta.url);
 const clientDashboardUrl = new URL("../app/api/client-dashboard/route.ts", import.meta.url);
 const marketingClaimUrl = new URL("../app/api/finance/marketing/route.ts", import.meta.url);
+const demoSessionUrl = new URL("../lib/demo-session.ts", import.meta.url);
+const loginUrl = new URL("../app/login/page.tsx", import.meta.url);
 
 test("ships the controlled review workflow", async () => {
   const [page, route] = await Promise.all([
@@ -120,4 +122,21 @@ test("ships period-based executive finance and LINNA marketing controls", async 
   assert.match(client, /partner_marketing_claims/);
   assert.match(marketing, /ยอดที่หักได้เกินเพดาน 50,000 บาทต่อเดือน/);
   assert.match(marketing, /ได้รับใบเสร็จและหลักฐานการชำระครบ/);
+});
+
+test("records the named internal approver and limits the test profile to approval work", async () => {
+  const [session, login, platform, reviews] = await Promise.all([
+    readFile(demoSessionUrl, "utf8"),
+    readFile(loginUrl, "utf8"),
+    readFile(new URL("../app/platform/page.tsx", import.meta.url), "utf8"),
+    readFile(routeUrl, "utf8"),
+  ]);
+  assert.match(session, /คุณผู้รับผิดชอบ/);
+  assert.match(session, /role: "Approver"/);
+  assert.match(login, /ผู้อนุมัติเอกสาร/);
+  assert.match(platform, /Approver: \["approval"\]/);
+  assert.match(platform, /อนุมัติโดย/);
+  assert.match(await readFile(new URL("../app/platform/layout.tsx", import.meta.url), "utf8"), /"Approver"/);
+  assert.match(reviews, /actor_display_name/);
+  assert.match(reviews, /actorDisplayName: currentActor\.displayName/);
 });

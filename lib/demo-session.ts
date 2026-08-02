@@ -3,7 +3,7 @@ import type { RequestActor } from "@/lib/server-identity";
 
 export const demoSessionCookie = "bib_demo_session";
 
-type DemoProfile = "internal" | "client";
+type DemoProfile = "internal" | "approver" | "client";
 
 function runtimeValue(key: string, fallback: string) {
   const value = String((env as unknown as Record<string, unknown>)[key] || "").trim();
@@ -16,9 +16,9 @@ export function demoAccessPin() {
 }
 
 export function tokenForDemoProfile(profile: DemoProfile) {
-  return profile === "client"
-    ? runtimeValue("BIB_DEMO_CLIENT_TOKEN", "")
-    : runtimeValue("BIB_DEMO_INTERNAL_TOKEN", "");
+  if (profile === "client") return runtimeValue("BIB_DEMO_CLIENT_TOKEN", "");
+  if (profile === "approver") return runtimeValue("BIB_DEMO_APPROVER_TOKEN", "");
+  return runtimeValue("BIB_DEMO_INTERNAL_TOKEN", "");
 }
 
 export function demoActorFromRequest(request: Request): RequestActor | null {
@@ -33,6 +33,15 @@ export function demoActorFromRequest(request: Request): RequestActor | null {
       displayName: "Redacted Person",
       tenantId: "bib",
       role: "Executive",
+      accountScope: "*",
+    };
+  }
+  if (token === tokenForDemoProfile("approver")) {
+    return {
+      email: "namporn-approver@bib.local",
+      displayName: "คุณผู้รับผิดชอบ",
+      tenantId: "bib",
+      role: "Approver",
       accountScope: "*",
     };
   }

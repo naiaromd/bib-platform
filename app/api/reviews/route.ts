@@ -11,9 +11,9 @@ const documents = [
 
 const actionRoles: Record<DocumentId, Record<string, AppRole[]>> = {
   linna: {
-    "Changes requested": ["Executive", "Finance", "Legal", "Sales", "Customer"],
+    "Changes requested": ["Executive", "Approver", "Finance", "Legal", "Sales", "Customer"],
     Conditional: ["Executive", "Finance", "Legal"],
-    Approved: ["Executive", "Finance", "Legal"],
+    Approved: ["Executive", "Approver", "Finance", "Legal"],
     "Ready for E‑Signature": ["Customer"],
   },
   drj: {
@@ -23,9 +23,9 @@ const actionRoles: Record<DocumentId, Record<string, AppRole[]>> = {
     "Ready for E‑Signature": ["Customer"],
   },
   memo: {
-    "Changes requested": ["Executive", "Finance", "Legal", "Sales"],
+    "Changes requested": ["Executive", "Approver", "Finance", "Legal", "Sales"],
     Conditional: ["Executive", "Finance"],
-    Approved: ["Executive", "Finance"],
+    Approved: ["Executive", "Approver", "Finance"],
   },
 };
 
@@ -52,7 +52,7 @@ async function initialize() {
       condition_text TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
     d1.prepare(`CREATE TABLE IF NOT EXISTS approval_records (
       id TEXT PRIMARY KEY, document_id TEXT NOT NULL, document_version TEXT NOT NULL,
-      version_hash TEXT NOT NULL, actor_email TEXT NOT NULL, actor_role TEXT NOT NULL,
+      version_hash TEXT NOT NULL, actor_email TEXT NOT NULL, actor_display_name TEXT NOT NULL DEFAULT '', actor_role TEXT NOT NULL,
       decision TEXT NOT NULL, approval_scope TEXT NOT NULL DEFAULT 'Internal workflow',
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)`),
     d1.prepare(`CREATE TABLE IF NOT EXISTS audit_events (
@@ -110,6 +110,14 @@ async function initialize() {
       internal_note TEXT NOT NULL DEFAULT '', locked_clinical_data TEXT NOT NULL DEFAULT '{}',
       status TEXT NOT NULL DEFAULT 'Draft', version INTEGER NOT NULL DEFAULT 1)`),
   ]);
+  const approvalColumns = await d1.prepare("PRAGMA table_info(approval_records)").all<{ name: string }>();
+  if (!approvalColumns.results.some((column) => column.name === "actor_display_name")) {
+    try {
+      await d1.prepare("ALTER TABLE approval_records ADD COLUMN actor_display_name TEXT NOT NULL DEFAULT ''").run();
+    } catch (error) {
+      if (!String(error).toLowerCase().includes("duplicate column")) throw error;
+    }
+  }
   for (const row of documents) {
     await d1.prepare(`INSERT OR IGNORE INTO review_documents
       (id, account, title, model, version, stage, risk, owner, customer_visible, decision, version_hash)
@@ -208,7 +216,7 @@ export async function POST(request: Request) {
       const body = payload.body?.trim();
       if (!body) return Response.json({ error: "Comment is required" }, { status: 400 });
       const visibility = currentActor.role === "Customer" ? "Customer-visible" : (payload.visibility || "Internal");
-      const authorLabel = currentActor.role === "Customer" ? "Customer · Reviewer" : `${currentActor.role} · Current user`;
+      const authorLabel = `${currentActor.displayName} · ${currentActor.role === "Customer" ? "ผู้ตรวจทาน" : "ผู้อนุมัติ"}`;
       const info = await d1.prepare(`INSERT INTO review_comments
         (document_id, author_email, author_label, role, body, visibility)
         VALUES (?, ?, ?, ?, ?, ?)`).bind(payload.documentId, currentActor.email, authorLabel, currentActor.role, body, visibility).run();
@@ -237,14 +245,14 @@ export async function POST(request: Request) {
           (document_id, version, actor_email, actor_role, decision)
           VALUES (?, ?, ?, ?, ?)`).bind(payload.documentId, version, currentActor.email, currentActor.role, decision),
         d1.prepare(`INSERT INTO approval_records
-          (id, document_id, document_version, version_hash, actor_email, actor_role, decision)
-          VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(approvalId, payload.documentId, currentDocument.version, currentDocument.version_hash, currentActor.email, currentActor.role, decision),
+          (id, document_id, document_version, version_hash, actor_email, actor_display_name, actor_role, decision)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).bind(approvalId, payload.documentId, currentDocument.version, currentDocument.version_hash, currentActor.email, currentActor.displayName, currentActor.role, decision),
         d1.prepare("UPDATE review_documents SET decision = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(decision, payload.documentId),
         d1.prepare(`INSERT INTO audit_events
           (document_id, actor_email, actor_role, event_type, event_data)
-          VALUES (?, ?, ?, ?, ?)`).bind(payload.documentId, currentActor.email, currentActor.role, "DECISION_RECORDED", JSON.stringify({ decision, version })),
+          VALUES (?, ?, ?, ?, ?)`).bind(payload.documentId, currentActor.email, currentActor.role, "DECISION_RECORDED", JSON.stringify({ decision, version, actorDisplayName: currentActor.displayName })),
       ]);
-      return Response.json({ ok: true, decision, approvalId, versionHash: currentDocument.version_hash, scope: "Internal workflow" });
+      return Response.json({ ok: true, decision, approvalId, versionHash: currentDocument.version_hash, actorDisplayName: currentActor.displayName, actorRole: currentActor.role, createdAt: new Date().toISOString(), scope: "Internal workflow" });
     }
     return Response.json({ error: "Unsupported action" }, { status: 400 });
   } catch (error) {
