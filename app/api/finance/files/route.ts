@@ -5,6 +5,7 @@ import { ensureFinanceStorage, financeDatabase } from "@/lib/finance-storage";
 const allowed = new Set([
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "application/vnd.ms-excel", "text/csv", "application/pdf",
+  "image/jpeg", "image/png",
 ]);
 
 function filesBucket() { const files = (env as unknown as { FILES?: R2Bucket }).FILES; if (!files) throw new Error("R2 binding FILES is unavailable"); return files; }
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
     const periodStart = String(form.get("periodStart") || "").trim();
     const periodEnd = String(form.get("periodEnd") || "").trim();
     if (!(file instanceof File)) return Response.json({ error: "กรุณาเลือกไฟล์" }, { status: 400 });
-    if (!allowed.has(file.type.toLowerCase())) return Response.json({ error: "รองรับไฟล์ Excel, CSV และ PDF" }, { status: 400 });
+    if (!allowed.has(file.type.toLowerCase())) return Response.json({ error: "รองรับไฟล์ Excel, CSV, PDF, JPG และ PNG" }, { status: 400 });
     if (!/^20\d{2}-\d{2}-\d{2}$/.test(periodStart) || !/^20\d{2}-\d{2}-\d{2}$/.test(periodEnd)) return Response.json({ error: "กรุณาระบุช่วงเวลาของเอกสาร" }, { status: 400 });
     if (file.size < 1 || file.size > 20 * 1024 * 1024) return Response.json({ error: "ไฟล์ต้องมีขนาดไม่เกิน 20 MB" }, { status: 400 });
     const bytes = await file.arrayBuffer();

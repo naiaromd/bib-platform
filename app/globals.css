@@ -1436,6 +1436,51 @@ nav button.active span { color: #a56145; }
 .v2-linna-marketing-form label.wide { grid-column: span 3; }
 .v2-linna-marketing-form input, .v2-linna-marketing-form select { width: 100%; min-height: 39px; margin-top: 5px; padding: 0 10px; border: 1px solid #d4cabf; background: #fff; font: 12px "Kanit"; }
 .v2-linna-marketing-form button { align-self: end; min-height: 39px; color: #fff; border: 0; background: #a76347; font: 600 12px "Kanit"; }
+.v2-linna-ads { border-bottom: 1px solid #ded7cd; background: #fff; }
+.v2-linna-ads > header { min-height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px 20px; border-bottom: 1px solid #ded7cd; }
+.v2-linna-ads > header span { color: #ad6448; font-size: 11px; font-weight: 600; }
+.v2-linna-ads > header h3 { margin: 3px 0 0; font-size: 20px; }
+.v2-linna-ads > header em { color: #8b4a35; font-size: 11px; font-style: normal; }
+.v2-linna-ads-layout { display: grid; grid-template-columns: 245px minmax(0, 1fr); min-height: 360px; }
+.v2-linna-ads-list { border-right: 1px solid #ded7cd; background: #f5f1eb; }
+.v2-linna-ads-list > button { width: 100%; min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 16px; color: #343432; border: 0; border-bottom: 1px solid #ded7cd; border-left: 3px solid transparent; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+.v2-linna-ads-list > button.active { border-left-color: #ad6448; background: #fff; }
+.v2-linna-ads-list span, .v2-linna-ads-list b, .v2-linna-ads-list small { display: block; }
+.v2-linna-ads-list b { font-size: 13px; }
+.v2-linna-ads-list small { margin-top: 3px; color: #7d756d; font-size: 10px; }
+.v2-linna-ads-list strong { color: #6e3d2b; font: 600 15px "Muli"; }
+.v2-linna-ads-detail { padding: 18px 20px 22px; }
+.v2-linna-ads-summary { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid #ded7cd; }
+.v2-linna-ads-summary article { min-height: 84px; padding: 14px; border-right: 1px solid #ded7cd; }
+.v2-linna-ads-summary article:last-child { border-right: 0; }
+.v2-linna-ads-summary span, .v2-linna-ads-summary strong { display: block; }
+.v2-linna-ads-summary span { color: #756f68; font-size: 10px; }
+.v2-linna-ads-summary strong { margin-top: 8px; font-size: 16px; }
+.v2-linna-ad-items { margin-top: 14px; border: 1px solid #ded7cd; }
+.v2-linna-ad-items article { display: grid; grid-template-columns: 1.2fr .7fr 1.2fr 1fr; gap: 12px; align-items: center; min-height: 70px; padding: 11px 13px; border-bottom: 1px solid #e5dfd6; }
+.v2-linna-ad-items article:last-child { border-bottom: 0; }
+.v2-linna-ad-items span b, .v2-linna-ad-items span small { display: block; }
+.v2-linna-ad-items span b { font-size: 13px; }
+.v2-linna-ad-items span small, .v2-linna-ad-items article > small { color: #79726b; font-size: 10px; }
+.v2-linna-ad-items strong { font: 600 15px "Muli"; }
+.v2-linna-ad-items em { color: #95543a; font-size: 10px; font-style: normal; }
+.v2-linna-review-note { min-height: 48px; margin: 12px 0 0; padding: 11px 13px; color: #645e57; background: #f5f1eb; font-size: 11px; line-height: 1.6; }
+.v2-linna-review-note b { display: block; color: #343432; }
+.v2-linna-review-box { margin-top: 14px; padding: 14px; border: 1px solid #d8c6ba; background: #fbf6f0; }
+.v2-linna-review-box label { display: grid; gap: 7px; color: #5f5953; font-size: 11px; }
+.v2-linna-review-box textarea { width: 100%; min-height: 72px; resize: vertical; padding: 10px; border: 1px solid #d4cabf; background: #fff; font: 12px "Kanit"; }
+.v2-linna-review-box > div { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.v2-linna-review-box button { min-height: 38px; padding: 0 13px; color: #3e3d3a; border: 1px solid #bdb4a8; background: #fff; font: 600 11px "Kanit"; cursor: pointer; }
+.v2-linna-review-box button.request { color: #874b34; border-color: #b7785f; }
+.v2-linna-review-box button.approve { color: #fff; border-color: #47745f; background: #47745f; }
+.v2-linna-review-box button:disabled { cursor: not-allowed; opacity: .38; }
+.v2-linna-review-box > small { display: block; margin-top: 8px; color: #7f6559; font-size: 10px; }
+.v2-linna-review-history { margin-top: 16px; }
+.v2-linna-review-history > b { font-size: 12px; }
+.v2-linna-review-history article { padding: 9px 0; border-bottom: 1px solid #e4ded5; }
+.v2-linna-review-history article span, .v2-linna-review-history article small { display: block; }
+.v2-linna-review-history article span { font-size: 11px; font-weight: 600; }
+.v2-linna-review-history article small, .v2-linna-review-history p { margin-top: 3px; color: #79726b; font-size: 10px; }
 .v2-linna-metrics { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid #ded7cd; }
 .v2-linna-metrics.five { grid-template-columns: repeat(5, 1fr); }
 .v2-linna-metrics article { min-height: 122px; padding: 20px; border-right: 1px solid #ded7cd; }
@@ -1612,6 +1657,11 @@ nav button.active span { color: #a56145; }
   .v2-linna-head, .v2-linna-head-actions { align-items: flex-start; flex-direction: column; }
   .v2-linna-marketing-form > div { grid-template-columns: 1fr 1fr; }
   .v2-linna-marketing-form label.wide { grid-column: 1 / -1; }
+  .v2-linna-ads-layout { grid-template-columns: 1fr; }
+  .v2-linna-ads-list { display: flex; overflow-x: auto; border-right: 0; border-bottom: 1px solid #ded7cd; }
+  .v2-linna-ads-list > button { min-width: 220px; border-bottom: 0; border-left: 0; border-top: 3px solid transparent; }
+  .v2-linna-ads-list > button.active { border-top-color: #ad6448; }
+  .v2-linna-ad-items article { grid-template-columns: 1fr 1fr; }
   .v2-linna-metrics article { border-right: 0; border-bottom: 1px solid #ded7cd; }
   .v2-home-target .inputs { grid-template-columns: repeat(2, 1fr); }
   .v2-home-target .inputs > * { border-bottom: 1px solid #ded7cd; }

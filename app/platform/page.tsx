@@ -9,7 +9,7 @@ type InternalView = "today" | "crm" | "account" | "customers" | "campaigns" | "o
 const workspaces: Array<[InternalView, string, string, string]> = [
   ["today", "01", "งานวันนี้", "สิ่งที่ต้องตัดสินใจและติดตาม"],
   ["crm", "02", "ลูกค้าและโอกาสขาย", "บุคคล องค์กร และขั้นตอนถัดไป"],
-  ["customers", "03", "ลูกค้าที่ใช้งาน", "เครื่องที่ติดตั้งและผลงาน LINNA"],
+  ["customers", "03", "ลูกค้าและเครื่องที่ติดตั้ง", "สัญญา การติดตั้ง และผลการดำเนินงาน"],
   ["campaigns", "04", "กิจกรรมและแคมเปญ", "Event Promotion และ Campaign"],
   ["operations", "05", "ฝึกอบรมและบริการ", "กิจกรรม Trainer และงานหลังการขาย"],
   ["approval", "06", "ข้อเสนอและการอนุมัติ", "รูปแบบธุรกิจและเอกสาร"],
@@ -151,50 +151,105 @@ export default function InternalPlatformPage() {
 
 type CustomerRecord = { id: string; legal_name: string; display_name: string; business_segment: string; commercial_model: string; device_model: string; serial_number: string; installed_at: string; deployment_status: string };
 type LinnaPerformance = { report_month: string; reported_paid_sessions: number; eligible_paid_sessions: number; complimentary_sessions: number; training_sessions: number; reported_gross_revenue: number; eligible_gross_revenue: number; bib_share_vat_inclusive: number; linna_share: number; deductible_marketing: number; approved_refunds: number; total_usage_minutes: number; exception_count: number; status: string };
-type LinnaMarketing = { report_month: string; submitted_amount_satang: number; eligible_amount_satang: number; excluded_amount_satang: number; monthly_cap_satang: number; evidence_status: string; review_status: string; review_note: string };
+type LinnaMarketing = { id: string; report_month: string; submitted_amount_satang: number; eligible_amount_satang: number; excluded_amount_satang: number; monthly_cap_satang: number; invoice_document_id: string; payment_document_id: string; evidence_status: string; review_status: string; review_note: string; updated_at: string };
+type LinnaMarketingItem = { id: string; claim_id: string; channel: string; service_period_start: string; service_period_end: string; description: string; submitted_amount_satang: number; source_document_id: string; source_file_name: string; source_file_hash: string; source_document_status: string; evidence_status: string };
+type LinnaMarketingReview = { id: string; claim_id: string; action: string; comment: string; actor_display_name: string; actor_role: string; created_at: string };
 
 function CustomersView({ toast }: { toast: (message: string) => void }) {
   const [customers, setCustomers] = useState<CustomerRecord[]>([]);
   const [linna, setLinna] = useState<LinnaPerformance | null>(null);
-  const [marketing, setMarketing] = useState<LinnaMarketing | null>(null);
+  const [marketingClaims, setMarketingClaims] = useState<LinnaMarketing[]>([]);
+  const [marketingItems, setMarketingItems] = useState<LinnaMarketingItem[]>([]);
+  const [marketingReviews, setMarketingReviews] = useState<LinnaMarketingReview[]>([]);
+  const [selectedClaimId, setSelectedClaimId] = useState("");
+  const [reviewComment, setReviewComment] = useState("");
   const [userRole, setUserRole] = useState("");
   const [showMarketingForm, setShowMarketingForm] = useState(false);
-  const [marketingForm, setMarketingForm] = useState({ reportMonth: "2026-06", submittedAmount: "0", eligibleAmount: "0", evidenceStatus: "ไม่มีรายการในรอบนี้", reviewNote: "" });
+  const [marketingForm, setMarketingForm] = useState({ reportMonth: "2026-07", submittedAmount: "1640", eligibleAmount: "0", evidenceStatus: "ได้รับตารางสรุปแล้ว", reviewNote: "" });
+  const [invoiceFile, setInvoiceFile] = useState<File | null>(null);
+  const [paymentFile, setPaymentFile] = useState<File | null>(null);
   const [tab, setTab] = useState<"installed" | "linna">("installed");
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    fetch("/api/workspace").then((response) => response.json()).then((payload) => {
-      setCustomers(Array.isArray(payload.customers) ? payload.customers : []);
-      setLinna(payload.linnaPerformance || null);
-      setMarketing(payload.linnaMarketing || null);
-      setUserRole(String(payload.user?.role || ""));
+    Promise.all([
+      fetch("/api/workspace", { cache: "no-store" }).then((response) => response.json()),
+      fetch("/api/finance/marketing?accountId=linna", { cache: "no-store" }).then((response) => response.json()),
+    ]).then(([workspace, ads]) => {
+      setCustomers(Array.isArray(workspace.customers) ? workspace.customers : []);
+      setLinna(workspace.linnaPerformance || null);
+      setUserRole(String(workspace.user?.role || ""));
+      const claims = Array.isArray(ads.claims) ? ads.claims as LinnaMarketing[] : [];
+      setMarketingClaims(claims);
+      setMarketingItems(Array.isArray(ads.items) ? ads.items : []);
+      setMarketingReviews(Array.isArray(ads.reviews) ? ads.reviews : []);
+      const matchingClaim = claims.find((claim) => claim.report_month === workspace.linnaPerformance?.report_month) || claims[0];
+      if (matchingClaim) setSelectedClaimId(matchingClaim.id);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
   const installed = customers.filter((customer) => customer.id !== "linna");
   const currency = (value: number) => `฿${Number(value || 0).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  const saveMarketing = async () => {
-    const response = await fetch("/api/finance/marketing", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accountId: "linna", ...marketingForm }) });
+  const currencySatang = (value: number) => currency(Number(value || 0) / 100);
+  const selectedClaim = marketingClaims.find((claim) => claim.id === selectedClaimId) || marketingClaims[0] || null;
+  const selectedItems = marketingItems.filter((item) => item.claim_id === selectedClaim?.id);
+  const selectedReviews = marketingReviews.filter((review) => review.claim_id === selectedClaim?.id);
+  const canReview = ["Executive", "Finance"].includes(userRole);
+  const uploadEvidence = async (file: File, documentType: string, reportMonth: string) => {
+    const [year, month] = reportMonth.split("-").map(Number);
+    const lastDay = new Date(year, month, 0).getDate();
+    const form = new FormData();
+    form.set("file", file); form.set("documentType", documentType);
+    form.set("periodStart", `${reportMonth}-01`); form.set("periodEnd", `${reportMonth}-${String(lastDay).padStart(2, "0")}`);
+    const response = await fetch("/api/finance/files", { method: "POST", body: form });
     const payload = await response.json();
-    if (!response.ok) return toast(payload.error || "บันทึกไม่สำเร็จ");
-    setMarketing({ report_month: marketingForm.reportMonth, submitted_amount_satang: payload.submitted, eligible_amount_satang: payload.eligible, excluded_amount_satang: payload.excluded, monthly_cap_satang: payload.cap, evidence_status: payload.evidenceStatus, review_status: payload.reviewStatus, review_note: marketingForm.reviewNote });
-    setShowMarketingForm(false); toast("บันทึกค่าโฆษณาและประวัติการตรวจแล้ว");
+    if (!response.ok) throw new Error(payload.error || "แนบเอกสารไม่สำเร็จ");
+    return String(payload.id);
+  };
+  const reloadMarketing = async (claimId?: string) => {
+    const response = await fetch("/api/finance/marketing?accountId=linna", { cache: "no-store" });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || "โหลดข้อมูลค่าโฆษณาไม่สำเร็จ");
+    setMarketingClaims(Array.isArray(payload.claims) ? payload.claims : []);
+    setMarketingItems(Array.isArray(payload.items) ? payload.items : []);
+    setMarketingReviews(Array.isArray(payload.reviews) ? payload.reviews : []);
+    if (claimId) setSelectedClaimId(claimId);
+  };
+  const saveMarketing = async () => {
+    try {
+      const invoiceDocumentId = invoiceFile ? await uploadEvidence(invoiceFile, "ใบเสร็จค่าโฆษณา LINNA", marketingForm.reportMonth) : "";
+      const paymentDocumentId = paymentFile ? await uploadEvidence(paymentFile, "หลักฐานการชำระค่าโฆษณา LINNA", marketingForm.reportMonth) : "";
+      const response = await fetch("/api/finance/marketing", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "save", accountId: "linna", ...marketingForm, invoiceDocumentId, paymentDocumentId }) });
+      const payload = await response.json();
+      if (!response.ok) return toast(payload.error || "บันทึกไม่สำเร็จ");
+      await reloadMarketing(payload.id);
+      setShowMarketingForm(false); setInvoiceFile(null); setPaymentFile(null);
+      toast("บันทึกรายการและส่งให้ฝ่ายการเงินตรวจแล้ว");
+    } catch (error) { toast(error instanceof Error ? error.message : "บันทึกไม่สำเร็จ"); }
+  };
+  const reviewMarketing = async (action: "comment" | "request_changes" | "approve") => {
+    if (!selectedClaim) return;
+    const response = await fetch("/api/finance/marketing", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, accountId: "linna", claimId: selectedClaim.id, comment: reviewComment }) });
+    const payload = await response.json();
+    if (!response.ok) return toast(payload.error || "บันทึกการตรวจไม่สำเร็จ");
+    await reloadMarketing(selectedClaim.id); setReviewComment("");
+    toast(action === "approve" ? "อนุมัติและบันทึกผู้ดำเนินการแล้ว" : action === "request_changes" ? "ส่งคำขอเอกสารเพิ่มเติมแล้ว" : "บันทึกความเห็นแล้ว");
   };
   return <div className="v2-view v2-customers-view">
-    <section className="v2-kicker-row"><div><span>ACTIVE CUSTOMER REGISTRY</span><h2>ลูกค้าที่ใช้งาน icoone</h2><p>แยกลูกค้าที่ซื้อเครื่องออกจากพันธมิตร Revenue Share</p></div><em>{loading ? "กำลังโหลด" : `พบ ${customers.length} บัญชี`}</em></section>
-    <nav className="v2-customer-tabs"><button className={tab === "installed" ? "active" : ""} onClick={() => setTab("installed")}>ลูกค้าที่ซื้อเครื่อง · {installed.length}</button><button className={tab === "linna" ? "active" : ""} onClick={() => setTab("linna")}>LINNA · รายงานผลงาน</button></nav>
+    <section className="v2-kicker-row"><div><span>ฐานลูกค้าและเครื่องที่ติดตั้ง</span><h2>ฐานลูกค้า icoone</h2><p>ติดตามสัญญา เครื่องที่ติดตั้ง และผลการดำเนินงานของลูกค้าแต่ละราย</p></div><em>{loading ? "กำลังโหลด" : `ทั้งหมด ${customers.length} บัญชี`}</em></section>
+    <nav className="v2-customer-tabs"><button className={tab === "installed" ? "active" : ""} onClick={() => setTab("installed")}>ลูกค้าซื้อเครื่อง · {installed.length}</button><button className={tab === "linna" ? "active" : ""} onClick={() => setTab("linna")}>LINNA · สัญญาแบ่งรายได้</button></nav>
     {tab === "installed" && <section className="v2-installed-customers">
-      <header><div><span>INSTALLED BASE</span><h3>ลูกค้าปัจจุบันที่ยืนยันจากข้อมูลฝ่ายบริหาร</h3></div><em>Serial และวันติดตั้งยังต้องเติม</em></header>
-      <div className="head"><span>ลูกค้า</span><span>กลุ่มธุรกิจ</span><span>รูปแบบ</span><span>เครื่อง</span><span>ความครบถ้วน</span></div>
-      {installed.map((customer) => <article key={customer.id}><span><i>{customer.display_name.slice(0, 2)}</i><b>{customer.display_name}</b></span><span>{customer.business_segment}</span><strong>{customer.commercial_model}</strong><span>{customer.device_model}</span><em>{customer.serial_number ? "ข้อมูลเครื่องครบ" : "รอ Serial/วันติดตั้ง"}</em></article>)}
+      <header><div><span>เครื่องที่จำหน่ายแล้ว</span><h3>ลูกค้าและเครื่องที่ส่งมอบแล้ว</h3></div><em>ข้อมูลที่ขาดจะแสดงเพื่อให้ทีมติดตาม</em></header>
+      <div className="head"><span>ลูกค้า</span><span>ประเภทธุรกิจ</span><span>เงื่อนไขการค้า</span><span>รุ่นเครื่อง</span><span>สถานะข้อมูล</span></div>
+      {installed.map((customer) => <article key={customer.id}><span><i>{customer.display_name.slice(0, 2)}</i><b>{customer.display_name}</b></span><span>{customer.business_segment}</span><strong>{customer.commercial_model}</strong><span>{customer.device_model}</span><em>{customer.serial_number ? "ข้อมูลเครื่องครบ" : "รอเลขเครื่องและวันติดตั้ง"}</em></article>)}
     </section>}
     {tab === "linna" && linna && <div className="v2-linna-performance">
-      <section className="v2-linna-head"><div><span>LINNA · D2 STRATEGIC REVENUE SHARE</span><h3>รอบรายงาน: 1–30 มิถุนายน 2569</h3><p>40% ของ BIB เป็นยอดรวม VAT แล้ว · ไม่มี Minimum Guarantee</p></div><div className="v2-linna-head-actions"><em>ต้องตรวจสอบ {linna.exception_count} จุด</em>{["Executive", "Finance"].includes(userRole) && <button onClick={() => setShowMarketingForm(!showMarketingForm)}>บันทึกค่าโฆษณา</button>}</div></section>
-      {showMarketingForm && <section className="v2-linna-marketing-form"><header><div><span>ADVERTISING COST REVIEW</span><h3>ค่าโฆษณาประจำรอบ</h3></div><em>เพดาน 50,000 บาท/เดือน</em></header><div><label>รอบเดือน<input type="month" value={marketingForm.reportMonth} onChange={(event) => setMarketingForm({ ...marketingForm, reportMonth: event.target.value })} /></label><label>ยอดที่ยื่น<input type="number" min="0" value={marketingForm.submittedAmount} onChange={(event) => setMarketingForm({ ...marketingForm, submittedAmount: event.target.value })} /></label><label>ยอดที่หักได้<input type="number" min="0" max="50000" value={marketingForm.eligibleAmount} onChange={(event) => setMarketingForm({ ...marketingForm, eligibleAmount: event.target.value })} /></label><label>หลักฐาน<select value={marketingForm.evidenceStatus} onChange={(event) => setMarketingForm({ ...marketingForm, evidenceStatus: event.target.value })}><option>ไม่มีรายการในรอบนี้</option><option>ยังไม่ได้รับหลักฐาน</option><option>หลักฐานไม่ครบ</option><option>ได้รับหลักฐานครบ</option></select></label><label className="wide">หมายเหตุ<input value={marketingForm.reviewNote} onChange={(event) => setMarketingForm({ ...marketingForm, reviewNote: event.target.value })} placeholder="เลขที่ใบเสร็จ รายการที่ไม่ผ่าน หรือเหตุผลประกอบ" /></label><button onClick={saveMarketing}>บันทึกผลการตรวจ</button></div></section>}
-      <div className="v2-linna-metrics five"><article><span>รายได้ตามไฟล์ลูกค้า</span><strong>{currency(linna.reported_gross_revenue)}</strong><small>{linna.reported_paid_sessions} รายการ · รอบ มิ.ย. 2569</small></article><article className="review"><span>รายได้ที่อยู่ในรอบ</span><strong>{currency(linna.eligible_gross_revenue)}</strong><small>{linna.eligible_paid_sessions} รายการ · รอตรวจ</small></article><article><span>ค่าโฆษณาที่หักได้</span><strong>{currency(linna.deductible_marketing)}</strong><small>เพดานตามสัญญา 50,000 บาท/เดือน</small></article><article><span>ส่วนแบ่ง BIB 40%</span><strong>{currency(linna.bib_share_vat_inclusive)}</strong><small>รวม VAT แล้ว ไม่บวก 7% เพิ่ม</small></article><article><span>ส่วนแบ่ง LINNA 60%</span><strong>{currency(linna.linna_share)}</strong><small>จากรายได้สุทธิที่อยู่ในรอบ</small></article></div>
-      <div className="v2-linna-grid"><section className="v2-panel v2-linna-usage"><header><div><span>USAGE MIX</span><h3>การใช้เครื่อง</h3></div></header><article><span>Paid Session</span><b>{linna.reported_paid_sessions}</b></article><article><span>Complimentary</span><b>{linna.complimentary_sessions}</b></article><article><span>Training</span><b>{linna.training_sessions}</b></article><article><span>เวลารวมจากไฟล์</span><b>{(linna.total_usage_minutes / 60).toFixed(2)} ชั่วโมง</b></article></section>
-      <section className="v2-panel v2-linna-check"><header><div><span>CONTRACT CHECK</span><h3>ตรวจตามเงื่อนไข</h3></div><em>{linna.status}</em></header><article className="pass"><i>✓</i><span><b>มี Paid Session ในเดือน</b><small>ไม่เข้าเงื่อนไขไม่มีรายได้ติดต่อกัน 3 เดือน</small></span></article><article className="pass"><i>✓</i><span><b>ค่าโฆษณาที่ขอหักเป็นศูนย์</b><small>หากมีรายการ ต้องแนบใบเสร็จและหลักฐานการชำระก่อนหัก</small></span></article><article className="alert"><i>!</i><span><b>พบรายการวันที่ 29 พฤษภาคม</b><small>4,360.20 บาทอยู่ในไฟล์เดือนมิถุนายน ต้องยืนยันรอบรับรู้รายได้</small></span></article><article className="alert"><i>!</i><span><b>วันที่ในไฟล์ถูกอ่านเป็นปี 1969</b><small>ต้องแก้รูปแบบวันที่เป็น 2569/2026 ก่อนปิดรอบ</small></span></article></section></div>
-      <footer className="v2-linna-source">แหล่งข้อมูล: Paid Session, Complimentary Session และ Training Session ประจำเดือนมิถุนายน 2569 · ค่าโฆษณา {marketing?.review_status || "รอตรวจ"} · สถานะยังไม่ Reconciled</footer>
+      <section className="v2-linna-head"><div><span>LINNA · สัญญาแบ่งรายได้แบบ D2</span><h3>ผลการดำเนินงานประจำเดือนมิถุนายน 2569</h3><p>BIB 40% รวม VAT แล้ว · LINNA 60% · ไม่มีรายได้ขั้นต่ำที่รับประกัน</p></div><div className="v2-linna-head-actions"><em>มี {linna.exception_count} รายการต้องตรวจ</em>{canReview && <button onClick={() => setShowMarketingForm(!showMarketingForm)}>＋ เพิ่มรายการค่าโฆษณา</button>}</div></section>
+      {showMarketingForm && <section className="v2-linna-marketing-form"><header><div><span>ค่าโฆษณาที่ขอหักจากรายได้</span><h3>บันทึกรายการและเอกสารประกอบ</h3></div><em>ไม่เกิน 50,000 บาทต่อเดือน</em></header><div><label>รอบบัญชี<input type="month" value={marketingForm.reportMonth} onChange={(event) => setMarketingForm({ ...marketingForm, reportMonth: event.target.value })} /></label><label>ยอดที่ LINNA แจ้ง<input type="number" min="0" value={marketingForm.submittedAmount} onChange={(event) => setMarketingForm({ ...marketingForm, submittedAmount: event.target.value })} /></label><label>ยอดเสนอให้หัก<input type="number" min="0" max="50000" value={marketingForm.eligibleAmount} onChange={(event) => setMarketingForm({ ...marketingForm, eligibleAmount: event.target.value })} /></label><label>สถานะเอกสาร<select value={marketingForm.evidenceStatus} onChange={(event) => setMarketingForm({ ...marketingForm, evidenceStatus: event.target.value })}><option>ยังไม่ได้รับหลักฐาน</option><option>ได้รับตารางสรุปแล้ว</option><option>ได้รับเอกสารบางส่วน</option><option>ได้รับใบเสร็จและหลักฐานการชำระครบ</option></select></label><label>ใบเสร็จ<input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(event) => setInvoiceFile(event.target.files?.[0] || null)} /></label><label>หลักฐานการชำระ<input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(event) => setPaymentFile(event.target.files?.[0] || null)} /></label><label className="wide">หมายเหตุ<input value={marketingForm.reviewNote} onChange={(event) => setMarketingForm({ ...marketingForm, reviewNote: event.target.value })} placeholder="ระบุช่องทาง ช่วงวันที่ และประเด็นที่ต้องตรวจ" /></label><button onClick={saveMarketing}>บันทึกและส่งตรวจ</button></div></section>}
+      <section className="v2-linna-ads"><header><div><span>หลักฐานค่าโฆษณา</span><h3>รายการที่ LINNA แจ้ง</h3></div><em>ตารางสรุปไม่ใช่หลักฐานการชำระ</em></header><div className="v2-linna-ads-layout"><div className="v2-linna-ads-list">{marketingClaims.map((claim) => <button className={selectedClaim?.id === claim.id ? "active" : ""} onClick={() => setSelectedClaimId(claim.id)} key={claim.id}><span><b>{new Intl.DateTimeFormat("th-TH", { month: "long", year: "numeric" }).format(new Date(`${claim.report_month}-01T00:00:00+07:00`))}</b><small>{claim.review_status}</small></span><strong>{currencySatang(claim.submitted_amount_satang)}</strong></button>)}</div>{selectedClaim && <div className="v2-linna-ads-detail"><div className="v2-linna-ads-summary"><article><span>ยอดที่แจ้ง</span><strong>{currencySatang(selectedClaim.submitted_amount_satang)}</strong></article><article><span>ยอดที่อนุมัติให้หัก</span><strong>{currencySatang(selectedClaim.review_status === "อนุมัติแล้ว" ? selectedClaim.eligible_amount_satang : 0)}</strong></article><article><span>สถานะ</span><strong>{selectedClaim.review_status}</strong></article></div><div className="v2-linna-ad-items">{selectedItems.map((item) => <article key={item.id}><span><b>{item.channel}</b><small>{item.service_period_start}{item.service_period_end ? ` – ${item.service_period_end}` : " เป็นต้นไป"}</small></span><strong>{currencySatang(item.submitted_amount_satang)}</strong><em>{item.evidence_status}</em><small>ที่มา: {item.source_file_name || "ยังไม่แนบไฟล์"}</small></article>)}</div><p className="v2-linna-review-note"><b>หมายเหตุล่าสุด</b>{selectedClaim.review_note || "ยังไม่มีหมายเหตุ"}</p>{canReview && <div className="v2-linna-review-box"><label>ความเห็นของผู้ตรวจ<textarea value={reviewComment} onChange={(event) => setReviewComment(event.target.value)} placeholder="ระบุเอกสารที่ขาด เหตุผล หรือข้อสรุปการตรวจ" /></label><div><button onClick={() => reviewMarketing("comment")}>บันทึกความเห็น</button><button className="request" onClick={() => reviewMarketing("request_changes")}>ขอเอกสารเพิ่มเติม</button><button className="approve" disabled={selectedClaim.evidence_status !== "ได้รับใบเสร็จและหลักฐานการชำระครบ" || !selectedClaim.invoice_document_id || !selectedClaim.payment_document_id} onClick={() => reviewMarketing("approve")}>อนุมัติยอดหัก</button></div>{selectedClaim.review_status !== "อนุมัติแล้ว" && <small>ปุ่มอนุมัติจะใช้งานได้เมื่อมีใบเสร็จและหลักฐานการชำระครบ</small>}</div>}<div className="v2-linna-review-history"><b>ประวัติการตรวจ</b>{selectedReviews.length ? selectedReviews.map((review) => <article key={review.id}><span>{review.action} · {review.actor_display_name} ({review.actor_role})</span><small>{review.comment || "ไม่มีความเห็นเพิ่มเติม"} · {formatThaiDate(review.created_at)}</small></article>) : <p>ยังไม่มีการอนุมัติหรือความเห็นในรายการนี้</p>}</div></div>}</div></section>
+      <div className="v2-linna-metrics five"><article><span>รายได้ที่ LINNA รายงาน</span><strong>{currency(linna.reported_gross_revenue)}</strong><small>{linna.reported_paid_sessions} รายการ · รอบ มิ.ย. 2569</small></article><article className="review"><span>รายได้ที่อยู่ในรอบบัญชี</span><strong>{currency(linna.eligible_gross_revenue)}</strong><small>{linna.eligible_paid_sessions} รายการ · รอตรวจ</small></article><article><span>ค่าโฆษณาที่อนุมัติให้หัก</span><strong>{currency(linna.deductible_marketing)}</strong><small>รายการที่ยังรอหลักฐานจะไม่ถูกนำมาหัก</small></article><article><span>ส่วนแบ่ง BIB 40%</span><strong>{currency(linna.bib_share_vat_inclusive)}</strong><small>ยอดรวม VAT แล้ว</small></article><article><span>ส่วนแบ่ง LINNA 60%</span><strong>{currency(linna.linna_share)}</strong><small>คำนวณจากรายได้สุทธิที่ผ่านการตรวจ</small></article></div>
+      <div className="v2-linna-grid"><section className="v2-panel v2-linna-usage"><header><div><span>สรุปการใช้เครื่อง</span><h3>จำนวนครั้งและชั่วโมงใช้งาน</h3></div></header><article><span>บริการที่ชำระเงินจริง</span><b>{linna.reported_paid_sessions}</b></article><article><span>บริการทดลองหรือไม่มีค่าใช้จ่าย</span><b>{linna.complimentary_sessions}</b></article><article><span>การฝึกอบรม</span><b>{linna.training_sessions}</b></article><article><span>เวลารวมจากไฟล์</span><b>{(linna.total_usage_minutes / 60).toFixed(2)} ชั่วโมง</b></article></section>
+      <section className="v2-panel v2-linna-check"><header><div><span>ตรวจตามสัญญา</span><h3>ประเด็นก่อนปิดรอบ</h3></div><em>{linna.status}</em></header><article className="pass"><i>✓</i><span><b>มีรายการให้บริการที่ชำระเงินจริง</b><small>ยังไม่เข้าเงื่อนไขไม่มีรายได้ติดต่อกัน 3 เดือน</small></span></article><article className={selectedClaim?.review_status === "อนุมัติแล้ว" ? "pass" : "alert"}><i>{selectedClaim?.review_status === "อนุมัติแล้ว" ? "✓" : "!"}</i><span><b>ค่าโฆษณายังไม่ถูกหักจากรายได้</b><small>{selectedClaim ? `${currencySatang(selectedClaim.submitted_amount_satang)} · ${selectedClaim.review_status}` : "ยังไม่มีรายการค่าโฆษณา"}</small></span></article><article className="alert"><i>!</i><span><b>พบรายการวันที่ 29 พฤษภาคม</b><small>4,360.20 บาทอยู่ในไฟล์เดือนมิถุนายน ต้องยืนยันรอบรับรู้รายได้</small></span></article><article className="alert"><i>!</i><span><b>รูปแบบวันที่ในไฟล์ไม่ถูกต้อง</b><small>ต้องแก้ปีเป็น 2569/2026 ก่อนปิดรอบ</small></span></article></section></div>
+      <footer className="v2-linna-source">แหล่งข้อมูล: รายงานบริการ LINNA เดือนมิถุนายน 2569 และตารางสรุปค่าโฆษณา 1472136.jpg · สถานะยังไม่กระทบยอดและยังไม่อนุมัติหักค่าโฆษณา</footer>
     </div>}
     {tab === "linna" && !linna && !loading && <section className="v2-empty">ยังไม่พบรายงาน LINNA</section>}
   </div>;

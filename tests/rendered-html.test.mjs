@@ -22,6 +22,7 @@ const financeFilesUrl = new URL("../app/api/finance/files/route.ts", import.meta
 const financeModuleUrl = new URL("../app/platform/FinanceModule.tsx", import.meta.url);
 const clientDashboardUrl = new URL("../app/api/client-dashboard/route.ts", import.meta.url);
 const marketingClaimUrl = new URL("../app/api/finance/marketing/route.ts", import.meta.url);
+const financeStorageUrl = new URL("../lib/finance-storage.ts", import.meta.url);
 const demoSessionUrl = new URL("../lib/demo-session.ts", import.meta.url);
 const loginUrl = new URL("../app/login/page.tsx", import.meta.url);
 const platformUrl = new URL("../app/platform/page.tsx", import.meta.url);
@@ -105,12 +106,14 @@ test("ships the focused CRM workspace and therapist evidence flow", async () => 
 });
 
 test("ships period-based executive finance and LINNA marketing controls", async () => {
-  const [finance, files, module, client, marketing] = await Promise.all([
+  const [finance, files, module, client, marketing, storage, platform] = await Promise.all([
     readFile(financeUrl, "utf8"),
     readFile(financeFilesUrl, "utf8"),
     readFile(financeModuleUrl, "utf8"),
     readFile(clientDashboardUrl, "utf8"),
     readFile(marketingClaimUrl, "utf8"),
+    readFile(financeStorageUrl, "utf8"),
+    readFile(platformUrl, "utf8"),
   ]);
   assert.match(finance, /requireRole\(actor, \["Executive", "Finance"\]\)/);
   assert.match(finance, /period_month/);
@@ -122,8 +125,17 @@ test("ships period-based executive finance and LINNA marketing controls", async 
   assert.match(module, /รายปี/);
   assert.match(module, /แยกข้อมูลจริงออกจากงบประมาณและประมาณการ/);
   assert.match(client, /partner_marketing_claims/);
-  assert.match(marketing, /ยอดที่หักได้เกินเพดาน 50,000 บาทต่อเดือน/);
+  assert.match(marketing, /ยอดเสนอให้หักเกินเพดาน 50,000 บาทต่อเดือน/);
   assert.match(marketing, /ได้รับใบเสร็จและหลักฐานการชำระครบ/);
+  assert.match(marketing, /Marketing evidence approved/);
+  assert.match(marketing, /partner_marketing_claim_reviews/);
+  assert.match(marketing, /ขอเอกสารเพิ่มเติม/);
+  assert.match(storage, /2044272/);
+  assert.match(storage, /164000/);
+  assert.match(storage, /linna-ads-summary-1472136/);
+  assert.match(platform, /ฐานลูกค้า icoone/);
+  assert.match(platform, /อนุมัติยอดหัก/);
+  assert.match(platform, /ตารางสรุปไม่ใช่หลักฐานการชำระ/);
 });
 
 test("records the named internal approver and limits the test profile to approval work", async () => {
