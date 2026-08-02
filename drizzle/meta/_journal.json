@@ -92,13 +92,6 @@
       "when": 1785644100000,
       "tag": "0012_remove_demo_submissions",
       "breakpoints": true
-    },
-    {
-      "idx": 13,
-      "version": "6",
-      "when": 1785644700000,
-      "tag": "0013_remove_known_demo_report",
-      "breakpoints": true
     }
   ]
 }
