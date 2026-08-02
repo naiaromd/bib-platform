@@ -14,6 +14,7 @@ function validAccount(actor: { accountScope: string }, accountId: string) {
 export async function GET(request: Request) {
   try {
     const actor = await requireRequestActor(request);
+    requireRole(actor, ["Executive", "Finance"]);
     await ensureFinanceStorage();
     const accountId = new URL(request.url).searchParams.get("accountId")?.trim() || "linna";
     validAccount(actor, accountId);

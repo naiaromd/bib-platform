@@ -173,7 +173,7 @@ function CustomersView({ toast }: { toast: (message: string) => void }) {
   useEffect(() => {
     Promise.all([
       fetch("/api/workspace", { cache: "no-store" }).then((response) => response.json()),
-      fetch("/api/finance/marketing?accountId=linna", { cache: "no-store" }).then((response) => response.json()),
+      fetch("/api/finance/marketing?accountId=linna", { cache: "no-store" }).then((response) => response.ok ? response.json() : { claims: [], items: [], reviews: [] }),
     ]).then(([workspace, ads]) => {
       setCustomers(Array.isArray(workspace.customers) ? workspace.customers : []);
       setLinna(workspace.linnaPerformance || null);

@@ -128,6 +128,7 @@ test("ships period-based executive finance and LINNA marketing controls", async 
   assert.match(marketing, /ยอดเสนอให้หักเกินเพดาน 50,000 บาทต่อเดือน/);
   assert.match(marketing, /ได้รับใบเสร็จและหลักฐานการชำระครบ/);
   assert.match(marketing, /Marketing evidence approved/);
+  assert.match(marketing, /requireRole\(actor, \["Executive", "Finance"\]\)/);
   assert.match(marketing, /partner_marketing_claim_reviews/);
   assert.match(marketing, /ขอเอกสารเพิ่มเติม/);
   assert.match(storage, /2044272/);
