@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const pageUrl = new URL("../app/page.tsx", import.meta.url);
+const pageUrl = new URL("../app/ReviewApp.tsx", import.meta.url);
 const routeUrl = new URL("../app/api/reviews/route.ts", import.meta.url);
 const cssUrl = new URL("../app/globals.css", import.meta.url);
 const hostingUrl = new URL("../.openai/hosting.json", import.meta.url);

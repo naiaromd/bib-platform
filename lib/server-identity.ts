@@ -1,5 +1,6 @@
 import { env } from "cloudflare:workers";
 import { headers } from "next/headers";
+import { demoActorFromRequest } from "@/lib/demo-session";
 
 export const appRoles = ["Executive", "Finance", "Legal", "Sales", "Trainer", "Therapist", "Marketing", "After Sales", "Customer"] as const;
 export type AppRole = (typeof appRoles)[number];
@@ -57,6 +58,9 @@ async function initializeIdentity() {
 }
 
 export async function requireRequestActor(request: Request): Promise<RequestActor> {
+  const demoActor = demoActorFromRequest(request);
+  if (demoActor) return demoActor;
+
   const url = new URL(request.url);
   const isLocal = url.hostname === "localhost" || url.hostname === "127.0.0.1";
   if (isLocal) await initializeIdentity();
