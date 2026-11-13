@@ -4,7 +4,7 @@
   "artifact_id": "bib-platform-sanitised-github-export-20261113",
   "class": "SANITISED_SOURCE_ARCHIVE",
   "version": "1.0",
-  "status": "VALIDATION_PENDING",
+  "status": "SANITISED_SOURCE_ARCHIVE_VALIDATED",
   "source": "Owner authorised Sites/local Git export; 2026-11-13",
   "current": true,
   "supersedes": null,
@@ -27,5 +27,8 @@
   ],
   "production_unchanged": true,
   "release_approval": null,
-  "rollback": "Discard the new archive if necessary; original Sites and local source remain unchanged. No production rollback required."
+  "rollback": "Discard the new archive if necessary; original Sites and local source remain unchanged. No production rollback required.",
+  "validation": "migration/VERIFICATION.json",
+  "permanent_link": "https://github.com/naiaromd/bib-platform/tree/saved-v56",
+  "historical_test_limits": false
 }
