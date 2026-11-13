@@ -4,7 +4,7 @@
   "artifact_id": "bib-platform-sanitised-github-export-20261113",
   "class": "SANITISED_SOURCE_ARCHIVE",
   "version": "1.0",
-  "status": "SANITISED_SOURCE_ARCHIVE_VALIDATED",
+  "status": "PRIVATE_GITHUB_READBACK_VERIFIED",
   "source": "Owner authorised Sites/local Git export; 2026-11-13",
   "current": true,
   "supersedes": null,
@@ -30,5 +30,7 @@
   "rollback": "Discard the new archive if necessary; original Sites and local source remain unchanged. No production rollback required.",
   "validation": "migration/VERIFICATION.json",
   "permanent_link": "https://github.com/naiaromd/bib-platform/tree/main",
-  "historical_test_limits": false
+  "historical_test_limits": false,
+  "fresh_clone_verification": "migration/CLONE_VERIFICATION.json",
+  "tested_github_commit": "de3a05b4a2367507ccb4b215bf0d8f00ce4908d8"
 }
