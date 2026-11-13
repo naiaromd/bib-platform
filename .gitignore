@@ -41,3 +41,11 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+
+# Privacy-safe local configuration
+!.env.example
+.dev.vars
+.dev.vars.*
+*.sqlite
+*.sqlite3
+*.db

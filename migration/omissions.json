@@ -1,0 +1,129 @@
+{
+  "omitted_files": [
+    {
+      "path": "public/documents/commission-memo.pdf",
+      "reason": [
+        "excluded file: contracts/private documents/runtime data/automation"
+      ]
+    },
+    {
+      "path": "public/documents/drj-contract.pdf",
+      "reason": [
+        "excluded file: contracts/private documents/runtime data/automation"
+      ]
+    },
+    {
+      "path": "public/documents/linna-company-certificate.pdf",
+      "reason": [
+        "excluded file: contracts/private documents/runtime data/automation"
+      ]
+    },
+    {
+      "path": "public/documents/linna-contract.pdf",
+      "reason": [
+        "excluded file: contracts/private documents/runtime data/automation"
+      ]
+    }
+  ],
+  "sanitised_files": [
+    {
+      "path": "app/ReviewApp.tsx",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    },
+    {
+      "path": "app/api/workspace/route.ts",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    },
+    {
+      "path": "app/page.tsx",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    },
+    {
+      "path": "app/platform/page.tsx",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    },
+    {
+      "path": "app/term-templates/page.tsx",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    },
+    {
+      "path": "drizzle/0008_demonic_clint_barton.sql",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    },
+    {
+      "path": "drizzle/0009_damp_red_hulk.sql",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    },
+    {
+      "path": "drizzle/0010_remove_linna_mock_records.sql",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    },
+    {
+      "path": "drizzle/0011_remove_seeded_monthly_report.sql",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    },
+    {
+      "path": "drizzle/0012_remove_demo_submissions.sql",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    },
+    {
+      "path": "drizzle/0013_finance_actuals_and_marketing.sql",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    },
+    {
+      "path": "drizzle/0013_remove_known_demo_report.sql",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    },
+    {
+      "path": "lib/demo-session.ts",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    },
+    {
+      "path": "lib/kpi-import-data.ts",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    },
+    {
+      "path": "tests/rendered-html.test.mjs",
+      "reason": [
+        "privacy/secrets/data-seed sanitisation"
+      ]
+    }
+  ],
+  "excluded_runtime": [
+    "production D1 rows",
+    "R2 user uploads",
+    "production secret values",
+    "domain/DNS/access configuration",
+    "dependencies/caches/build outputs",
+    "uncommitted local README 2.md (CRM only)"
+  ],
+  "author_metadata": "Personal author names/emails replaced; dates, topology and commit messages retained after sanitisation."
+}
