@@ -25,7 +25,7 @@ git clone https://github.com/naiaromd/bib-platform.git
 cd bib-platform
 npm ci
 npm run db:local:init
-npm run dev -- --host 127.0.0.1 --port 5173
+npm run dev -- --hostname 127.0.0.1 --port 5173
 ```
 
 เปิด http://127.0.0.1:5173 หลังเริ่มสำเร็จ ใช้ฐานจำลองว่างใน `.wrangler/state` เท่านั้น `db:local:init` ใช้ครั้งแรกกับฐานใหม่; หากรันซ้ำบนฐานเดิม คำสั่งเพิ่มคอลัมน์อาจแจ้งว่ามีอยู่แล้ว

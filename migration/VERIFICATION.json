@@ -1,0 +1,70 @@
+{
+  "date": "2026-11-13",
+  "branch_checks": [
+    {
+      "branch": "main",
+      "head": "f86cc64f5c21fee6b3561212356ed40bab232ef2",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "tests": {
+          "exit_code": 0,
+          "summary": [
+            "ℹ tests 7",
+            "ℹ pass 7",
+            "ℹ fail 0"
+          ]
+        },
+        "schema_sqlite": {
+          "passed": true,
+          "table_count": 48
+        }
+      }
+    },
+    {
+      "branch": "saved-v56",
+      "head": "76017ce4ffcb0f9a678754622d5a81168367b83d",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "tests": {
+          "exit_code": 0,
+          "summary": [
+            "ℹ tests 7",
+            "ℹ pass 7",
+            "ℹ fail 0"
+          ]
+        },
+        "schema_sqlite": {
+          "passed": true,
+          "table_count": 48
+        }
+      }
+    }
+  ],
+  "privacy_audit": {
+    "reachable_blob_count": 318,
+    "mapped_source_commits": 59,
+    "source_topology_retained": true,
+    "known_secret_and_privacy_findings": [],
+    "note": "Pattern scan plus explicit source-value checks; no universal proof against unknown secrets. Published synthetic test vectors and fake identities are not production credentials."
+  },
+  "gitleaks": {
+    "version": "8.30.1",
+    "scan": "git --log-opts=--all --redact=100",
+    "findings": 0,
+    "source": "https://github.com/gitleaks/gitleaks"
+  },
+  "local_http": {
+    "base": "http://localhost:5173",
+    "paths_200": [
+      "/login",
+      "/explore"
+    ]
+  },
+  "runtime_scope": "Local schema and synthetic/in-memory tests only. No production rows, webhook, domain or deployment changed.",
+  "runtime_secret_guard": "Missing runtime secrets reject lookups (four keys); anonymous request stays anonymous.",
+  "current_result": "Main ready for clone/build/local startup. Original historical test limitations retained in README."
+}
