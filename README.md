@@ -1,98 +1,67 @@
-# vinext-starter
+# bib-platform · สำเนาโค้ด BIB สำหรับทำงานต่อ
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+คลัง private ของไนน์ ย้ายเมื่อ 13 พฤศจิกายน 2026 หลังลบค่าลับ ข้อมูลส่วนบุคคล และเอกสารสัญญาออกจากประวัติ เว็บจริงไม่เปลี่ยน
 
-## Prerequisites
+`main` = รุ่น 55 ที่เผยแพร่แล้วใน Sites; `saved-v56` = รุ่น 56 ที่บันทึกแต่ยังไม่เผยแพร่
 
-- Node.js `>=22.13.0`
+สาขาปัจจุบัน `saved-v56` อ้างอิงต้นทาง `5c7e813e3f655c583ada024666778823f368c532`; ตารางเทียบทุก commit อยู่ที่ [migration/commit-map.csv](migration/commit-map.csv) และ [รายการสิ่งที่เว้นไว้](migration/OMISSIONS_TH.md)
 
-## Quick Start
+## โฟลเดอร์สำคัญ
 
-```bash
-npm install
-npm run dev
+- `app/` หน้าเว็บและจุดรับส่งข้อมูลของเว็บ
+- `lib/` กติกาใช้งาน การตรวจสิทธิ์ และส่วนทำงานร่วมกัน
+- `db/schema.ts` โครงสร้างข้อมูล; `drizzle/` ลำดับการปรับโครงสร้างฐานข้อมูล
+- `public/` รูป โลโก้ และฟอนต์ที่อยู่ในโค้ด โดยไม่รวมสัญญา
+- `worker/`, `build/`, `vite.config.ts`, `.openai/hosting.json` ส่วนรันบน Cloudflare และข้อมูลอ้างอิง Sites เดิม
+- `tests/` ชุดตรวจเดิม; `scripts/setup-local-db.mjs` ตั้งฐานข้อมูลจำลองเฉพาะเครื่อง
+- `migration/` หลักฐานการย้าย รายการที่เว้นไว้ และทะเบียนของชุดส่งออกนี้ ไม่ใช่ทะเบียนเผยแพร่เว็บจริง
+
+## วิธีรันในเครื่อง
+
+ต้องมี Node.js ตั้งแต่ 22.13.0 ขึ้นไป และ npm ใช้บัญชี GitHub ที่เข้าคลัง private นี้ได้
+
+```sh
+git clone https://github.com/naiaromd/bib-platform.git
+cd bib-platform
+npm ci
+npm run db:local:init
+npm run dev -- --host 127.0.0.1 --port 5173
+```
+
+เปิด http://127.0.0.1:5173 หลังเริ่มสำเร็จ ใช้ฐานจำลองว่างใน `.wrangler/state` เท่านั้น `db:local:init` ใช้ครั้งแรกกับฐานใหม่; หากรันซ้ำบนฐานเดิม คำสั่งเพิ่มคอลัมน์อาจแจ้งว่ามีอยู่แล้ว
+
+สำหรับค่าตั้งเฉพาะเครื่อง ให้คัดลอก `.env.example` เป็น `.dev.vars` แล้วใส่ค่าของเครื่องนั้นเอง ไฟล์นี้ถูกกันไม่ให้เข้า Git แล้ว ไม่ต้องใส่ค่าจริงเพื่อเปิดหน้าสาธารณะหรือ build
+
+การทดลองเข้าสู่ระบบต้องกำหนด PIN และ token ทั้งสี่ชื่อด้วยค่าท้องถิ่นที่สร้างใหม่เอง โค้ดหยุดการเข้าใช้งานเมื่อไม่ได้กำหนดค่าที่จำเป็น ค่าทดสอบต้องไม่ใช้ซ้ำกับระบบจริง
+
+การย้ายนี้ทำให้เปิดหน้าเว็บและทำงานกับโค้ดได้ แต่ไม่มีฐานลูกค้าจริง สัญญา ไฟล์อัปโหลด หรือบัญชีผู้ใช้จริงตามมาด้วย บางหน้าที่ต้องยืนยันตัวตนหรือมีข้อมูลจะยังไม่ทำงานครบจากการ clone เพียงอย่างเดียว
+
+## วิธี build และตรวจ
+
+```sh
 npm run build
+node --test tests/rendered-html.test.mjs
 ```
 
-This starter does not use `wrangler.jsonc`.
+ผล build อยู่ใน `dist/` ไม่ต้องอัปโหลดขึ้น Git ไม่มีคำสั่ง deploy อัตโนมัติในชุดนี้
 
-## Included Shape
+## เว็บจริงและฐานข้อมูลอยู่ที่ไหน
 
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
+เว็บเดิมอยู่ที่ https://bib.wiseofwellness.com/platform โฮสต์ด้วย ChatGPT Sites / Cloudflare Workers หมายเลข Site `appgprj_6a64159e1b048191918737d8e872ef18`
 
-## Workspace Auth Headers
+ฐานจริงเป็น Cloudflare D1 ที่ Sites ผูกชื่อ `DB` และคลังไฟล์ R2 ชื่อ `FILES` หมายเลขฐานจริงและบัญชี Cloudflare ผู้ให้บริการไม่ได้อยู่ในโค้ด จึงไม่ได้อ้างว่าย้ายฐานมาแล้ว การยืนยันตัวตนและการตั้งโดเมนของ Sites ต้องจัดเตรียมแยกหากจะย้ายโฮสต์ในอนาคต
 
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
+## ตัวแปรที่ต้องเตรียม — ชื่อเท่านั้น
 
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
+- `BIB_DEMO_ACCESS_PIN`
+- `BIB_DEMO_CLIENT_TOKEN`
+- `BIB_DEMO_APPROVER_TOKEN`
+- `BIB_DEMO_INTERNAL_TOKEN`
+- `SITE_OWNER_USER_ID`
+- `SITE_OWNER_EMAIL`
 
-Treat the full name as optional and fall back to email when it is absent:
+ดูไฟล์ `.env.example` ซึ่งไม่มีค่า ตัวแปรบางชื่อเป็นตัวตั้งสิทธิ์หรือสวิตช์การทำงาน ไม่ใช่รหัสลับ แต่ต้องไม่ใส่ข้อมูลบุคคลจริงลงใน Git
 
-```tsx
-import { headers } from "next/headers";
+## ขอบเขตและการย้อนกลับ
 
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
-```
-
-## Optional Dispatch-Owned ChatGPT Sign-In
-
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
-
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
-
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
-
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
-
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
-
-## Useful Commands
-
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
-
-## Learn More
-
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+ไม่มีการ deploy/publish/rollback เปลี่ยนโดเมน เปลี่ยน webhook หรือแก้ฐานข้อมูลจริง การย้อนงานย้ายนี้ไม่ต้องย้อนเว็บจริง ต้นฉบับ Sites และโค้ด local เดิมยังอยู่ครบ อย่าเชื่อมระบบปล่อยเว็บอัตโนมัติหรือเรียก migration กับฐานจริงโดยอาศัยคู่มือนี้

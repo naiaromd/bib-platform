@@ -1,0 +1,31 @@
+{
+  "project_id": "appgprj_6a64159e1b048191918737d8e872ef18",
+  "owner": "Sunai / Nine",
+  "artifact_id": "bib-platform-sanitised-github-export-20261113",
+  "class": "SANITISED_SOURCE_ARCHIVE",
+  "version": "1.0",
+  "status": "VALIDATION_PENDING",
+  "source": "Owner authorised Sites/local Git export; 2026-11-13",
+  "current": true,
+  "supersedes": null,
+  "site_id": "appgprj_6a64159e1b048191918737d8e872ef18",
+  "repository": "https://github.com/naiaromd/bib-platform",
+  "branch": "saved-v56",
+  "original_source_commit": "5c7e813e3f655c583ada024666778823f368c532",
+  "sanitised_source_commit": "f46808dd093fb80380104ec4d51271ab0055447c",
+  "source_commit_count": 59,
+  "source_relationship": "Privacy-sanitised archive; original Sites editing and Production pointers unchanged",
+  "commit_map": "migration/commit-map.csv",
+  "omissions": "migration/OMISSIONS_TH.md",
+  "environment_names": [
+    "BIB_DEMO_ACCESS_PIN",
+    "BIB_DEMO_CLIENT_TOKEN",
+    "BIB_DEMO_APPROVER_TOKEN",
+    "BIB_DEMO_INTERNAL_TOKEN",
+    "SITE_OWNER_USER_ID",
+    "SITE_OWNER_EMAIL"
+  ],
+  "production_unchanged": true,
+  "release_approval": null,
+  "rollback": "Discard the new archive if necessary; original Sites and local source remain unchanged. No production rollback required."
+}
