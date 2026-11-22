@@ -1,0 +1,25 @@
+name = "bib-platform"
+compatibility_date = "2024-11-06"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".vercel/output/static"
+
+# === Cloudflare Pages deploy ===
+# After the first Pages project is created, Cloudflare dashboard overrides most of this.
+# This file is a reference for local `wrangler pages dev` and for setting vars from CLI.
+#
+# To deploy from CLI (after `wrangler login`):
+#   npm run pages:deploy
+#
+# Secrets (set via Cloudflare dashboard → Pages → Settings → Environment variables, not here):
+#   AIRTABLE_TOKEN
+#
+# Public vars (safe to commit here if needed, but prefer dashboard):
+#   NEXT_PUBLIC_SITE_URL
+#   NEXT_PUBLIC_NOINDEX
+#   NEXT_PUBLIC_SHOW_* flags
+
+[env.preview]
+# preview branch deploys — flags stay default-OFF
+
+[env.production]
+# production deploy — same defaults, flip flags via dashboard when Nine approves

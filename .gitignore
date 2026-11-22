@@ -13,10 +13,22 @@
 # testing
 /coverage
 
-# next.js
+# next.js / cloudflare next-on-pages
 /.next/
-/.vinext/
+/.vercel/
 /out/
+/.open-next/
+/.wrangler/
+
+# cloudflare
+.dev.vars
+wrangler.log
+.wrangler/
+
+# env
+.env
+.env.local
+.env.*.local
 
 # misc
 .DS_Store
@@ -28,24 +40,6 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
 # typescript
-next-env.d.ts
 *.tsbuildinfo
-/dist/
-/.wrangler/
-/outputs/
-/work/
-
-# Privacy-safe local configuration
-!.env.example
-.dev.vars
-.dev.vars.*
-*.sqlite
-*.sqlite3
-*.db
+next-env.d.ts

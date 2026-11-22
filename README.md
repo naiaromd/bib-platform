@@ -1,67 +1,89 @@
-# bib-platform · สำเนาโค้ด BIB สำหรับทำงานต่อ
+# BIB × icoone · SEE THE UNSEEN
 
-คลัง private ของไนน์ ย้ายเมื่อ 13 พฤศจิกายน 2026 หลังลบค่าลับ ข้อมูลส่วนบุคคล และเอกสารสัญญาออกจากประวัติ เว็บจริงไม่เปลี่ยน
+เว็บ B2B สำหรับคลินิก · icoone® Laser Med · ตัวแทนจำหน่ายในประเทศไทยคือ BIB (Beauty Innovation & Beyond)
 
-`main` = รุ่น 55 ที่เผยแพร่แล้วใน Sites; `saved-v56` = รุ่น 56 ที่บันทึกแต่ยังไม่เผยแพร่
+> สาขานี้ `see-the-unseen-r03` คือการเขียนใหม่จาก prototype r03 ที่อยู่ใน `../landing-r03/BIB-handoff_r03`. สาขา `main` และ `saved-v56` เก็บโค้ด BIB Platform เดิม (ย้ายจาก chatgpt.site เมื่อ 13 พ.ย. 2026) ไว้ครบ ไม่ถูกแตะ
 
-สาขาปัจจุบัน `main` อ้างอิงต้นทาง `6a532c656c9820a6f1f6c337772b3326fcfc2116`; ตารางเทียบทุก commit อยู่ที่ [migration/commit-map.csv](migration/commit-map.csv) และ [รายการสิ่งที่เว้นไว้](migration/OMISSIONS_TH.md)
+## สถานะตอนนี้
 
-## โฟลเดอร์สำคัญ
+- ✅ หน้าแรก (Landing) · พร้อม hero interactive · video · handpieces · 40 programs · evidence · footer
+- 🟡 Explorer · เป็น placeholder ที่รับ state จาก hero ได้แล้ว · เวอร์ชันเต็ม (4 ขั้น + animation + form) ลงใน commit ถัดไป
+- ✅ API `/api/submit` · เขียนลง Airtable Web Leads + Explorer Drafts (ต้องใส่ `AIRTABLE_TOKEN` ก่อนใช้งานจริง)
+- ⏳ API สำหรับ booking (Demo Slots · Workshops) ยังไม่ทำ · รอ confirm flow กับทีม
+- ⏳ Mechanism page · อาจทำหลัง Explorer
 
-- `app/` หน้าเว็บและจุดรับส่งข้อมูลของเว็บ
-- `lib/` กติกาใช้งาน การตรวจสิทธิ์ และส่วนทำงานร่วมกัน
-- `db/schema.ts` โครงสร้างข้อมูล; `drizzle/` ลำดับการปรับโครงสร้างฐานข้อมูล
-- `public/` รูป โลโก้ และฟอนต์ที่อยู่ในโค้ด โดยไม่รวมสัญญา
-- `worker/`, `build/`, `vite.config.ts`, `.openai/hosting.json` ส่วนรันบน Cloudflare และข้อมูลอ้างอิง Sites เดิม
-- `tests/` ชุดตรวจเดิม; `scripts/setup-local-db.mjs` ตั้งฐานข้อมูลจำลองเฉพาะเครื่อง
-- `migration/` หลักฐานการย้าย รายการที่เว้นไว้ และทะเบียนของชุดส่งออกนี้ ไม่ใช่ทะเบียนเผยแพร่เว็บจริง
+## สิ่งที่พี่ไนน์ต้องทำเอง (ผมทำแทนไม่ได้)
 
-## วิธีรันในเครื่อง
+| # | ขั้น | ที่ไหน | หมายเหตุ |
+|---|---|---|---|
+| 1 | Cloudflare Pages · สร้าง project ใหม่ | dash.cloudflare.com → Workers & Pages → Create · เชื่อมกับ GitHub repo `naiaromd/bib-platform` · branch `see-the-unseen-r03` | ใช้ build command `npm run pages:build` · output `.vercel/output/static` |
+| 2 | ตั้ง env var `AIRTABLE_TOKEN` | Cloudflare dashboard → Pages project → Settings → Environment variables | ห้ามใส่ใน code หรือ commit · value ของพี่ไนน์เอง |
+| 3 | DNS record สำหรับ subdomain | Cloudflare dashboard → wiseofwellness.com → DNS → เพิ่ม CNAME `bib` → Cloudflare Pages project | หลังเพิ่ม DNS เสร็จ ผมจะเปิดใช้ Custom Domain ใน Pages project |
+| 4 | เปิด content flag ทีละอัน (ตอน soft launch) | Cloudflare dashboard → Pages → Settings → Environment variables | ดูรายการใน `.env.example` · default = OFF ทุกตัว |
 
-ต้องมี Node.js ตั้งแต่ 22.13.0 ขึ้นไป และ npm ใช้บัญชี GitHub ที่เข้าคลัง private นี้ได้
+## รัน local
 
-```sh
-git clone https://github.com/naiaromd/bib-platform.git
-cd bib-platform
-npm ci
-npm run db:local:init
-npm run dev -- --hostname 127.0.0.1 --port 5173
+```bash
+npm install
+cp .env.example .env.local
+# ใส่ค่า AIRTABLE_TOKEN ของพี่ลงใน .env.local
+npm run dev
 ```
 
-เปิด http://127.0.0.1:5173 หลังเริ่มสำเร็จ ใช้ฐานจำลองว่างใน `.wrangler/state` เท่านั้น `db:local:init` ใช้ครั้งแรกกับฐานใหม่; หากรันซ้ำบนฐานเดิม คำสั่งเพิ่มคอลัมน์อาจแจ้งว่ามีอยู่แล้ว
+เปิด http://localhost:3000
 
-สำหรับค่าตั้งเฉพาะเครื่อง ให้คัดลอก `.env.example` เป็น `.dev.vars` แล้วใส่ค่าของเครื่องนั้นเอง ไฟล์นี้ถูกกันไม่ให้เข้า Git แล้ว ไม่ต้องใส่ค่าจริงเพื่อเปิดหน้าสาธารณะหรือ build
+## Deploy ไป Cloudflare Pages (คำสั่ง · ถ้าพี่อยาก deploy จาก terminal)
 
-การทดลองเข้าสู่ระบบต้องกำหนด PIN และ token ทั้งสี่ชื่อด้วยค่าท้องถิ่นที่สร้างใหม่เอง โค้ดหยุดการเข้าใช้งานเมื่อไม่ได้กำหนดค่าที่จำเป็น ค่าทดสอบต้องไม่ใช้ซ้ำกับระบบจริง
-
-การย้ายนี้ทำให้เปิดหน้าเว็บและทำงานกับโค้ดได้ แต่ไม่มีฐานลูกค้าจริง สัญญา ไฟล์อัปโหลด หรือบัญชีผู้ใช้จริงตามมาด้วย บางหน้าที่ต้องยืนยันตัวตนหรือมีข้อมูลจะยังไม่ทำงานครบจากการ clone เพียงอย่างเดียว
-
-## วิธี build และตรวจ
-
-```sh
-npm run build
-node --test tests/rendered-html.test.mjs
+```bash
+npx wrangler login
+npm run pages:deploy
 ```
 
-ผล build อยู่ใน `dist/` ไม่ต้องอัปโหลดขึ้น Git ไม่มีคำสั่ง deploy อัตโนมัติในชุดนี้
+## โครงสร้างไฟล์
 
-## เว็บจริงและฐานข้อมูลอยู่ที่ไหน
+```
+bib-platform/
+├── app/                     Next.js App Router
+│   ├── layout.tsx           root layout · โหลด font
+│   ├── globals.css          design tokens + Tailwind
+│   ├── page.tsx             Landing (ประกอบจาก _components/landing/)
+│   ├── _components/landing/ Header · Hero · Technology · Handpieces · Programs · Evidence · Trust · Clinics · Contact
+│   ├── explorer/            /explorer route (placeholder)
+│   └── api/submit/          Airtable Web Leads + Explorer Drafts (server · edge runtime)
+├── lib/                     data + helpers (shared ระหว่าง Landing และ Explorer)
+│   ├── areas.ts             7 บริเวณ · 31 โจทย์ · hotspot coords
+│   ├── programs.ts          40 programs จัดกลุ่ม Base/Focus/Healthcare
+│   ├── handpieces.ts        4 หัว · ppm · light=RS only
+│   ├── assets.ts            map ไอคอน/รูปไปที่ /public/assets
+│   └── env.ts               flag + Airtable form fallback + SITE_URL
+├── public/assets/           46 PNG + 6 JPG + 1 MP4 (video Roboderm)
+├── wrangler.toml            Cloudflare Pages config
+├── .env.example             ตัวอย่าง env (copy ไป .env.local)
+├── next.config.mjs
+├── tsconfig.json
+├── postcss.config.mjs
+└── package.json             Next 15 · React 19 · Tailwind 4 · @cloudflare/next-on-pages
+```
 
-เว็บเดิมอยู่ที่ https://bib.wiseofwellness.com/platform โฮสต์ด้วย ChatGPT Sites / Cloudflare Workers หมายเลข Site `appgprj_6a64159e1b048191918737d8e872ef18`
+## Content flags (default OFF)
 
-ฐานจริงเป็น Cloudflare D1 ที่ Sites ผูกชื่อ `DB` และคลังไฟล์ R2 ชื่อ `FILES` หมายเลขฐานจริงและบัญชี Cloudflare ผู้ให้บริการไม่ได้อยู่ในโค้ด จึงไม่ได้อ้างว่าย้ายฐานมาแล้ว การยืนยันตัวตนและการตั้งโดเมนของ Sites ต้องจัดเตรียมแยกหากจะย้ายโฮสต์ในอนาคต
+ทั้งหมดอ่านจาก env var · เปลี่ยนใน Cloudflare dashboard ไม่ต้อง deploy ใหม่
 
-## ตัวแปรที่ต้องเตรียม — ชื่อเท่านั้น
+- `NEXT_PUBLIC_SHOW_CLIENT_LOGOS` · SHA · Dior · Clinique La Prairie ฯลฯ (ต้องขอ permission)
+- `NEXT_PUBLIC_SHOW_GLOBAL_STATS` · 4,500+ ศูนย์ · 6,000,000+ ทรีตเมนต์ (ต้องมีแหล่งอ้างอิง)
+- `NEXT_PUBLIC_SHOW_AWARDS` · 3 รางวัล
+- `NEXT_PUBLIC_SHOW_FDA_BADGE` · CE 0476 · CE-MDR · FDA K211272
+- `NEXT_PUBLIC_SHOW_STUDY_TABLE_DETAILS` · ลิงก์ paper
+- `NEXT_PUBLIC_SHOW_PILOT_OFFER` · 5-Case Pilot
+- `NEXT_PUBLIC_SHOW_REAL_QR` · QR LINE OA (ยังไม่มี OA)
+- `NEXT_PUBLIC_NOINDEX` · ป้องกัน Google index ขณะ test (เปลี่ยนเป็น `false` ตอน launch)
 
-- `BIB_DEMO_ACCESS_PIN`
-- `BIB_DEMO_CLIENT_TOKEN`
-- `BIB_DEMO_APPROVER_TOKEN`
-- `BIB_DEMO_INTERNAL_TOKEN`
-- `SITE_OWNER_USER_ID`
-- `SITE_OWNER_EMAIL`
+## คำถามที่ยังค้าง (ต้องตัดสินใจก่อน launch)
 
-ดูไฟล์ `.env.example` ซึ่งไม่มีค่า ตัวแปรบางชื่อเป็นตัวตั้งสิทธิ์หรือสวิตช์การทำงาน ไม่ใช่รหัสลับ แต่ต้องไม่ใส่ข้อมูลบุคคลจริงลงใน Git
+ดู audit §06 ใน artifact — 8 ข้อ
 
-## ขอบเขตและการย้อนกลับ
+## ที่มาของข้อมูล
 
-ไม่มีการ deploy/publish/rollback เปลี่ยนโดเมน เปลี่ยน webhook หรือแก้ฐานข้อมูลจริง การย้อนงานย้ายนี้ไม่ต้องย้อนเว็บจริง ต้นฉบับ Sites และโค้ด local เดิมยังอยู่ครบ อย่าเชื่อมระบบปล่อยเว็บอัตโนมัติหรือเรียก migration กับฐานจริงโดยอาศัยคู่มือนี้
+- Programs · Protocol Templates · Template Steps → Airtable base `BIB Precision Lab` (`app2HcsMi1mmqTLJi`) อ่าน 22 Nov 2026
+- Prototype → `../landing-r03/BIB-handoff_r03/prototypes/`
+- Spec → `../landing-r03/BIB-handoff_r03/docs/AIRTABLE_LEADS_BOOKING_SPEC.md`
