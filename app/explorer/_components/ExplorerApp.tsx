@@ -1,96 +1,285 @@
 "use client";
 
-// Placeholder — full 4-stage Explorer lands in a follow-up commit.
-// Reads the optional state hand-off from the Landing hero: ?g=m&v=front&area=arms&k=0
-
-import Image from "next/image";
-import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { AREAS, AreaId } from "@/lib/areas";
-import { LOGO_LIGHT } from "@/lib/assets";
+import { AREAS, AreaId, FRONT_IDS_WITH_WHOLE, BACK_IDS_WITH_WHOLE } from "@/lib/areas";
+import { PROGRAM_AIRTABLE_ID } from "@/lib/programs";
+import { HANDPIECES, HandpieceKey } from "@/lib/handpieces";
+import { buildBlueprint, computeLeadTier } from "@/lib/blueprint";
+import StageNav from "./StageNav";
+import Stage1Context from "./Stage1Context";
+import Stage2Body from "./Stage2Body";
+import Stage3Handpiece from "./Stage3Handpiece";
+import Stage4Blueprint from "./Stage4Blueprint";
+import {
+  Course,
+  ExplorerState,
+  FormState,
+  Gender,
+  Stage,
+  View,
+  CONTEXT_OPTIONS,
+} from "./types";
+
+const EMPTY_FORM: FormState = {
+  name: "",
+  license: "",
+  clinic: "",
+  province: "",
+  volume: "31–80",
+  phone: "",
+  line: "",
+  consent: false,
+  mkt: false,
+};
 
 export default function ExplorerApp() {
   const sp = useSearchParams();
-  const g = (sp.get("g") === "m" ? "ชาย" : "หญิง");
-  const v = (sp.get("v") === "back" ? "ด้านหลัง" : "ด้านหน้า");
-  const areaKey = (sp.get("area") || "arms") as AreaId;
-  const k = Math.max(0, parseInt(sp.get("k") || "0", 10) || 0);
-  const area = AREAS[areaKey] ?? AREAS.arms;
-  const concern = area.k[Math.min(k, area.k.length - 1)];
+
+  const [s, setS] = useState<ExplorerState>(() => {
+    const g = (sp.get("g") === "m" ? "m" : "f") as Gender;
+    const v = (sp.get("v") === "back" ? "back" : "front") as View;
+    const areaParam = sp.get("area") as AreaId | null;
+    const ids = v === "front" ? FRONT_IDS_WITH_WHOLE : BACK_IDS_WITH_WHOLE;
+    const area: AreaId = areaParam && ids.includes(areaParam) ? areaParam : "arms";
+    const k = Math.max(0, parseInt(sp.get("k") || "0", 10) || 0);
+    const initialPick = `${area}:${Math.min(k, AREAS[area].k.length - 1)}`;
+    return {
+      stage: sp.get("area") ? 2 : 1,
+      ctx: { body: true },
+      view: v,
+      gender: g,
+      area,
+      picked: { [initialPick]: true },
+      draft: {},
+      hp: "RS",
+      suc: 50,
+      led: true,
+      las: false,
+      lock: null,
+      net: true,
+      playing: true,
+      ses: "5",
+      form: { ...EMPTY_FORM },
+      tried: false,
+      done: false,
+    };
+  });
+
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const patch = (p: Partial<ExplorerState>) => setS((prev) => ({ ...prev, ...p }));
+  const patchForm = (k: keyof FormState, v: string) =>
+    setS((prev) => ({ ...prev, form: { ...prev.form, [k]: v } }));
+  const patchFormBool = (k: "consent" | "mkt", v: boolean) =>
+    setS((prev) => ({ ...prev, form: { ...prev.form, [k]: v } }));
+
+  const toggleCtx = (key: string) =>
+    patch({ ctx: { ...s.ctx, [key]: !s.ctx[key] } });
+  const toggleConcern = (key: string) =>
+    patch({ picked: { ...s.picked, [key]: !s.picked[key] } });
+  const toggleDraft = (id: string) =>
+    patch({ draft: { ...s.draft, [id]: !s.draft[id] } });
+  const toggleLight = (which: "led" | "las") => {
+    if (!HANDPIECES[s.hp].hasLight) return;
+    patch({ [which]: !s[which] } as Partial<ExplorerState>);
+  };
+
+  const pickedKeys = useMemo(
+    () => Object.keys(s.picked).filter((k) => s.picked[k]),
+    [s.picked]
+  );
+
+  const sucLabel = s.suc < 34 ? "เบา" : s.suc < 67 ? "กลาง" : "แรง";
+  const okLight = HANDPIECES[s.hp].hasLight;
+  const lightText = !okLight
+    ? "ไม่มีแสงในหัวนี้"
+    : s.led || s.las
+      ? [s.led && "LED 650 nm", s.las && "Laser 915 nm"].filter(Boolean).join(" + ")
+      : "ไม่ใช้แสง";
+
+  const blueprint = useMemo(
+    () => buildBlueprint(pickedKeys, s.hp, s.ses),
+    [pickedKeys, s.hp, s.ses]
+  );
+
+  const sumCtx =
+    CONTEXT_OPTIONS.filter(([id]) => s.ctx[id])
+      .map(([, label]) => label)
+      .join(" · ") || "ยังไม่ได้เลือก";
+
+  const ctxChip =
+    (CONTEXT_OPTIONS.find(([id]) => s.ctx[id])?.[1] ?? "ทุกกลุ่ม") +
+    " · " +
+    AREAS[s.area].th;
+
+  const leadTier = computeLeadTier(s.ctx, pickedKeys.length);
+
+  const payload = useMemo(() => {
+    const draftIds = Object.keys(s.draft).filter((k) => s.draft[k]);
+    const concerns = pickedKeys.map((k) => {
+      const [ar, iStr] = k.split(":");
+      const area = AREAS[ar as AreaId];
+      const concern = area?.k[+iStr];
+      return {
+        key: k,
+        area: ar,
+        label: concern?.[0] ?? "",
+        programs: (concern?.[1] ?? []).map((name) => ({
+          name,
+          airtable_id: PROGRAM_AIRTABLE_ID[name] ?? "",
+        })),
+      };
+    });
+    return JSON.stringify(
+      {
+        blueprint_id: blueprint.id,
+        source: "explorer-r04",
+        lead: {
+          name: s.form.name,
+          license: s.form.license || null,
+          clinic: s.form.clinic,
+          province: s.form.province,
+          cases_per_month: s.form.volume,
+          phone: s.form.phone,
+          line_id: s.form.line,
+          consent_contact: s.form.consent,
+          consent_marketing: s.form.mkt,
+          lead_tier: leadTier,
+        },
+        clinic_context: CONTEXT_OPTIONS.filter(([id]) => s.ctx[id]).map((c) => c[0]),
+        concerns,
+        draft_programs: draftIds.map((id) => ({
+          name: id,
+          airtable_id: PROGRAM_AIRTABLE_ID[id] ?? "",
+        })),
+        handpiece: HANDPIECES[s.hp].name,
+        light: okLight ? { led: s.led, laser: s.las } : null,
+        suction_sim: sucLabel,
+        course: s.ses,
+        protocol_cards: blueprint.cards.map((c) => c.id),
+        no_card_concerns: blueprint.openConcerns,
+      },
+      null,
+      2
+    );
+  }, [blueprint, pickedKeys, s, leadTier, sucLabel, okLight]);
+
+  const canSubmit = () => {
+    const miss =
+      !s.form.name.trim() ||
+      !s.form.clinic.trim() ||
+      !s.form.province ||
+      (s.form.phone || "").replace(/\D/g, "").length < 9 ||
+      !s.form.line.trim();
+    return !miss && s.form.consent;
+  };
+
+  const submit = async () => {
+    if (!canSubmit()) {
+      patch({ tried: true });
+      return;
+    }
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await fetch("/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        setSubmitError(data.error || "ส่งข้อมูลไม่สำเร็จ · ลองอีกครั้ง");
+        return;
+      }
+      patch({ tried: false, done: true });
+    } catch (err) {
+      setSubmitError((err as Error).message || "network error");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Scroll top on stage change
+  useEffect(() => {
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [s.stage]);
 
   return (
-    <main className="min-h-screen">
-      <header className="border-b border-chalk">
-        <div className="lp-wrap flex items-center gap-7 h-[72px] md:h-[80px]">
-          <Link href="/" aria-label="กลับหน้าแรก BIB" className="flex items-center gap-3.5">
-            <Image src={LOGO_LIGHT} alt="BIB" width={160} height={44} className="h-10 md:h-11 w-auto" priority />
-            <span className="font-mono text-[12px] tracking-[0.14em] text-ink-2 hidden md:inline">
-              PRECISION LAB
-            </span>
-          </Link>
-          <nav className="flex-1 flex items-center justify-center gap-3.5 overflow-x-auto" aria-label="ขั้นตอน">
-            {["บริบทคลินิก", "โจทย์ที่สนใจ", "เลือกหัวและโปรแกรม", "สรุปแนวทาง"].map((label, i) => (
-              <span
-                key={label}
-                className={`h-[72px] md:h-20 flex items-center gap-1.5 border-b-2 px-0.5 text-[14.5px] font-mono whitespace-nowrap ${
-                  i === 1 ? "border-rose text-ink font-semibold" : "border-transparent text-muted"
-                }`}
-              >
-                <span className="font-mono text-[12.5px]">0{i + 1}</span>
-                <span className="font-body">{label}</span>
-              </span>
-            ))}
-          </nav>
-          <span className="hidden lg:inline font-mono text-[12px] tracking-[0.18em]">
-            SEE THE UNSEEN
-          </span>
-        </div>
-      </header>
-
-      <div className="lp-wrap py-16">
-        <p className="font-mono text-[12px] tracking-[0.14em] uppercase text-muted">
-          02 · โจทย์ที่สนใจ
-        </p>
-        <h1 className="mt-4 font-display text-[40px] md:text-[48px] leading-[1.1] font-semibold max-w-3xl">
-          Explorer กำลังสร้าง · ตอนนี้โชว์ state ที่ได้มาจาก Landing
-        </h1>
-
-        <div className="mt-10 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-x-6 gap-y-3 border-t border-chalk pt-6 max-w-3xl">
-          <div className="font-mono text-[12.5px] uppercase tracking-[0.08em] text-muted">เพศหุ่น</div>
-          <div className="text-[16px]">{g}</div>
-
-          <div className="font-mono text-[12.5px] uppercase tracking-[0.08em] text-muted">มุมมอง</div>
-          <div className="text-[16px]">{v}</div>
-
-          <div className="font-mono text-[12.5px] uppercase tracking-[0.08em] text-muted">บริเวณ</div>
-          <div className="text-[16px]">
-            {area.th} <span className="font-mono text-[13px] text-ink-2">· {area.en}</span>
-          </div>
-
-          <div className="font-mono text-[12.5px] uppercase tracking-[0.08em] text-muted">โจทย์ที่เลือก</div>
-          <div className="text-[16px]">
-            {concern?.[0]}{" "}
-            <span className="font-mono text-[13px] text-ink-2">
-              · {concern?.[1].join(" · ")}
-            </span>
-          </div>
-        </div>
-
-        <div className="mt-10 p-5 rounded-xl border border-line bg-paper max-w-3xl text-[14.5px] text-ink-2 leading-[1.6]">
-          <b className="text-ink">ยังไม่ใช่เวอร์ชันเต็ม</b> — Explorer ของจริงมี 4 ขั้น,
-          หุ่น interactive, animation ใต้ผิว, Protocol cards จาก Airtable และ form สมัคร
-          Pilot · ตามแผนที่ร่างไว้ใน audit (§01–§07) · ลงใน commit ถัดไป
-        </div>
-
-        <div className="mt-8">
-          <Link
-            href="/"
-            className="inline-flex items-center min-h-[48px] px-5 rounded-full border border-ink text-ink hover:bg-ink hover:text-bg transition-colors"
-          >
-            ← กลับหน้าแรก
-          </Link>
-        </div>
-      </div>
-    </main>
+    <>
+      <StageNav stage={s.stage} onGo={(st) => patch({ stage: st })} />
+      <main className="lp-wrap pb-20 pt-9">
+        {s.stage === 1 && (
+          <Stage1Context
+            ctx={s.ctx}
+            onToggle={toggleCtx}
+            onNext={() => patch({ stage: 2 })}
+          />
+        )}
+        {s.stage === 2 && (
+          <Stage2Body
+            gender={s.gender}
+            view={s.view}
+            area={s.area}
+            picked={s.picked}
+            onGender={(g) => patch({ gender: g })}
+            onView={(v) => patch({ view: v, area: v === "front" ? "arms" : "upper" })}
+            onArea={(id) => patch({ area: id })}
+            onToggleConcern={toggleConcern}
+            onNext={() => patch({ stage: 3 })}
+          />
+        )}
+        {s.stage === 3 && (
+          <Stage3Handpiece
+            ctxLabel={ctxChip}
+            hp={s.hp}
+            suc={s.suc}
+            led={s.led}
+            las={s.las}
+            lockStep={s.lock}
+            showNet={s.net}
+            picked={s.picked}
+            draft={s.draft}
+            onHp={(k: HandpieceKey) => patch({ hp: k })}
+            onSuc={(v) => patch({ suc: v })}
+            onToggleLight={toggleLight}
+            onLockStep={(i) => patch({ lock: i })}
+            onToggleNet={() => patch({ net: !s.net })}
+            onToggleDraft={toggleDraft}
+            onNext={() => patch({ stage: 4 })}
+          />
+        )}
+        {s.stage === 4 && (
+          <>
+            <Stage4Blueprint
+              blueprint={blueprint}
+              sumCtx={sumCtx}
+              pickedKeys={pickedKeys}
+              hp={s.hp}
+              sucLabel={sucLabel}
+              lightText={lightText}
+              course={s.ses}
+              form={s.form}
+              tried={s.tried}
+              done={s.done}
+              payload={payload}
+              onCourse={(c: Course) => patch({ ses: c })}
+              onFormChange={patchForm}
+              onFormBool={patchFormBool}
+              onSubmit={submit}
+              onEdit={() => patch({ done: false })}
+            />
+            {submitting && (
+              <p className="mt-4 text-sm text-ink-2">กำลังส่ง...</p>
+            )}
+            {submitError && (
+              <p className="mt-4 text-sm text-bad">{submitError}</p>
+            )}
+          </>
+        )}
+      </main>
+    </>
   );
 }
