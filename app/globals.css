@@ -1,7 +1,9 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
-  /* === BIB design tokens === */
+/* === BIB design tokens (duplicate of tailwind.config for CSS-only use) === */
+:root {
   --color-bg: #F4EFE5;
   --color-paper: #FAF7F1;
   --color-card: #FFFFFF;
@@ -20,10 +22,7 @@
   --color-good: #5E7F5C;
   --color-warn: #B07E42;
   --color-bad: #8C3A2A;
-
-  --font-display: var(--font-display), Georgia, serif;
-  --font-body: var(--font-body), system-ui, sans-serif;
-  --font-mono: var(--font-mono), system-ui, sans-serif;
+  --color-bad-soft: #F6E3DE;
 }
 
 * {
@@ -36,7 +35,7 @@ body {
   padding: 0;
   background: var(--color-bg);
   color: var(--color-ink);
-  font-family: var(--font-body);
+  font-family: var(--font-body), system-ui, sans-serif;
   font-size: 16px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
@@ -57,13 +56,11 @@ img {
   display: block;
 }
 
-/* Thai text: never letter-spacing */
 :lang(th),
 [lang="th"] {
   letter-spacing: 0;
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,
@@ -75,7 +72,6 @@ img {
   }
 }
 
-/* Utility: wrap */
 .lp-wrap {
   max-width: 1280px;
   margin: 0 auto;
@@ -90,7 +86,6 @@ img {
   }
 }
 
-/* Focus ring */
 :focus-visible {
   outline: 2px solid var(--color-rose);
   outline-offset: 2px;
