@@ -13,7 +13,13 @@ export default function Thanks() {
   }, []);
   return (
     <main className="mx-auto max-w-[640px] px-4 py-16 text-center">
-      <p className="m-0 text-sm text-muted">icoone Laser Med</p>
+      <div className="mb-4 flex items-center justify-center gap-3">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/assets/brand/bib-logo.png" alt="BIB · Beauty Innovation & Beyond" className="h-12 w-auto" />
+        <span aria-hidden className="h-7 w-px bg-chalk" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/assets/brand/icoone-laser-med-logo.png" alt="icoone Laser Med" className="h-8 w-auto" />
+      </div>
       <h1 className="mb-3 mt-1 text-3xl font-semibold leading-tight text-ink">ได้รับข้อมูลแล้ว ขอบคุณครับ</h1>
       <p className="m-0 text-ink-2">{line ? "ทีมจะติดต่อกลับทาง LINE ตามไอดี LINE ที่ให้ไว้" : "ทีมจะติดต่อกลับตามเบอร์โทรที่ให้ไว้"}</p>
       {ref ? (

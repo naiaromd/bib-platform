@@ -42,7 +42,13 @@ export default function BodyMapApp({ data }: { data: BodyMapData }) {
     <main className="mx-auto w-full max-w-[1280px] overflow-x-hidden px-4 pb-24 pt-4 lg:pb-8 lg:pt-8 md:px-8">
       <header className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
-          <p className="m-0 text-sm text-muted">icoone Laser Med</p>
+          <div className="mb-2 flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/brand/bib-logo.png" alt="BIB · Beauty Innovation & Beyond" className="h-10 w-auto md:h-12" />
+            <span aria-hidden className="h-7 w-px bg-chalk" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/brand/icoone-laser-med-logo.png" alt="icoone Laser Med" className="h-6 w-auto md:h-8" />
+          </div>
           <h1 className="m-0 text-xl font-semibold leading-tight text-ink md:text-3xl">เครื่องเดียว ดูแลได้ทั้งตัว · ปรับตามคนไข้แต่ละคน</h1>
         </div>
         {data.mode === "internal" ? (
