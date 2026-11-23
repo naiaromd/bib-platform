@@ -4,11 +4,11 @@ import { track } from "@/lib/bodymap/events";
 import type { BodyMapData } from "@/lib/bodymap/data";
 import { Row, Sheet, Status, Tag } from "./ui";
 
-/** แตะไอคอน → ย่อ (1 บรรทัด) · กด "ดูละเอียด" → ละเอียดจากคู่มือผู้ผลิต */
+/** แตะไอคอน → เห็นย่อ 1 บรรทัด + รายละเอียดกางไว้เลย (ไนน์สั่ง 23 พ.ย.) · กด "ซ่อนรายละเอียด" เพื่อพับ */
 export default function ProgramSheet({ id, data, onClose }: { id: string; data: BodyMapData; onClose: () => void }) {
-  const [detail, setDetail] = useState(false);
+  const [detail, setDetail] = useState(true);
   const p = data.programs.find((x) => x.id === id);
-  useEffect(() => { track("เปิด Program ย่อ", { program: id }); }, [id]);
+  useEffect(() => { track("เปิด Program ย่อ", { program: id }); track("เปิด Program ละเอียด", { program: id }); }, [id]);
   if (!p) return null;
   const internal = data.mode === "internal";
   const inTemplates = Array.from(new Set(data.templates.filter((t) => t.steps.some((s) => s.programId === id)).map((t) => t.nameTh || t.name)));
