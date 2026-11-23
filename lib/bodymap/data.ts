@@ -18,7 +18,7 @@ export type Concern = {
 export type Program = {
   id: string; name: string; group: string; effectTags: string; aim: string; exam: string; position: string;
   notes: string; defaultMinutes: number | null; headCompat: string; short: string; shortStatus: string;
-  ceMedical: string; locked: boolean; sourcePage: string;
+  ceMedical: string; locked: boolean; sourcePage: string; detail?: string;
 };
 export type TemplateStep = {
   range: string; phase: number; order: number; programId: string; minutes: number | null;
@@ -45,7 +45,7 @@ export type Evidence = {
   id: string; title: string; year: number | null; authors: string; categories: string[]; questions: QuestionKey[];
   relation: string; level: string; n: number | null; summary: string; direction: string; canSay: string;
   limits: string; url: string; reviewStatus: string; pains: string[]; programs: string[]; short: string;
-  rank: number[]; locked: boolean;
+  rank: number[]; locked: boolean; detail?: string; headline?: string;
 };
 export type Case = {
   id: string; topic: string; quality: string; pains: string[]; country: string; programs: string[];
@@ -53,12 +53,15 @@ export type Case = {
   result: string; measure: string; limits: string; nearestTemplate: string[]; reviewStatus: string;
   short: string; locked: boolean;
 };
+export type Insight = {
+  id: string; painId: string; course: 5 | 10; who: string; opportunity: string; proof: string; proofRef: string; status: string; locked: boolean;
+};
 export type FigurePoints = Record<string, Record<string, number[][]>>;
 export type BodyMapData = {
   mode: Mode;
   zones: Zone[]; figurePoints: FigurePoints; concerns: Concern[]; programs: Program[]; templates: Template[];
   bibProtocols: BibProtocol[]; patientSituations: PatientSituation[]; evidence: Evidence[]; cases: Case[];
-  evidenceByProgram: Record<string, string[]>;
+  evidenceByProgram: Record<string, string[]>; insights: Insight[];
 };
 
 type Raw = Omit<BodyMapData, "mode"> & { figurePoints: unknown };
@@ -67,6 +70,7 @@ const all = raw as unknown as Raw;
 /** โหมดนำเสนอ = เฉพาะแถวที่ติ๊ก 🔒 ทุกตาราง · โหมดภายใน = ทุกแถว */
 export function loadBodyMap(mode: Mode): BodyMapData {
   const base: BodyMapData = { ...(all as unknown as Omit<BodyMapData, "mode">), mode };
+  base.insights = base.insights ?? [];
   if (mode === "internal") return base;
   const keep = <T extends { locked: boolean }>(rows: T[]) => rows.filter((r) => r.locked);
   const programs = keep(base.programs);
@@ -88,7 +92,7 @@ export function loadBodyMap(mode: Mode): BodyMapData {
     psPrimary: c.psPrimary.filter((x) => sS.has(x)),
     psSecondary: c.psSecondary.filter((x) => sS.has(x)),
   }));
-  return { ...base, concerns, programs, templates, bibProtocols, evidence, cases, patientSituations: ps };
+  return { ...base, concerns, programs, templates, bibProtocols, evidence, cases, patientSituations: ps, insights: keep(base.insights) };
 }
 
 export function currentMode(): Mode {

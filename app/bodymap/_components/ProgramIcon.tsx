@@ -25,10 +25,10 @@ export default function ProgramIcon({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={icon} alt="" className="h-12 w-12 object-contain" />
         ) : (
-          <span className="font-mono text-[10px] text-ink">{program.id.slice(4)}</span>
+          <span className="text-[10px] text-ink">{program.id.slice(4)}</span>
         )}
       </span>
-      <span className="font-mono text-[10px] leading-tight text-ink">{program.name}</span>
+      <span className="text-[10px] leading-tight text-ink">{program.name}</span>
       {showMinutes ? (
         <span className="text-[11px] leading-none text-muted">{minutes != null ? `${minutes} นาที` : "— นาที"}</span>
       ) : null}

@@ -15,9 +15,9 @@ export function Status({ show, children }: { show: boolean; children: React.Reac
 }
 export function Row({ k, children }: { k: string; children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-[110px_1fr] gap-3 border-t border-line py-2 text-sm">
+    <div className="grid grid-cols-[96px_minmax(0,1fr)] gap-3 border-t border-line py-2 text-sm">
       <dt className="text-muted">{k}</dt>
-      <dd className="m-0 text-ink">{children}</dd>
+      <dd className="m-0 min-w-0 whitespace-pre-line break-words text-ink">{children}</dd>
     </div>
   );
 }
@@ -27,8 +27,8 @@ export function Sheet({ title, kicker, onClose, children }: { title: string; kic
       <div className="h-full w-full max-w-[460px] overflow-y-auto bg-paper p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
-            {kicker ? <p className="font-mono text-[11px] uppercase tracking-widest text-muted">{kicker}</p> : null}
-            <h3 className="font-display text-2xl leading-tight text-ink">{title}</h3>
+            {kicker ? <p className="text-[11px] text-muted">{kicker}</p> : null}
+            <h3 className="m-0 text-2xl font-semibold leading-tight text-ink">{title}</h3>
           </div>
           <button type="button" onClick={onClose} className="rounded-full border border-line px-3 py-1 text-sm text-ink-2 hover:border-ink">ปิด</button>
         </div>

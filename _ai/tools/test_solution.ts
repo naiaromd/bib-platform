@@ -1,6 +1,6 @@
 // ทดสอบ solution.ts กับข้อมูลจริง · รัน: npx tsx _ai/tools/test_solution.ts
 import { loadBodyMap } from "../../lib/bodymap/data";
-import { resolveSolutions, concernMatchesGoal, type Fit } from "../../lib/bodymap/solution";
+import { resolveSolutions, resolveAnswer, concernMatchesGoal, DEFAULT_FIT, type Fit } from "../../lib/bodymap/solution";
 const d = loadBodyMap("internal");
 const C = (id: string) => d.concerns.find((c) => c.id === id)!;
 let fail = 0;
@@ -32,6 +32,15 @@ const g = (goal: Fit["goal"]) => d.concerns.filter((c) => concernMatchesGoal(c, 
 console.log("เป้าหมาย → จำนวนปัญหาที่แสดง", { all: g(null), Toning: g("Toning"), Reshaping: g("Reshaping"), AntiAgeing: g("Anti-Ageing"), Drainage: g("Drainage"), Healthcare: g("Healthcare") });
 const p = loadBodyMap("present");
 ok("โหมดนำเสนอ: ไม่มีแถว 🔒 = ไม่มีข้อมูลหลุด", p.concerns.length + p.programs.length + p.evidence.length + p.cases.length === 0, null);
+// v004 ข้อ 0.2.2 · คำตอบเดียว
+const a5 = resolveAnswer(C("P23"), DEFAULT_FIT, d), a10 = resolveAnswer(C("P23"), { ...DEFAULT_FIT, course: 10 }, d);
+ok("คำตอบเดียว P23: หลัก = เมนู BIB · แผนคอร์ส 5 = PRO-CARD-019 · คอร์ส 10 = PRO-CARD-020", a5.primary?.layer === "bib" && a5.coursePlan?.id === "PRO-CARD-019" && a10.coursePlan?.id === "PRO-CARD-020", [a5.primary?.id, a5.coursePlan?.id, a10.coursePlan?.id]);
+const am = resolveAnswer(C("P01"), { ...DEFAULT_FIT, sex: "m" }, d);
+ok("คำตอบเดียว P01 ชาย: ไม่มีแผน Protocol ผู้ผลิต (Women) · เมนูที่ 2 อยู่ใต้ทางเลือกอื่น", am.coursePlan === null && am.hidden.length === 1 && am.alternatives.length === 1, [am.coursePlan?.id, am.alternatives.map((x) => x.id)]);
+const ap = resolveAnswer(C("P10"), DEFAULT_FIT, d);
+ok("คำตอบเดียว P10: โปรแกรมตรง ไม่มีทางเลือกอื่น", ap.primary?.layer === "program" && ap.alternatives.length === 0, ap.primary);
+ok("Insight: มี 1 ชิ้นต่อ ปัญหา × คอร์ส สำหรับปัญหาที่มีคำตอบ (84)", d.insights.length === 84 && new Set(d.insights.map((i) => i.painId + i.course)).size === 84, d.insights.length);
+ok("เนื้อหา: โปรแกรม 40 · หลักฐาน 64 · เคส 44 มีข้อความย่อครบ", d.programs.every((p) => p.short && p.detail) && d.evidence.every((e) => e.short && e.detail) && d.cases.every((c) => c.short), null);
 const sexChanges = d.concerns.filter((c) => resolveSolutions(c, { ...none, sex: "m" }, d).hidden.length > 0).map((c) => c.id);
 console.log("เพศชายเปลี่ยนผลใน", sexChanges.length, "ปัญหา:", sexChanges.join(" "));
 console.log(fail ? `FAILED ${fail}` : "ALL PASS"); process.exit(fail ? 1 : 0);

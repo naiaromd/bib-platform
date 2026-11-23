@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import type { BodyMapData, Case, Concern, Evidence, QuestionKey } from "@/lib/bodymap/data";
+import { track } from "@/lib/bodymap/events";
 import { Row, Status, Tag } from "./ui";
 
 const QUESTIONS: [QuestionKey, string][] = [
@@ -19,12 +20,19 @@ function PaperCard({ e, internal }: { e: Evidence; internal: boolean }) {
         <Status show={internal && !e.short}>รอเนื้อหาย่อ</Status>
         <Status show={internal && !e.locked}>{e.reviewStatus || "ร่าง"}</Status>
       </div>
+      {e.headline ? <p className="m-0 text-2xl font-semibold leading-tight text-ink">{e.headline}</p> : null}
       <p className="m-0 text-base leading-snug text-ink">{e.short || e.title}</p>
       <p className="m-0 mt-1 text-xs text-muted">{[e.authors, e.year].filter(Boolean).join(" · ")}{internal ? ` · ${e.id}` : ""}</p>
-      <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="mt-2 text-sm text-ink underline underline-offset-4">
+      <button type="button" onClick={() => { if (!open) track("เปิดหลักฐานละเอียด", { evidence: e.id }); setOpen(!open); }} aria-expanded={open} className="mt-2 text-sm text-ink underline underline-offset-4">
         {open ? "ซ่อนรายละเอียด" : "ดูการ์ดงานวิจัย"}
       </button>
       {open ? (
+        e.detail ? (
+          <div className="mt-2 border-t border-line pt-2 text-sm text-ink">
+            <p className="m-0 whitespace-pre-line break-words">{e.detail}</p>
+            {e.url ? <a href={e.url} target="_blank" rel="noreferrer" className="mt-1 inline-block break-all underline">เปิดงานวิจัยต้นฉบับ</a> : null}
+          </div>
+        ) : (
         <dl className="m-0 mt-2">
           <Row k="ชื่องาน">{e.title}</Row>
           <Row k="ใคร · ปี">{[e.authors, e.year].filter(Boolean).join(" · ") || "—"}</Row>
@@ -35,6 +43,7 @@ function PaperCard({ e, internal }: { e: Evidence; internal: boolean }) {
           <Row k="ข้อจำกัด">{e.limits || "—"}</Row>
           <Row k="ลิงก์">{e.url ? <a href={e.url} target="_blank" rel="noreferrer" className="break-all underline">{e.url}</a> : "—"}</Row>
         </dl>
+        )
       ) : null}
     </article>
   );
@@ -55,7 +64,7 @@ function CaseCard({ c, data }: { c: Case; data: BodyMapData }) {
       </div>
       <p className="m-0 text-base leading-snug text-ink">{c.short || c.result || c.topic}</p>
       <p className="m-0 mt-1 text-xs text-muted">{[c.topic, c.country].filter(Boolean).join(" · ")}{internal ? ` · ${c.id}` : ""}</p>
-      <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="mt-2 text-sm text-ink underline underline-offset-4">
+      <button type="button" onClick={() => { if (!open) track("เปิดหลักฐานละเอียด", { evidence: c.id }); setOpen(!open); }} aria-expanded={open} className="mt-2 text-sm text-ink underline underline-offset-4">
         {open ? "ซ่อนรายละเอียด" : "ดูรายละเอียดเคส"}
       </button>
       {open ? (
@@ -97,9 +106,9 @@ export default function EvidenceBlock({ concern, data }: { concern: Concern; dat
         {visible.map(([k, t]) => {
           const n = count(k);
           return (
-            <button key={k} type="button" role="tab" aria-selected={curKey === k} onClick={() => setQ(k)}
+            <button key={k} type="button" role="tab" aria-selected={curKey === k} onClick={() => { setQ(k); track("เปิดหลักฐานย่อ", { p: concern.id, note: t }); }}
               className={`rounded-full border px-3 py-1.5 text-sm transition ${curKey === k ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink-2 hover:border-ink"} ${n === 0 ? "opacity-40" : ""}`}>
-              {t} <span className="font-mono text-[11px]">{n}</span>
+              {t} <span className="text-[11px]">{n}</span>
             </button>
           );
         })}

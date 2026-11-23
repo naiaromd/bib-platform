@@ -1,20 +1,28 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { BodyMapData } from "@/lib/bodymap/data";
-import { concernMatchesGoal, type Fit } from "@/lib/bodymap/solution";
+import { setContext, track } from "@/lib/bodymap/events";
+import { concernMatchesGoal, DEFAULT_FIT, type Fit } from "@/lib/bodymap/solution";
 import AnswerPanel from "./_components/AnswerPanel";
 import BodyFigure, { type View } from "./_components/BodyFigure";
+import ConsentBar from "./_components/ConsentBar";
 import FitPanel from "./_components/FitPanel";
+import { headText, type HeadChoice } from "./_components/HandpiecePicker";
 import InsightDrawer from "./_components/InsightDrawer";
 import ProgramSheet from "./_components/ProgramSheet";
 
+const fitLabel = (f: Fit) => [f.sex === "f" ? "หญิง" : f.sex === "m" ? "ชาย" : "ไม่ระบุเพศ", f.goal ?? "ทุกเป้าหมาย", `คอร์ส ${f.course ?? 5}`].join(" · ");
+
 export default function BodyMapApp({ data }: { data: BodyMapData }) {
-  const [fit, setFit] = useState<Fit>({ sex: null, goal: null, course: null });
+  const [fit, setFitState] = useState<Fit>(DEFAULT_FIT);
   const [view, setView] = useState<View>("front");
   const [zoneId, setZoneId] = useState<string | null>(null);
   const [concernId, setConcernId] = useState<string | null>(null);
   const [programId, setProgramId] = useState<string | null>(null);
   const [insight, setInsight] = useState(false);
+  const [head, setHead] = useState<HeadChoice>({ hp: "RS", suc: 50, led: false, las: false });
+
+  useEffect(() => { setContext({ fit: fitLabel(DEFAULT_FIT), mode: data.mode === "internal" ? "ภายใน" : "นำเสนอ" }); track("เปิดหน้า"); }, [data.mode]);
 
   const shown = useMemo(() => data.concerns.filter((c) => concernMatchesGoal(c, fit.goal, data)), [data, fit.goal]);
   const counts = useMemo(() => {
@@ -26,31 +34,37 @@ export default function BodyMapApp({ data }: { data: BodyMapData }) {
   const inZone = zone ? shown.filter((c) => c.zones.includes(zone.id)) : [];
   const concern = inZone.find((c) => c.id === concernId) ?? null;
 
+  const setFit = (f: Fit) => { setFitState(f); setContext({ fit: fitLabel(f) }); track("เลือก Fit", { note: fitLabel(f) }); };
+  const changeHead = (h: HeadChoice) => { setHead(h); track("เลือกหัวเครื่อง", { p: concern?.id, note: headText(h) }); };
+
   return (
-    <main className="mx-auto max-w-[1280px] px-4 py-8 md:px-8">
+    <main className="mx-auto w-full max-w-[1280px] overflow-x-hidden px-4 pb-28 pt-8 md:px-8">
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="m-0 font-mono text-[11px] uppercase tracking-widest text-muted">icoone Laser Med · Body Map</p>
-          <h1 className="m-0 font-display text-3xl leading-tight text-ink md:text-4xl">เครื่องเดียว ดูแลได้ทั้งตัว · ปรับตามคนไข้แต่ละคน</h1>
+        <div className="min-w-0">
+          <p className="m-0 text-sm text-muted">icoone Laser Med · Body Map</p>
+          <h1 className="m-0 text-2xl font-semibold leading-tight text-ink md:text-4xl">เครื่องเดียว ดูแลได้ทั้งตัว · ปรับตามคนไข้แต่ละคน</h1>
         </div>
         {data.mode === "internal" ? (
           <span className="rounded-full border border-warn px-3 py-1 text-xs text-warn">โหมดภายใน · ข้อมูลร่าง ยังไม่ผ่านการตรวจ</span>
         ) : null}
       </header>
-      <div className="grid gap-6 lg:grid-cols-[250px_340px_1fr]">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[230px_300px_minmax(0,1fr)]">
         <FitPanel fit={fit} onChange={setFit} />
         <BodyFigure
-          sex={fit.sex ?? "f"} view={view} onView={setView} zones={data.zones} points={data.figurePoints}
-          counts={counts} active={zoneId}
-          onPick={(z) => { setZoneId(z); setConcernId(null); }}
+          sex={fit.sex ?? "f"} view={view} zones={data.zones} points={data.figurePoints} counts={counts} active={zoneId}
+          onView={(v) => { setView(v); track("หมุนรูป", { note: v === "front" ? "ด้านหน้า" : "ด้านหลัง" }); }}
+          onPick={(z) => { setZoneId(z); setConcernId(null); track("กดจุด", { z }); }}
         />
         <AnswerPanel
-          data={data} zone={zone} concerns={inZone} concern={concern} onConcern={setConcernId} fit={fit}
-          onProgram={setProgramId} onInsight={() => setInsight(true)}
+          data={data} zone={zone} concerns={inZone} concern={concern} fit={fit} head={head} onHead={changeHead}
+          onConcern={(id) => { setConcernId(id); track("เปิดปัญหา", { p: id, z: zoneId ?? undefined }); }}
+          onProgram={setProgramId}
+          onInsight={() => { setInsight(true); track("เปิด Insight", { p: concern?.id }); }}
         />
       </div>
       {programId ? <ProgramSheet key={programId} id={programId} data={data} onClose={() => setProgramId(null)} /> : null}
-      {insight && concern ? <InsightDrawer concern={concern} data={data} onClose={() => setInsight(false)} /> : null}
+      {insight && concern ? <InsightDrawer concern={concern} course={fit.course ?? 5} data={data} onClose={() => setInsight(false)} /> : null}
+      <ConsentBar onAnswer={(v) => { if (v === "yes") track("เปิดหน้า", { note: "ยอมรับการเก็บข้อมูล" }); }} />
     </main>
   );
 }

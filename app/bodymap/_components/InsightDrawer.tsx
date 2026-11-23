@@ -1,35 +1,26 @@
 "use client";
 import type { BodyMapData, Concern } from "@/lib/bodymap/data";
-import { Row, Sheet, Status, Tag } from "./ui";
+import type { Course } from "@/lib/bodymap/solution";
+import { Sheet, Status, Tag } from "./ui";
 
-/** Insight = ชั้นลึก · สร้างจากกลุ่มคนไข้ที่มักมากับปัญหานี้ (จุดเริ่ม · สิ่งที่อยากได้ · สิ่งที่ไม่อยากเจอ) */
-export default function InsightDrawer({ concern, data, onClose }: { concern: Concern; data: BodyMapData; onClose: () => void }) {
+/** โอกาสของ Treatment นี้ · เตรียมไว้ล่วงหน้า 1 ชิ้นต่อ ปัญหา × คอร์ส (ไม่สร้างสดบนหน้า) */
+export default function InsightDrawer({ concern, course, data, onClose }: { concern: Concern; course: Course; data: BodyMapData; onClose: () => void }) {
   const internal = data.mode === "internal";
-  const pick = (ids: string[]) => ids.map((i) => data.patientSituations.find((p) => p.id === i)).filter(Boolean);
-  const groups: [string, ReturnType<typeof pick>][] = [["พบบ่อยที่สุด", pick(concern.psPrimary)], ["พบร่วมด้วย", pick(concern.psSecondary)]];
+  const it = data.insights.find((i) => i.painId === concern.id && i.course === course);
+  const parts: [string, string][] = it ? [["คนไข้กลุ่มไหนมาด้วยเรื่องนี้", it.who], ["โอกาสของคลินิก", it.opportunity], ["หลักฐานที่ใช้คุยกับคนไข้", it.proof]] : [];
   return (
-    <Sheet title={concern.label} kicker="Insight · คนไข้ที่มาด้วยปัญหานี้" onClose={onClose}>
-      <Status show={internal}>วัตถุดิบ Insight · ร่าง · รอเขียนเนื้อหาเต็ม</Status>
-      {groups.map(([title, list]) => list.length ? (
-        <section key={title} className="mt-5">
-          <h4 className="mb-2 text-sm text-muted">{title}</h4>
-          <div className="space-y-4">
-            {list.map((p) => p && (
-              <article key={p.id} className="rounded-xl border border-line bg-card p-4">
-                <div className="mb-1 flex items-center gap-2">
-                  <h5 className="m-0 text-base text-ink">{p.label}</h5>
-                  {internal ? <Tag>{p.id}</Tag> : null}
-                </div>
-                <dl className="m-0">
-                  <Row k="จุดเริ่ม">{p.trigger || "—"}</Row>
-                  <Row k="สิ่งที่อยากได้">{p.job || "—"}</Row>
-                  <Row k="สิ่งที่ไม่อยากเจอ">{p.avoid || "—"}</Row>
-                </dl>
-              </article>
-            ))}
-          </div>
+    <Sheet title={concern.label} kicker={`โอกาสของ Treatment นี้ · คอร์ส ${course} ครั้ง`} onClose={onClose}>
+      <div className="flex flex-wrap gap-1.5">
+        <Status show={internal && !!it && !it.locked}>ร่าง</Status>
+        {internal && it ? <Tag>{it.id}</Tag> : null}
+      </div>
+      {parts.filter(([, t]) => t).map(([h, t]) => (
+        <section key={h} className="mt-5">
+          <h4 className="mb-1 mt-0 text-sm font-normal text-muted">{h}</h4>
+          <p className="m-0 whitespace-pre-line text-base leading-relaxed text-ink">{t}</p>
         </section>
-      ) : null)}
+      ))}
+      {!it ? <Status show={internal}>ยังไม่มีเนื้อหาสำหรับปัญหานี้กับคอร์สนี้</Status> : null}
     </Sheet>
   );
 }

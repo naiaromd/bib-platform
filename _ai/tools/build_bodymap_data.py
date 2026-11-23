@@ -24,10 +24,11 @@ fig = json.load(open(os.path.join(CAN, "figure_points.json")))
 
 # ---------- programs (Airtable snapshot = ต้นทางรายละเอียด · CANON = ชื่อไทย/ตำแหน่ง)
 canp = {p["program_id"]: p for p in R("programs.csv")}
-SHORT = {}
-sp = os.path.join(ROOT, "_ai/content/program_short_doctor.csv")
-if os.path.exists(sp):
-    for r in csv.DictReader(open(sp, encoding="utf-8-sig")): SHORT[r["program_id"]] = r
+def content(f, k):
+    """เนื้อหาที่เขียนแล้ว (สำเนาของที่ลง Airtable สถานะร่าง) · ไม่มีไฟล์ = ช่องว่าง"""
+    p = os.path.join(ROOT, "_ai/content", f)
+    return {r[k]: r for r in csv.DictReader(open(p, encoding="utf-8-sig"))} if os.path.exists(p) else {}
+SHORT = content("programs_doctor.csv", "program_id"); EVC = content("evidence_doctor.csv", "evidence_id"); CAC = content("cases_doctor.csv", "case_id")
 programs = []
 for r in A("programs.json"):
     v = r["cellValuesByFieldId"]; pid = v["fldVsuhHbYugeVaOJ"]; c = canp.get(pid, {})
@@ -39,7 +40,7 @@ for r in A("programs.json"):
     programs.append({"id": pid, "name": v["fldke8dNLmkJg5LPG"], "group": sel(v.get("fldK8Q8ScUiejGjKv")) or "",
         "effectTags": v.get("fldutB9Fbjn6Y1qWF") or "", "aim": clean(v.get("fldNqjZU66Jvg7Fkt")), "exam": exam, "position": pos, "notes": notes,
         "defaultMinutes": v.get("fldVu3FROhL7OtWEy"), "headCompat": v.get("fldYf6InGtWCeO9bl") or "",
-        "short": s.get("short_doctor", ""), "shortStatus": s.get("status", ""),
+        "short": s.get("short_doctor", ""), "detail": s.get("detail_doctor", ""), "shortStatus": s.get("status", ""),
         "ceMedical": (c.get("ce_medical_0476") or "").strip(), "locked": bool(v.get("fldO624FM2RiMjL9i")),
         "sourcePage": v.get("fldxlgA3BPQvwLb6h") or ""})
 programs.sort(key=lambda p: p["id"])
@@ -98,7 +99,7 @@ for r in A("research_evidence.json"):
         "categories": cats, "questions": qs, "relation": rel, "level": lvl, "n": v.get("fldzUMpfCEF9jhdqF"), "summary": v.get("fldliHY0YWysAaBwB") or "",
         "direction": sel(v.get("fld7qanyMUHlZSLKw")) or "", "canSay": v.get("fldg0fUkC8HeuDBKv") or "", "limits": v.get("fldz2cFwMssUgWCXs") or "",
         "url": v.get("fldFibKJzjBNnExP8") or "", "reviewStatus": sel(v.get("fldrl4NM35ixParxG")) or "", "pains": P, "programs": G,
-        "short": v.get("fldewPNxxDVKO8af6") or "", "rank": [REL_RANK.get(rel, 9), LVL_RANK.get(lvl, 2)], "locked": bool(v.get("fldXCdw6WnLhzkT52"))})
+        "short": EVC.get(eid, {}).get("short_doctor", ""), "detail": EVC.get(eid, {}).get("detail_doctor", ""), "headline": EVC.get(eid, {}).get("headline_number", ""), "rank": [REL_RANK.get(rel, 9), LVL_RANK.get(lvl, 2)], "locked": bool(v.get("fldXCdw6WnLhzkT52"))})
     for p in P: ev_by_p[p].append(eid)
     for g in G: ev_by_prg[g].append(eid)
 evidence.sort(key=lambda e: (e["rank"], e["id"]))
@@ -118,7 +119,7 @@ for r in A("cases.json"):
         "sessions": v.get("fldM1EBwkSk0q3dRU"), "minutesPerSession": v.get("fld7zCxWRH2XKpyfD"), "frequency": v.get("fld2jURIAownntilu") or "",
         "goal": v.get("fld3i05RDLklOiJT9") or "", "result": v.get("flduNhV2uJIqE264g") or "", "measure": v.get("fldZiJqvDrz9LKD1a") or "",
         "limits": v.get("flddWlzeH4uT1tjCg") or "", "nearestTemplate": links(v.get("fld33aKEc3X0wR3R4")), "reviewStatus": sel(v.get("fldXiHWjyIW07o1hk")) or "",
-        "short": v.get("fldhWcExcnz1qOjZo") or "", "locked": bool(v.get("fldysmpoQCX4B6f4d"))})
+        "short": CAC.get(cid, {}).get("short_doctor", ""), "locked": bool(v.get("fldysmpoQCX4B6f4d"))})
     for p in P: case_by_p[p].append(cid)
 cases.sort(key=lambda c: ({"A": 0, "B": 1, "C": 2, "D": 3}.get(c["quality"], 9), c["id"]))
 
@@ -141,10 +142,16 @@ for c in R("concerns.csv"):
         "bibProtocols": mb[p], "template5": m["card_5_sessions"] or None, "template10": m["card_10_sessions"] or None, "templateMatch": m["match_status"],
         "programs": pl[p], "evidence": [e for e in ev_by_p[p]], "cases": case_by_p[p], "psPrimary": ps_pri[p], "psSecondary": ps_sec[p], "locked": False})
 
+insights = []
+ip = os.path.join(ROOT, "_ai/content/insights.csv")
+if os.path.exists(ip):
+    for r in csv.DictReader(open(ip, encoding="utf-8-sig")):
+        insights.append({"id": r["content_id"], "painId": r["pain_id"], "course": int(r["course"]), "who": r["who"], "opportunity": r["opportunity"],
+                         "proof": r["proof"], "proofRef": r["proof_ref"], "status": r["status"], "locked": False})
 data = {"meta": {"builtFrom": "CANON r03 + Airtable snapshot 2026-11-23 (อ่านอย่างเดียว)", "note": "ข้อมูลร่าง · ยังไม่มีแถวใดติ๊ก 🔒",
                  "skipped": {"evidence": dict(ev_skip), "cases": dict(case_skip)}},
         "zones": zones, "figurePoints": fig, "concerns": concerns, "programs": programs, "templates": templates, "bibProtocols": bib,
-        "patientSituations": ps, "evidence": evidence, "cases": cases, "evidenceByProgram": ev_by_prg}
+        "patientSituations": ps, "evidence": evidence, "cases": cases, "evidenceByProgram": ev_by_prg, "insights": insights}
 json.dump(data, open(OUT, "w", encoding="utf8"), ensure_ascii=False, separators=(",", ":"))
 print("wrote", OUT, os.path.getsize(OUT), "bytes")
 print({k: len(v) for k, v in data.items() if isinstance(v, list)}, "skipped", data["meta"]["skipped"])

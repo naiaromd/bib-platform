@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { track } from "@/lib/bodymap/events";
 import type { BodyMapData } from "@/lib/bodymap/data";
 import { Row, Sheet, Status, Tag } from "./ui";
 
@@ -7,6 +8,7 @@ import { Row, Sheet, Status, Tag } from "./ui";
 export default function ProgramSheet({ id, data, onClose }: { id: string; data: BodyMapData; onClose: () => void }) {
   const [detail, setDetail] = useState(false);
   const p = data.programs.find((x) => x.id === id);
+  useEffect(() => { track("เปิด Program ย่อ", { program: id }); }, [id]);
   if (!p) return null;
   const internal = data.mode === "internal";
   const inTemplates = data.templates.filter((t) => t.steps.some((s) => s.programId === id)).map((t) => t.name);
@@ -20,17 +22,21 @@ export default function ProgramSheet({ id, data, onClose }: { id: string; data: 
         <Status show={internal && !p.locked}>ร่าง · ยังไม่ติ๊ก 🔒</Status>
       </div>
       {p.short ? <p className="text-lg leading-snug text-ink">{p.short}</p> : <Status show={internal}>รอเนื้อหาย่อ 1 บรรทัด</Status>}
-      <button type="button" onClick={() => setDetail(!detail)} aria-expanded={detail} className="mt-4 rounded-full border border-ink px-4 py-1.5 text-sm text-ink hover:bg-ink hover:text-paper">
+      <button type="button" onClick={() => { if (!detail) track("เปิด Program ละเอียด", { program: id }); setDetail(!detail); }} aria-expanded={detail} className="mt-4 rounded-full border border-ink px-4 py-1.5 text-sm text-ink hover:bg-ink hover:text-paper">
         {detail ? "ซ่อนรายละเอียด" : "ดูละเอียด"}
       </button>
       {detail ? (
         <dl className="mt-4">
-          <Row k="เป้าหมายของโปรแกรม">{p.aim || "—"}</Row>
-          <Row k="เหมาะกับสภาพผิวแบบไหน">{p.exam || "—"}</Row>
-          <Row k="ท่าคนไข้">{p.position || "—"}</Row>
+          {p.detail ? <Row k="รายละเอียด">{p.detail}</Row> : (
+            <>
+              <Row k="เป้าหมายของโปรแกรม">{p.aim || "—"}</Row>
+              <Row k="เหมาะกับสภาพผิวแบบไหน">{p.exam || "—"}</Row>
+              <Row k="ท่าคนไข้">{p.position || "—"}</Row>
+              {p.notes ? <Row k="วิธีทำจากคู่มือ">{p.notes}</Row> : null}
+            </>
+          )}
           <Row k="หัวที่ใช้">เลือกตามบริเวณ</Row>
           <Row k="นาทีตั้งต้น">{p.defaultMinutes != null ? `${p.defaultMinutes} นาที` : "—"}</Row>
-          {p.notes ? <Row k="วิธีทำจากคู่มือ">{p.notes}</Row> : null}
           <Row k="อยู่ใน Protocol">
             {inBib.length + inTemplates.length === 0 ? "—" : (
               <span className="flex flex-wrap gap-1.5">
@@ -42,7 +48,7 @@ export default function ProgramSheet({ id, data, onClose }: { id: string; data: 
           <Row k="หลักฐานที่ผูก">
             {ev.length === 0 ? "—" : (
               <ul className="m-0 list-none space-y-1 p-0">
-                {ev.map((e) => e && <li key={e.id}><span className="font-mono text-[11px] text-muted">{e.id}</span> {e.title}</li>)}
+                {ev.map((e) => e && <li key={e.id}>{internal ? <span className="text-[11px] text-muted">{e.id} </span> : null}{e.short || e.title}</li>)}
               </ul>
             )}
           </Row>

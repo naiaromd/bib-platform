@@ -6,7 +6,9 @@ import type { BodyMapData, Concern, Template } from "./data";
 export type Sex = "f" | "m";
 export type Goal = "Toning" | "Reshaping" | "Anti-Ageing" | "Drainage" | "Healthcare";
 export type Course = 5 | 10;
+/** คอร์สมีค่าเสมอ (เริ่มต้น 5) · เพศ/เป้าหมาย ไม่เลือก = ไม่กรอง */
 export type Fit = { sex: Sex | null; goal: Goal | null; course: Course | null };
+export const DEFAULT_FIT: Fit = { sex: null, goal: null, course: 5 };
 
 export type Layer = "bib" | "template" | "program";
 export type SolutionStep = {
@@ -128,4 +130,21 @@ export function concernMatchesGoal(concern: Concern, goal: Goal | null, data: Bo
   if (goal === "Healthcare") return healthcare || fams.length === 0;
   if (fams.length === 0) return true;
   return fams.includes(goal);
+}
+
+/** คำตอบเดียวของหน้า (v004 ข้อ 0.2.2)
+ * primary = ตัวแรกตามลำดับ เมนู BIB → Protocol ผู้ผลิต → โปรแกรมตรง ที่เข้ากับ Fit
+ * coursePlan = Protocol ผู้ผลิตของคอร์สที่เลือก เมื่อ primary เป็นเมนู BIB (เมนูมีแต่นาทีรวม · แผนรายครั้งมาจากผู้ผลิต)
+ * alternatives = ตัวเลือกที่เหลือ ซ่อนไว้ใต้ "ดูทางเลือกอื่น" */
+export type Answer = { primary: Solution | null; coursePlan: Solution | null; alternatives: Solution[]; hidden: Resolved["hidden"] };
+export function resolveAnswer(concern: Concern, fit: Fit, data: BodyMapData): Answer {
+  const f: Fit = { ...fit, course: fit.course ?? 5 };
+  const { solutions, hidden } = resolveSolutions(concern, f, data);
+  const fam = (s: Solution) => !f.goal || f.goal === "Healthcare" || !s.family || s.family === f.goal;
+  const templates = solutions.filter((s) => s.layer === "template" && fam(s));
+  const rest = solutions.filter((s) => s.layer !== "template");
+  const primary = rest.find((s) => s.layer === "bib") ?? templates[0] ?? rest.find((s) => s.layer === "program") ?? null;
+  const coursePlan = primary?.layer === "bib" ? templates[0] ?? null : null;
+  const alternatives = solutions.filter((s) => s !== primary && s !== coursePlan && (s.layer !== "template" || fam(s)));
+  return { primary, coursePlan, alternatives, hidden };
 }

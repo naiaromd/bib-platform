@@ -15,8 +15,8 @@ export default function BodyFigure({
   const key = `${sex === "f" ? "female" : "male"}_${view}`;
   const pts = (points[key] ?? {}) as Record<string, number[][]>;
   return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="relative w-full max-w-[320px]">
+    <div className="flex min-w-0 flex-col items-center gap-3">
+      <div className="relative w-full max-w-[300px]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={view === "front" ? fig.front : fig.back} alt={view === "front" ? fig.altFront : fig.altBack} className="w-full select-none" draggable={false} />
         {zones.map((z) => {
@@ -30,7 +30,7 @@ export default function BodyFigure({
               aria-label={`${z.th} · ${count} ปัญหา`}
               aria-pressed={active === z.id}
               style={{ left: `${x}%`, top: `${y}%` }}
-              className={`absolute flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border font-mono text-[11px] transition ${
+              className={`absolute flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border text-[11px] transition ${
                 active === z.id ? "border-ink bg-ink text-paper scale-110" : count ? "border-rose bg-rose-soft text-ink hover:bg-rose hover:text-paper" : "border-line bg-paper/70 text-muted opacity-50"
               }`}
             >

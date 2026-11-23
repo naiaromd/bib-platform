@@ -7,47 +7,39 @@ const GOALS: [Goal, string][] = [
 
 function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button
-      type="button"
-      aria-pressed={on}
-      onClick={onClick}
-      className={`rounded-full border px-3 py-1.5 text-sm transition ${on ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink-2 hover:border-ink"}`}
-    >
+    <button type="button" aria-pressed={on} onClick={onClick}
+      className={`rounded-full border px-3 py-1.5 text-sm transition ${on ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink-2 hover:border-ink"}`}>
       {children}
     </button>
   );
 }
 
-/** Fit = 3 อย่างที่หมอปรับเองได้ · กดซ้ำ = ยกเลิก (ไม่เลือก = แสดงทั้งหมด) */
+/** 3 อย่างที่หมอปรับเองได้ · เพศ/เป้าหมาย กดซ้ำ = ยกเลิก · คอร์สมีค่าเสมอ (เริ่มที่ 5 ครั้ง) */
 export default function FitPanel({ fit, onChange }: { fit: Fit; onChange: (f: Fit) => void }) {
-  const tog = <K extends keyof Fit>(k: K, v: Fit[K]) => onChange({ ...fit, [k]: fit[k] === v ? null : v });
   return (
-    <aside className="space-y-5 rounded-2xl border border-line bg-paper p-5">
+    <aside className="min-w-0 space-y-4 rounded-2xl border border-line bg-paper p-5">
+      <h2 className="m-0 text-xl font-semibold text-ink">ปรับตามคนไข้</h2>
       <div>
-        <p className="font-mono text-[11px] uppercase tracking-widest text-muted">Fit</p>
-        <h2 className="font-display text-xl text-ink">ปรับให้ตรงกับคนไข้</h2>
-      </div>
-      <div>
-        <p className="mb-2 text-sm text-ink-2">เพศคนไข้</p>
+        <p className="mb-2 mt-0 text-sm text-ink-2">เพศคนไข้</p>
         <div className="flex flex-wrap gap-2">
           {([["f", "หญิง"], ["m", "ชาย"]] as [Sex, string][]).map(([v, t]) => (
-            <Chip key={v} on={fit.sex === v} onClick={() => tog("sex", v)}>{t}</Chip>
+            <Chip key={v} on={fit.sex === v} onClick={() => onChange({ ...fit, sex: fit.sex === v ? null : v })}>{t}</Chip>
           ))}
         </div>
       </div>
       <div>
-        <p className="mb-2 text-sm text-ink-2">เป้าหมาย</p>
+        <p className="mb-2 mt-0 text-sm text-ink-2">เป้าหมาย</p>
         <div className="flex flex-wrap gap-2">
           {GOALS.map(([v, t]) => (
-            <Chip key={v} on={fit.goal === v} onClick={() => tog("goal", v)}>{t}</Chip>
+            <Chip key={v} on={fit.goal === v} onClick={() => onChange({ ...fit, goal: fit.goal === v ? null : v })}>{t}</Chip>
           ))}
         </div>
       </div>
       <div>
-        <p className="mb-2 text-sm text-ink-2">คอร์ส</p>
+        <p className="mb-2 mt-0 text-sm text-ink-2">คอร์ส</p>
         <div className="flex flex-wrap gap-2">
           {([5, 10] as Course[]).map((v) => (
-            <Chip key={v} on={fit.course === v} onClick={() => tog("course", v)}>{v} ครั้ง</Chip>
+            <Chip key={v} on={(fit.course ?? 5) === v} onClick={() => onChange({ ...fit, course: v })}>{v} ครั้ง</Chip>
           ))}
         </div>
       </div>
