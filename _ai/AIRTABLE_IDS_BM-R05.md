@@ -1,0 +1,17 @@
+# รหัสตาราง/ช่องที่สร้างใหม่ · BM-R05 (23 พ.ย. 2026) · base app2HcsMi1mmqTLJi
+| ตาราง | ID | ช่อง (ID) |
+|---|---|---|
+| Concerns | tbloX37wnKCQ0q6XP | Pain ID fldfjJNEat5e3J0CG · ชื่อกลาง fldLKyCsFIRZruTAW · ชื่อหน้าหมอ fldJagQd06EnMKkXx · ชื่อหน้าคนทั่วไป fldX0GLeUWMSK22RP · สถานะชื่อ fldt2Nxo6g13I8udV · กลุ่ม fldRrIENxLJysFRPO · ประเภท fldM3Ar43sUVplAIZ · คำค้นลูกค้า fldSr6ejtK9eU7NB6 · คำถามช่วยแยก fldecayofhYDxy8Rc · จุดร่างกาย fldarciAf0CBcvTDa · ชนิดจุด fldx9OTOe2b9G11hq · ความหมายอีกแบบ fldofPlq2ksCqpn7Z · ความสัมพันธ์กับโปรแกรม (ข้อความ) fldTZNaukMiwRSTo7 · สถานะข้อมูล flds589sp9Zqo5bfZ · ที่มา fld6nHU4fnS2y9GT9 · Programs fldiw3xT15APb6d4F · Protocol Template (คอร์ส 5) fldzT2VXhySWgUmtz · (คอร์ส 10) fld7g0IyJ1ho8uZur · Protocols (BIB) fldy7eOuZVllAsrNH · Cases fldujVO6fVJoSXbfw · Research Evidence fldcIpzrebqo4cKkG · 🔒 fldts9Vj6ghnRcLFd · (inverse) PS หลัก fldYJDwB5XGTA4b36 · PS รอง fld6KoYJLFsu1jeev · Body Map Content fldPOgfns6IriMjNc |
+| Patient Situations | tblxFlB9j735dTN5i | PS ID fldmjxHmvwYazidjc · รหัสเดิม fldiFr05F3v2HdIOw · ชื่อกลาง fldTqWwjEgjr7VaTI · ชื่อหน้าหมอ fldztRLFy9dEQusDl · ชื่อหน้าคนทั่วไป fldmdXqPzpDVElxwC · trigger fld4TLpmtMo9sl8Sn · job fld5VgRDwLnh5n0zl · avoid fldvDouasAilDE8ga · สถานะกลุ่ม fldpsV4AhPwL31lRJ · สถานะชื่อ fld9secl13w9LO5uG · Concerns (หลัก) fldGgBvPkmGLRPl6R · Concerns (รอง) fldrPykbs24h8KSde · 🔒 fldoXwvvsK183ioRl |
+| Body Map Content | tblMeVbqZO3aiWRxF | Content ID fldX1RLSkjqhNVd8M · Concern fldec1oJ1mtySIIYd · Patient Situation fldS6VuNnsFfvYxdw · Insight ย่อ fldiZPtTCQ00gNxt8 · Insight ละเอียด fldmsxxdqDhgzTyQ8 · Research Evidence fld7eHVHCaUhOlMcL · Cases fldKIszGDsAfHWVVF · สถานะเนื้อหา fldUrH8gL3EpPCxhP · 🔒 fld2DGMxrRWazBnPx |
+| Body Map Events | tblrsc5wipbc5AfCm | Event Key fld5kjwDt83hvZbeV · Session ID fld3ypxt3sndZV88v · เวลา fldzSM5QF97JClzgK · ชนิด event fldqys0RlMuQGxWum · P fldJw6yOkTjVoPj5k · Z fldswdpm2YGolkC2I · Program ID fldBtRwQeIL1lwECT · Evidence ID fldooMwYSz2EBnC0O · Fit ที่เลือก fldF4lb4S4N9BXHdJ · โหมด fldMsMLCZ4M5mObcd · Web Lead fldt8UXzFoDCmumu6 |
+| Body Map Insights | tblwlZJ7diFNmSKgm | สัปดาห์ fldqbcYACTIbhrckR · สรุป AI fldKw4qvmuwfPCoNp · ตัวเลข fldKL7kvicWIAhQIN · ไนน์ตรวจแล้ว fldpAfqTQBTZLoKNn |
+| LINE Contacts | tblZQobbQm1dTyol8 | LINE userId fldg1ibSRnziGX4Cq · Web Lead fldNaPyehUTDYwIfF · รหัสอ้างอิง fld8bWeQZzeru6UnV · สถานะติดตาม fldCgif8OfA3bouqN · ข้อความล่าสุด fld09Am2YXdAu7Eph · เวลาเพิ่มเพื่อน fld7hFFHt0iewHx7F |
+
+## ช่องใหม่ในตารางเดิม
+- Programs: ย่อ-หมอ fldzmCXXnklKfCMEH · ละเอียด-หมอ fld82PShD7ka8qBMy · สถานะเนื้อหา fldjLlnmEGlhiwkY9 · Concerns (inverse) fldB4yyVJYGMJ5sct · Research Evidence (inverse) fldabp9voPciHudPx
+- Protocol Templates: Concerns คอร์ส 5 (inverse) fldHgxcBLwAUBBiOM · คอร์ส 10 (inverse) fldgNRzthrxPOuslT
+- Protocols: ชื่อหน้าหมอ fldqCS21tsziTkuFY · Concerns (inverse) fldxGSFXftH7oVFco
+- Research Evidence: Programs fldpDBiA32RMfU9Wp · คำถามที่ตอบ fldym5y3N4qC9ifMQ · ย่อ-หมอ fldewPNxxDVKO8af6 · ละเอียด-หมอ fld595QKO8mTAhTGc · สถานะเนื้อหา fldkrjlZKxo4Ayl5S · Concerns (inverse) fldWwEMhe5daoL4dH · Body Map Content (inverse) fldKYJISFcmSE9yQM
+- Cases: ย่อ-หมอ fldhWcExcnz1qOjZo · สถานะเนื้อหา flddq3kZPqEELMJlA · Concerns (inverse) fld8NejWzIVniEJ5O · Body Map Content (inverse) fldXa0t0VWK0BvoMY
+- Web Leads: LINE userId fldwQSM6zY3dOxFMx · รหัสอ้างอิง LINE fld2gkNW13nDvfHmo · ยินยอมให้ติดต่อทาง LINE fldt8lMtBD2jAqLKm · Body Map Events (inverse) fldH7Y4DqJdm7w8yw · LINE Contacts (inverse) flddkfqizzGnfC2UD
