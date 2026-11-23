@@ -4,8 +4,8 @@ import BodyMapApp from "./BodyMapApp";
 
 export const dynamic = "force-static";
 export const metadata: Metadata = {
-  title: "Body Map · icoone Laser Med",
-  description: "เลือกบริเวณและปัญหา ดู Protocol โปรแกรม และหลักฐานของ icoone Laser Med",
+  title: "แผนดูแลตามบริเวณ · icoone Laser Med",
+  description: "เลือกบริเวณและปัญหา ดูแผนดูแล โปรแกรม และหลักฐานของ icoone Laser Med",
   robots: { index: false, follow: false },
 };
 

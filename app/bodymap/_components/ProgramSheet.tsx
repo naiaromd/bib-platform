@@ -11,14 +11,14 @@ export default function ProgramSheet({ id, data, onClose }: { id: string; data: 
   useEffect(() => { track("เปิด Program ย่อ", { program: id }); }, [id]);
   if (!p) return null;
   const internal = data.mode === "internal";
-  const inTemplates = data.templates.filter((t) => t.steps.some((s) => s.programId === id)).map((t) => t.name);
-  const inBib = data.bibProtocols.filter((b) => b.steps.some((s) => s.programId === id || s.options.includes(id))).map((b) => b.name);
+  const inTemplates = Array.from(new Set(data.templates.filter((t) => t.steps.some((s) => s.programId === id)).map((t) => t.nameTh || t.name)));
+  const inBib = data.bibProtocols.filter((b) => b.steps.some((s) => s.programId === id || s.options.includes(id))).map((b) => b.nameTh || b.name);
   const ev = (data.evidenceByProgram[id] ?? []).map((e) => data.evidence.find((x) => x.id === e)).filter(Boolean);
   const group = { base: "Base", focus: "Focus", healthcare: "Healthcare" }[p.group.toLowerCase()] ?? p.group;
   return (
-    <Sheet title={p.name} kicker={`โปรแกรม · ${group}`} onClose={onClose}>
+    <Sheet title={p.name} kicker={`โปรแกรม · กลุ่ม ${group}`} onClose={onClose}>
       <div className="mb-3 flex flex-wrap gap-2">
-        {p.effectTags ? <Tag>{p.effectTags}</Tag> : null}
+        {internal && p.effectTags ? <Tag>{p.effectTags}</Tag> : null}
         <Status show={internal && !p.locked}>ร่าง · ยังไม่ติ๊ก 🔒</Status>
       </div>
       {p.short ? <p className="text-lg leading-snug text-ink">{p.short}</p> : <Status show={internal}>รอเนื้อหาย่อ 1 บรรทัด</Status>}
@@ -37,7 +37,7 @@ export default function ProgramSheet({ id, data, onClose }: { id: string; data: 
           )}
           <Row k="หัวที่ใช้">เลือกตามบริเวณ</Row>
           <Row k="นาทีตั้งต้น">{p.defaultMinutes != null ? `${p.defaultMinutes} นาที` : "—"}</Row>
-          <Row k="อยู่ใน Protocol">
+          <Row k="อยู่ในแผนดูแล">
             {inBib.length + inTemplates.length === 0 ? "—" : (
               <span className="flex flex-wrap gap-1.5">
                 {inBib.map((n) => <Tag key={"b" + n} tone="rose">{n}</Tag>)}

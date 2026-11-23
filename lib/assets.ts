@@ -26,17 +26,17 @@ export const FIGURES = {
 
 // === Video + poster (hero of the Technology section) ===
 export const TECH_VIDEO = ext("f62f7034ba1ba88d2a9ed3bd88fc8768", "mp4");
-export const TECH_POSTER = ext("7cce333f55d2739544e065fa8b4718ed");
+export const TECH_POSTER = ext("7cce333f55d2739544e065fa8b4718ed", "jpg");
 
 // === icoone Laser Med machine (Evidence section) ===
 export const DEVICE_PHOTO = ext("7d3654625308b2affb49d3814d04a8fe");
 
 // === Handpieces ===
 export const HANDPIECE_IMG = {
-  RS: ext("da0b5700904ceb15e0fa21838b9e1d7f"),
-  RT: ext("7c821f6776726fe019169ef4701e098f"),
+  RS: ext("da0b5700904ceb15e0fa21838b9e1d7f", "jpg"),
+  RT: ext("7c821f6776726fe019169ef4701e098f", "jpg"),
   RM: ext("40ecab82bef6a299a535a212c7446e1c", "jpg"),
-  RC: ext("96011254f1bb8b0d40ec2cc3212b47e3"),
+  RC: ext("96011254f1bb8b0d40ec2cc3212b47e3", "jpg"),
 } as const;
 
 // === Program icons ===

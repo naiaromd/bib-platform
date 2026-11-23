@@ -24,6 +24,7 @@ WHO = {
 }
 Z = {z["id"]: z["th"] for z in d["zones"]}; T = {t["id"]: t for t in d["templates"]}; B = {b["id"]: b for b in d["bibProtocols"]}
 P = {p["id"]: p for p in d["programs"]}; E = {e["id"]: e for e in d["evidence"]}; K = {c["id"]: c for c in d["cases"]}
+def nm(x): return "%s (%s)" % (x["nameTh"], x["name"]) if x.get("nameTh") else x["name"]
 def freq(s):
     m = re.match(r"(\d)x/week", s or ""); return "สัปดาห์ละ %s ครั้ง" % m.group(1) if m else (s or "")
 rows = []; skipped = []
@@ -34,12 +35,12 @@ for c in d["concerns"]:
         opp = []
         if c["bibProtocols"]:
             b = B[c["bibProtocols"][0]]
-            opp.append("เมนูที่เปิดขายได้: %s%s" % (b["name"], " · %d นาทีต่อครั้ง" % b["totalMinutes"] if b["totalMinutes"] else ""))
-            if len(c["bibProtocols"]) > 1: opp.append("เมนูอื่นที่ใช้ได้: " + " · ".join(B[x]["name"] for x in c["bibProtocols"][1:]))
+            opp.append("แผนดูแลที่เปิดขายได้: %s%s" % (nm(b), " · %d นาทีต่อครั้ง" % b["totalMinutes"] if b["totalMinutes"] else ""))
+            if len(c["bibProtocols"]) > 1: opp.append("แผนดูแลอื่นที่ใช้ได้: " + " · ".join(nm(B[x]) for x in c["bibProtocols"][1:]))
         if t:
             mins = "ครั้งที่ 1–5 ใช้ %s นาที" % t["minutes1to5"] if t["minutes1to5"] else ""
             if course == 10 and t["minutes6to10"]: mins += " · ครั้งที่ 6–10 ใช้ %s นาที" % t["minutes6to10"]
-            opp.append("คอร์ส %d ครั้ง ตาม Protocol ผู้ผลิต %s%s%s" % (course, t["name"], " · " + freq(t["frequency"]) if t["frequency"] else "", " · " + mins if mins else ""))
+            opp.append("คอร์ส %d ครั้ง ตามแผนของผู้ผลิต %s%s%s" % (course, nm(t), " · " + freq(t["frequency"]) if t["frequency"] else "", " · " + mins if mins else ""))
         if not c["bibProtocols"] and not t and c["programs"]:
             opp.append("ใช้โปรแกรม %s ได้โดยตรง" % " · ".join(P[x["programId"]]["name"] for x in c["programs"] if x["programId"] in P))
         if not opp: skipped.append((c["id"], course)); continue

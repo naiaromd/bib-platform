@@ -62,14 +62,14 @@ function CaseCard({ c, data }: { c: Case; data: BodyMapData }) {
         <Status show={internal && !c.short}>รอเนื้อหาย่อ</Status>
         <Status show={internal && !c.locked}>{c.reviewStatus || "ร่าง"}</Status>
       </div>
-      <p className="m-0 text-base leading-snug text-ink">{c.short || c.result || c.topic}</p>
-      <p className="m-0 mt-1 text-xs text-muted">{[c.topic, c.country].filter(Boolean).join(" · ")}{internal ? ` · ${c.id}` : ""}</p>
+      <p className="m-0 text-base leading-snug text-ink">{c.short || c.result}</p>
+      {internal ? <p className="m-0 mt-1 text-xs text-muted">{[c.topic, c.country, c.id].filter(Boolean).join(" · ")}</p> : null}
       <button type="button" onClick={() => { if (!open) track("เปิดหลักฐานละเอียด", { evidence: c.id }); setOpen(!open); }} aria-expanded={open} className="mt-2 text-sm text-ink underline underline-offset-4">
         {open ? "ซ่อนรายละเอียด" : "ดูรายละเอียดเคส"}
       </button>
       {open ? (
         <dl className="m-0 mt-2">
-          <Row k="เป้าหมาย">{c.goal || "—"}</Row>
+          {internal ? <Row k="เป้าหมาย (ต้นทาง)">{c.goal || "—"}</Row> : null}
           <Row k="ผลที่รายงาน">{c.result || "—"}</Row>
           <Row k="วิธีวัด">{c.measure || "—"}</Row>
           <Row k="จำนวนครั้ง">{c.sessions != null ? `${c.sessions} ครั้ง` : "—"}{c.frequency ? ` · ${c.frequency}` : ""}</Row>
@@ -80,6 +80,11 @@ function CaseCard({ c, data }: { c: Case; data: BodyMapData }) {
       ) : null}
     </article>
   );
+}
+
+export function evidenceCount(concern: Concern, data: BodyMapData): number {
+  const has = <T extends { id: string }>(rows: T[], ids: string[]) => ids.filter((i) => rows.some((r) => r.id === i)).length;
+  return has(data.evidence, concern.evidence) + has(data.cases, concern.cases) + (concern.fdaBadge ? 1 : 0);
 }
 
 /** หลักฐาน = งานวิจัย + เคส · แยกตาม 6 คำถามที่หมอถาม */
@@ -96,7 +101,7 @@ export default function EvidenceBlock({ concern, data }: { concern: Concern; dat
   const count = (q: QuestionKey) => { const x = by(q); return x.papers.length + x.cases.length + (x.fda ? 1 : 0); };
   const first = QUESTIONS.find(([q]) => count(q) > 0)?.[0] ?? "works";
   const [q, setQ] = useState<QuestionKey>(first);
-  const visible = QUESTIONS.filter(([k]) => internal || count(k) > 0);
+  const visible = QUESTIONS.filter(([k]) => count(k) > 0);
   if (visible.length === 0) return null;
   const cur = by(visible.some(([k]) => k === q) ? q : visible[0][0]);
   const curKey = visible.some(([k]) => k === q) ? q : visible[0][0];
@@ -107,8 +112,8 @@ export default function EvidenceBlock({ concern, data }: { concern: Concern; dat
           const n = count(k);
           return (
             <button key={k} type="button" role="tab" aria-selected={curKey === k} onClick={() => { setQ(k); track("เปิดหลักฐานย่อ", { p: concern.id, note: t }); }}
-              className={`rounded-full border px-3 py-1.5 text-sm transition ${curKey === k ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink-2 hover:border-ink"} ${n === 0 ? "opacity-40" : ""}`}>
-              {t} <span className="text-[11px]">{n}</span>
+              className={`rounded-full border px-3 py-1.5 text-sm transition ${curKey === k ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink-2 hover:border-ink"}`}>
+              {t} <span className="text-xs">{n}</span>
             </button>
           );
         })}
@@ -117,12 +122,11 @@ export default function EvidenceBlock({ concern, data }: { concern: Concern; dat
         {cur.fda ? (
           <div className="rounded-xl border border-good bg-card p-4">
             <Tag tone="good">FDA 510(k) cleared</Tag>
-            <p className="m-0 mt-2 text-sm text-ink">ปัญหานี้อยู่ในข้อบ่งใช้ที่ FDA รับรอง · เลขที่ K211272</p>
+            <p className="m-0 mt-2 text-sm text-ink">ปัญหานี้อยู่ในข้อบ่งใช้ที่ FDA รับรอง · เลขทะเบียน K211272</p>
           </div>
         ) : null}
         {cur.papers.map((e) => <PaperCard key={e.id} e={e} internal={internal} />)}
         {cur.cases.map((c) => <CaseCard key={c.id} c={c} data={data} />)}
-        {internal && cur.papers.length + cur.cases.length + (cur.fda ? 1 : 0) === 0 ? <Status show>ยังไม่มีหลักฐานที่ผูกกับคำถามนี้</Status> : null}
       </div>
     </div>
   );

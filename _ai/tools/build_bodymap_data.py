@@ -28,7 +28,7 @@ def content(f, k):
     """เนื้อหาที่เขียนแล้ว (สำเนาของที่ลง Airtable สถานะร่าง) · ไม่มีไฟล์ = ช่องว่าง"""
     p = os.path.join(ROOT, "_ai/content", f)
     return {r[k]: r for r in csv.DictReader(open(p, encoding="utf-8-sig"))} if os.path.exists(p) else {}
-SHORT = content("programs_doctor.csv", "program_id"); EVC = content("evidence_doctor.csv", "evidence_id"); CAC = content("cases_doctor.csv", "case_id")
+PLAN_TH = content("plan_names_th.csv", "plan_id"); SHORT = content("programs_doctor.csv", "program_id"); EVC = content("evidence_doctor.csv", "evidence_id"); CAC = content("cases_doctor.csv", "case_id")
 programs = []
 for r in A("programs.json"):
     v = r["cellValuesByFieldId"]; pid = v["fldVsuhHbYugeVaOJ"]; c = canp.get(pid, {})
@@ -54,7 +54,7 @@ for s in R("protocol_steps.csv"):
 templates = []
 for c in R("protocol_cards.csv"):
     st = sorted(steps_by[c["protocol_id"]], key=lambda x: (x["phase"], x["order"]))
-    templates.append({"id": c["protocol_id"], "name": c["original_title"] or c["name"], "family": c["family"], "subline": c["subline"], "target": c["target"],
+    templates.append({"id": c["protocol_id"], "nameTh": PLAN_TH.get(c["protocol_id"], {}).get("name_th", ""), "name": c["original_title"] or c["name"], "family": c["family"], "subline": c["subline"], "target": c["target"],
         "area": c["area"], "sessions": c["sessions"], "frequency": c["frequency"], "statedMinutes": c["stated_minutes"],
         "minutes1to5": c["minutes_sessions_1_5"] or None, "minutes6to10": c["minutes_sessions_6_10"] or None, "minutesCheck": c["minutes_check"],
         "assessment": c.get("exam_criteria") or c.get("presentation") or "", "aim": c.get("aim") or "", "footnotes": c["footnotes"], "steps": st,
@@ -69,7 +69,7 @@ for s in R("menu_protocol_steps.csv"):
 bib = []
 for m in menus.values():
     if m["menu_set"] != "BIB Menu 21": continue
-    bib.append({"id": "BIB:" + m["name"], "name": m["name"], "consumerLabel": m["name"], "legacyAlias": m["legacy_alias"], "category": m["category"],
+    bib.append({"id": "BIB:" + m["name"], "nameTh": PLAN_TH.get("BIB:" + m["name"], {}).get("name_th", ""), "name": m["name"], "consumerLabel": m["name"], "legacyAlias": m["legacy_alias"], "category": m["category"],
         "totalMinutes": int(m["minutes"]) if m["minutes"].isdigit() else None, "composition": m["composition_programs"],
         "steps": sorted(bsteps[m["protocol_reference"]], key=lambda x: x["order"]), "status": "draft", "locked": False})
 menu2bib = {k: "BIB:" + m["name"] for k, m in menus.items() if m["menu_set"] == "BIB Menu 21"}

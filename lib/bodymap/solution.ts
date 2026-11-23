@@ -24,8 +24,10 @@ export type SolutionStep = {
 export type Solution = {
   layer: Layer;
   id: string;
-  /** ชื่อ Protocol ที่หมอเห็น */
+  /** ชื่อเดิมของแผนดูแล (ตัวเล็ก) */
   protocol?: string;
+  /** ชื่อไทยของแผนดูแล (บรรทัดใหญ่) · ว่าง = ยังไม่มีชื่อไทย */
+  protocolTh?: string;
   /** ชื่อหน้าลูกค้า (เมนู) ของ Protocol BIB */
   menu?: string;
   steps: SolutionStep[];
@@ -55,6 +57,7 @@ function fromTemplate(t: Template, course: Course): Solution {
     layer: "template",
     id: t.id,
     protocol: t.name,
+    protocolTh: t.nameTh || undefined,
     steps: t.steps.map((s) => ({
       programId: s.programId, options: [], minutes: s.minutes, sessions: s.range, handpiece: s.handpiece,
     })),
@@ -82,6 +85,7 @@ export function resolveSolutions(concern: Concern, fit: Fit, data: BodyMapData):
       layer: "bib",
       id: b.id,
       protocol: b.name,
+      protocolTh: b.nameTh || undefined,
       menu: b.consumerLabel,
       steps: b.steps.map((s) => ({ programId: s.programId, options: s.options, minutes: null, handpiece: null })),
       totalMinutes: b.totalMinutes,
@@ -95,7 +99,7 @@ export function resolveSolutions(concern: Concern, fit: Fit, data: BodyMapData):
     const t = tid ? data.templates.find((x) => x.id === tid) : undefined;
     if (!t) continue;
     if (fit.sex === "m" && t.target.trim() === "Women") {
-      hidden.push({ id: t.id, reason: "ผู้ผลิตระบุ Protocol นี้สำหรับคนไข้หญิง" });
+      hidden.push({ id: t.id, reason: "แผนรายครั้งของผู้ผลิตชุดนี้ระบุสำหรับคนไข้หญิง" });
       continue;
     }
     solutions.push(fromTemplate(t, c));

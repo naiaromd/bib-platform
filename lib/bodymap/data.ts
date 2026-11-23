@@ -25,7 +25,7 @@ export type TemplateStep = {
   handpiece: string | null; raw: string;
 };
 export type Template = {
-  id: string; name: string; family: string; subline: string; target: string; area: string; sessions: string;
+  id: string; nameTh?: string; name: string; family: string; subline: string; target: string; area: string; sessions: string;
   frequency: string; statedMinutes: string; minutes1to5: string | null; minutes6to10: string | null;
   minutesCheck: string; assessment: string; aim: string; footnotes: string; steps: TemplateStep[];
   status: string; locked: boolean;
@@ -34,7 +34,7 @@ export type BibStep = {
   order: number; programId: string | null; options: string[]; stepType: string; raw: string; minutes: number | null;
 };
 export type BibProtocol = {
-  id: string; name: string; consumerLabel: string; legacyAlias: string; category: string;
+  id: string; nameTh?: string; name: string; consumerLabel: string; legacyAlias: string; category: string;
   totalMinutes: number | null; composition: string; steps: BibStep[]; status: string; locked: boolean;
 };
 export type PatientSituation = {
