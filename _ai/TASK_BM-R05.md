@@ -59,3 +59,16 @@
 - ส่งตัวอย่างในแชท (Program 3 · หลักฐาน 3 · Insight 3) · รอไนน์ตอบ "OK เนื้อหา"
 - 13:05 ไนน์ติโทนตัวอย่างรอบ 1 ("งานบวม" ไม่มี) → ร่างรอบ 2 ตาม skill bib-voice · บทเรียนลง `_ai/บันทึกบทเรียน.md` · ยังรอ "OK เนื้อหา"
 - 13:20 ไนน์ตัดสิน: ใช้คำ "น้ำเหลือง" ตามคู่มือผู้ผลิตในหน้าหมอ · ต่างจากใบงานข้อ 1 ที่จำกัดคำกล่าวอ้างไว้ที่ข้อบ่งใช้ FDA 4 ข้อ → ยึดคำไนน์ล่าสุด · ไนน์ขอทำ MVP ให้ทีมตรวจก่อนเพราะห่วง credit → เสนอขอบเขต MVP รอไนน์เลือก
+- 13:30 ไนน์สั่ง: งานเนื้อหา "ห้ามย่อเด็ดขาด · สำคัญที่สุด แต่ทำเพิ่มทีหลัง" · อะไรไม่ใช้ token ให้ทำเลย · ให้ deploy · ขอวิธีสร้าง token → งาน 5 ยังค้างทั้งก้อน (ไม่ตัดทอน) · ยังไม่มี "OK เนื้อหา"
+
+## 6–7/12 · MVP ไม่ใช้ token (2026-11-23 13:30–13:50) · commit 64f0738 บน see-the-unseen-r03 (ไม่ push)
+- ข้อมูล: `_ai/tools/build_bodymap_data.py` → `lib/bodymap/data.generated.json` จาก CANON r03 + snapshot Airtable 23 พ.ย. (snapshot อยู่ `_ai/airtable_snapshot_20261123/` · ไม่ commit เพราะมีแถวเอกสารลับ) · ผล: ปัญหา 50 · โปรแกรม 40 · Protocol ผู้ผลิต 26 · Protocol BIB 21 · PS 12 · หลักฐาน 64 (ข้ามลับ 2 · ไม่มี "หมอ" 4) · เคส 44 (ข้าม demo 2 · ต่ำกว่า 18 2 · ไม่ใช้กับหมอ 34)
+- **ต่างจากใบงานข้อ 6:** `lib/bodymap/data.ts` อ่านไฟล์สำเนา ไม่ได้อ่าน Airtable สด · ยังไม่มี revalidate และ `/api/bodymap-revalidate` (รอ token)
+- `lib/bodymap/solution.ts`: `resolveSolutions(P, Fit)` คืนทุก Solution (ตามแผน p02 F2 แสดงทั้ง Protocol BIB และ Protocol ผู้ผลิต) · `resolveSolution` คืนตัวแรกตามรูปแบบใบงาน
+- หน้า `/bodymap`: FitPanel · BodyFigure · AnswerPanel · ProgramIcon · ProgramSheet · EvidenceBlock · InsightDrawer · **ยังไม่มี** LeadForm · ConsentBar (รอ token)
+- Fit: เพศเปลี่ยนผล 7 ปัญหา (P01 P02 P03 P14 P21 P24 P38 · Protocol ผู้ผลิตระบุ Women) + เปลี่ยนรูป · คอร์ส 5/10 เปลี่ยน Protocol ผู้ผลิตใน 23 ปัญหา · เป้าหมายกรองรายการปัญหา (ไม่เลือก 50 · Toning 41 · Reshaping 31 · Anti-Ageing 28 · Drainage 31 · ฟื้นฟู 36) → ไม่ตัดตัวปรับใดออก
+- ทดสอบ: `npx tsx _ai/tools/test_solution.ts` ผ่าน 11/11 · `next build` ผ่าน · eslint (next/core-web-vitals) เฉพาะ `app/bodymap` `lib/bodymap` ไม่มีข้อผิดพลาด · เปิดในเบราว์เซอร์โหมดภายใน กดจุด → ปัญหา → Protocol → โปรแกรม → หลักฐาน ได้
+- **ไม่ผ่าน:** `npm run lint` ทั้ง repo รันไม่ได้ (repo ไม่มีไฟล์ตั้งค่า ESLint · คำสั่งค้างถามตัวเลือก) · `npm run pages:build` ล้มที่ `Could not resolve "async_hooks"` ตอนรวม `_worker.js` (ส่วน edge ของ `/api/submit` เดิม · ไม่ได้แตะ) · โหมดนำเสนอยังไม่ได้เปิดดูในเบราว์เซอร์ (ทดสอบด้วยสคริปต์ว่าไม่มีแถวหลุด)
+- Deploy: สร้าง Cloudflare Pages project ใหม่ `bib-bodymap-preview` · ขึ้นเฉพาะไฟล์นิ่งของหน้า Body Map (โหมดภายใน) → https://bib-bodymap-preview.pages.dev/bodymap · ตอบ 200 · `X-Robots-Tag: noindex` · ไม่มีรหัสผ่าน ใครมีลิงก์เปิดได้ · ไม่มี `/api/*` · ไม่ได้แตะ production
+- แก้ไฟล์นอก repo 1 ไฟล์: `BIB/.claude/launch.json` (ตั้งค่าเปิดดูหน้าในแอป)
+- งานค้างทั้งหมด + วิธีสร้าง token: `_ai/PENDING_BM-R05.html`

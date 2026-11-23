@@ -1,7 +1,7 @@
 // Body Map r05 · ชั้นข้อมูล
 // ตอนนี้อ่านจากไฟล์ที่สร้างไว้ล่วงหน้า (CANON r03 + snapshot Airtable 23 พ.ย. 2026)
 // สร้างใหม่ด้วย: /usr/bin/python3 _ai/tools/build_bodymap_data.py
-// เมื่อมี AIRTABLE_TOKEN → เปลี่ยน loadAll() ไปอ่าน Airtable ฝั่ง server (ดู _ai/PENDING_BM-R05.md ข้อ 6)
+// เมื่อมี AIRTABLE_TOKEN → เปลี่ยน loadAll() ไปอ่าน Airtable ฝั่ง server (ดู _ai/PENDING_BM-R05.html หัวข้อ ระบบ)
 import raw from "./data.generated.json";
 
 export type Mode = "present" | "internal";
