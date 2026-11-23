@@ -3,7 +3,7 @@
 // คู่มือผู้ผลิตให้แพทย์เลือกหัวตามบริเวณเอง · LED/Laser เปิดได้เฉพาะ RoboSolo
 import { useState } from "react";
 import { HANDPIECES, HANDPIECE_ORDER, type HandpieceKey } from "@/lib/handpieces";
-import MechanismDiagram from "@/app/explorer/_components/MechanismDiagram";
+import MechanismAnim from "./MechanismAnim";
 
 export type HeadChoice = { hp: HandpieceKey; suc: number; led: boolean; las: boolean };
 export const sucLabel = (v: number) => (v < 34 ? "เบา" : v < 67 ? "กลาง" : "แรง");
@@ -13,7 +13,7 @@ export const headText = (c: HeadChoice) =>
 export default function HandpiecePicker({ value, onChange }: { value: HeadChoice; onChange: (c: HeadChoice) => void }) {
   const h = HANDPIECES[value.hp];
   const light = h.hasLight;
-  const [diagram, setDiagram] = useState(false);
+  const [diagram, setDiagram] = useState(true);
   return (
     <div className="mt-4 rounded-xl border border-line bg-card p-3">
       <p className="m-0 text-sm text-ink">หัวเครื่อง · เลือกตามบริเวณ</p>
@@ -35,7 +35,7 @@ export default function HandpiecePicker({ value, onChange }: { value: HeadChoice
       <button type="button" aria-expanded={diagram} onClick={() => setDiagram(!diagram)} className="mb-2 text-sm text-ink underline underline-offset-4">
         {diagram ? "ซ่อนภาพกลไกใต้ผิว ▴" : "ดูภาพกลไกใต้ผิว ▾"}
       </button>
-      {diagram ? <MechanismDiagram step={0} showNet={false} suc={value.suc} led={light && value.led} las={light && value.las} /> : null}
+      {diagram ? <div className="mb-2"><MechanismAnim suc={value.suc} led={light && value.led} las={light && value.las} headName={h.name} /></div> : null}
       <div className="grid gap-3 rounded-xl border border-line p-3 sm:grid-cols-2">
         <label className="block text-sm text-ink">
           <span className="flex justify-between"><span>แรงดูด (จำลอง)</span><span className="text-ink-2">{sucLabel(value.suc)}</span></span>
