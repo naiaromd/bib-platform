@@ -49,7 +49,8 @@ export default function BodyMapApp({ data }: { data: BodyMapData }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/assets/brand/icoone-laser-med-logo.png" alt="icoone Laser Med" className="h-6 w-auto md:h-8" />
           </div>
-          <h1 className="m-0 text-xl font-semibold leading-tight text-ink md:text-3xl">เครื่องเดียว ดูแลได้ทั้งตัว · ปรับตามคนไข้แต่ละคน</h1>
+          <h1 className="m-0 text-xl font-semibold leading-tight text-ink md:text-3xl">นวัตกรรมฟื้นฟูผิวและรูปร่างจากประเทศอิตาลี</h1>
+          <p className="m-0 mt-1 text-sm text-ink-2 md:text-base">เครื่องเดียว ดูแลได้ทั้งตัว · ปรับตามคนไข้แต่ละคน</p>
         </div>
         {data.mode === "internal" ? (
           <span className="rounded-full border border-warn px-3 py-1 text-xs text-warn">โหมดภายใน · ข้อมูลร่าง ยังไม่ผ่านการตรวจ</span>
