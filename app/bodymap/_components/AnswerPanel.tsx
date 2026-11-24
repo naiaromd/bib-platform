@@ -109,7 +109,7 @@ export default function AnswerPanel({
   const tabs: [TabKey, string][] = [];
   if (main) tabs.push(["how", "วิธีทำ"]);
   if (concern && evidenceCount(concern, data) > 0) tabs.push(["proof", "หลักฐาน"]);
-  if (insight) tabs.push(["chance", "โอกาสของคลินิก"]);
+  tabs.push(["chance", "คำนวณการคืนทุน"]);
   if (others.length) tabs.push(["other", "ทางเลือกอื่น"]);
   const cur = tabs.some(([k]) => k === tab) ? tab : tabs[0]?.[0];
   const fitText = [fit.sex === "f" ? "หญิง" : fit.sex === "m" ? "ชาย" : "", fit.goal ? GOAL_TH[fit.goal] : "", `คอร์ส ${course} ครั้ง`].filter(Boolean).join(" · ");
@@ -159,7 +159,7 @@ export default function AnswerPanel({
               </>
             ) : null}
             {cur === "proof" ? <EvidenceBlock key={concern.id} concern={concern} data={data} onRequest={(e) => { setDoc(e); setForm("line"); }} /> : null}
-            {cur === "chance" && insight ? <ChanceTab insight={insight} course={course} minutes={main?.totalMinutes ?? plan?.totalMinutes ?? null} internal={internal} face={concern.zones.every((z) => FACE_ZONES.includes(z))} sex={fit.sex} /> : null}
+            {cur === "chance" ? <ChanceTab insight={insight ?? null} concern={concern} data={data} course={course} internal={internal} face={concern.zones.every((z) => FACE_ZONES.includes(z))} sex={fit.sex} /> : null}
             {cur === "other" ? (
               <div className="grid gap-2">
                 {others.map((s) => (
