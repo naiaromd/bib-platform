@@ -239,3 +239,9 @@ Assignment ID ที่ทำ: **BM-R05-20261123-v004** (ไฟล์มาถ�
 - จุดสีชมพูที่ชื่อแท็บ "คำนวณการคืนทุน"
 - ข้อจำกัด: ถ้าเครื่องหมอไม่มีแอปอีเมล ปุ่มใบเสนอราคาจะไม่ทำงาน · ทางเลือก = ส่งผ่านฟอร์ม → Airtable → automation ส่งอีเมล (ต้องให้ไนน์อนุมัติเปิด automation ตาม 0.1)
 - รอไนน์: ตั้งชื่อ 12 กลุ่มใหม่
+
+## 25 พ.ย. 2026 · ชื่อกลุ่มคนไข้ 12 กลุ่ม (ไนน์อนุมัติ)
+- ไนน์ยืนยันชื่อชุด "English · ไทย" · PS07 ใช้ "Post Maternity Care" แทน New Mom · สั่งอัปเดต Airtable ด้วย
+- Airtable ตาราง PS (tblxFlB9j735dTN5i): แก้เฉพาะช่อง label_doctor (fldztRLFy9dEQusDl) ทั้ง 12 แถว + หมายเหตุ "label_doctor = ไนน์ยืนยัน 25 พ.ย." · ชื่อ canon เดิมไม่แตะ · ไม่ติ๊ก 🔒
+- live.ts อ่านชื่อกลุ่มสดจาก Airtable แล้ว (แก้ใน Airtable → หน้าเปลี่ยนภายใน 10 นาที) · สำเนา `_ai/canon_r03/patient_situations_12.csv` + data.generated.json อัปเดตตาม
+- Deploy แยกโหมด: preview https://27395a43.bib-bodymap-preview.pages.dev (internal) · demo https://9fb925e4.bib-bodymap-demo.pages.dev (showcase) · ตรวจแล้ว API source = airtable และชื่อใหม่ขึ้นทั้งสองลิงก์ · tag ขึ้นบรรทัดใหม่สวยที่ 1280px

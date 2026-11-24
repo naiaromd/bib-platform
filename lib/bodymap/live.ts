@@ -57,7 +57,7 @@ async function buildLive(): Promise<BodyMapData> {
     fetchAll("tblxN0XvHZXhy3FlC", ["fldg0ZSL1ORhVX56D", "fldqCS21tsziTkuFY"]),
     fetchAll("tbld0RiSgMZy7BTkk", ["fldKlFB9FVbDhssg5", "fldFVE4G4eCvV76x8"]),
     fetchAll("tbloX37wnKCQ0q6XP", ["fldfjJNEat5e3J0CG", "fldJagQd06EnMKkXx", "fldts9Vj6ghnRcLFd"]),
-    fetchAll("tblxFlB9j735dTN5i", ["fldmjxHmvwYazidjc", "fldoXwvvsK183ioRl"]),
+    fetchAll("tblxFlB9j735dTN5i", ["fldmjxHmvwYazidjc", "fldztRLFy9dEQusDl", "fldoXwvvsK183ioRl"]),
     fetchAll("tblMeVbqZO3aiWRxF", ["fldX1RLSkjqhNVd8M", "fldmsxxdqDhgzTyQ8", "fld2DGMxrRWazBnPx"]),
   ]);
   const P = byKey(programs, "fldVsuhHbYugeVaOJ"), E = byKey(evidence, "fld24fsyv4kRLUTqB"), K = byKey(cases, "fldM1ioKMrTD5gBYp");
@@ -94,7 +94,7 @@ async function buildLive(): Promise<BodyMapData> {
     }),
     patientSituations: base.patientSituations.map((s) => {
       const f = S.get(s.id);
-      return f ? { ...s, locked: f.fldoXwvvsK183ioRl === true } : s;
+      return f ? { ...s, label: str(f.fldztRLFy9dEQusDl) || s.label, locked: f.fldoXwvvsK183ioRl === true } : s;
     }),
     insights: base.insights.map((i) => {
       const f = I.get(i.id);
