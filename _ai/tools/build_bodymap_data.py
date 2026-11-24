@@ -140,15 +140,19 @@ for x in R("menu_concern_links.csv"):
     b = menu2bib[x["menu_key"]]
     if b not in mb[x["pain_id"]]: mb[x["pain_id"]].append(b)
 FDA = {"P20", "P23", "P31", "P32", "P41", "P42", "P43"}
+# ไนน์ตัดสิน 24 พ.ย.: ปัญหาสีผิว icoone ไม่ได้ช่วย → ไม่แสดง · ปัญหาขอบเขตใหญ่ที่ยังไม่มีแผน → icoone อาจเป็นส่วนหนึ่ง ชวนหมอมาศึกษาเพิ่ม
+OUT_OF_SCOPE = {"P05", "P09"}
+STUDY = {"P08", "P16", "P37", "P44", "P45", "P50"}
 concerns = []
 for c in R("concerns.csv"):
     p = c["pain_id"]; m = cm[p]
+    if p in OUT_OF_SCOPE: continue
     concerns.append({"id": p, "label": c["label_doctor"] or c["original_concern"], "canon": c["original_concern"], "consumerLabel": c["label_consumer"],
         "group": c["group_names"], "category": c["category_names"], "zones": [z for z in c["body_zones"].split(";") if z], "zoneType": c["body_zone_type"],
         "terms": [t.strip() for t in c["customer_search_terms"].split("|") if t.strip()][:6], "question": c["clarifying_question"],
         "status": c["status"], "altMeaning": c["handoff_alt_meaning"], "fdaBadge": p in FDA,
         "bibProtocols": mb[p], "template5": m["card_5_sessions"] or None, "template10": m["card_10_sessions"] or None, "templateMatch": m["match_status"],
-        "programs": pl[p], "evidence": [e for e in ev_by_p[p]], "cases": case_by_p[p], "psPrimary": ps_pri[p], "psSecondary": ps_sec[p], "locked": False})
+        "programs": pl[p], "evidence": [e for e in ev_by_p[p]], "cases": case_by_p[p], "psPrimary": ps_pri[p], "psSecondary": ps_sec[p], "scope": "study" if p in STUDY else "", "locked": False})
 
 insights = []
 ip = os.path.join(ROOT, "_ai/content/insights.csv")

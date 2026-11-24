@@ -14,6 +14,8 @@ export type Concern = {
   fdaBadge: boolean; bibProtocols: string[]; template5: string | null; template10: string | null;
   templateMatch: string; programs: ProgramLink[]; evidence: string[]; cases: string[];
   psPrimary: string[]; psSecondary: string[]; locked: boolean;
+  /** "study" = ยังไม่มีแผนดูแล · icoone อาจเป็นส่วนหนึ่งของการดูแล ชวนศึกษาเพิ่ม */
+  scope?: string;
 };
 export type Program = {
   id: string; name: string; group: string; effectTags: string; aim: string; exam: string; position: string;

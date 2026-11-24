@@ -118,7 +118,12 @@ export default function AnswerPanel({
             {concern && ans ? (
               <div className="lg:mt-4">
                 <p className="mb-2 mt-0 text-sm text-muted">แผนดูแล</p>
-                {main ? <PlanCard s={main} course={course} internal={internal} /> : <Status show={internal}>ยังไม่มีแผนดูแลหรือโปรแกรมที่ผูกกับปัญหานี้</Status>}
+                {main ? <PlanCard s={main} course={course} internal={internal} /> : concern.scope === "study" ? (
+                  <div className="rounded-xl border border-line bg-card p-3">
+                    <p className="m-0 text-base font-semibold text-ink">icoone อาจเป็นส่วนหนึ่งของแผนดูแล</p>
+                    <p className="m-0 mt-1 text-sm text-ink-2">ปัญหานี้มีได้หลายสาเหตุ และมักดูแลด้วยหลายวิธีร่วมกัน ทีมยังรวบรวมข้อมูลเฉพาะเรื่องนี้อยู่ กด &quot;ขอเดโม&quot; หรือ &quot;คุยทาง LINE&quot; เพื่อศึกษาร่วมกับทีม</p>
+                  </div>
+                ) : <Status show={internal}>ยังไม่มีแผนดูแลหรือโปรแกรมที่ผูกกับปัญหานี้</Status>}
                 {ans.hidden.map((h) => <p key={h.id} className="mb-0 mt-2 text-sm text-muted">{h.reason}</p>)}
               </div>
             ) : null}

@@ -19,7 +19,7 @@ r = ids("P01", { sex: "f", goal: null, course: 5 });
 ok("P01 หญิง คอร์ส 5 = มี PRO-CARD-011", r.some((s) => s.includes("PRO-CARD-011")), r);
 const p10 = resolveSolutions(C("P10"), none, d).solutions;
 ok("P10 = โปรแกรมตรง · นาทีเป็น null (ไม่เดา)", p10.length === 1 && p10[0].layer === "program" && p10[0].steps.every((s) => s.minutes === null), p10);
-ok("P05 = ไม่มี Solution", resolveSolutions(C("P05"), none, d).solutions.length === 0, null);
+ok("P05 P09 (สีผิว) ไม่อยู่ในหน้า · P44 = ไม่มี Solution และติดป้ายชวนศึกษา", !d.concerns.some((c) => c.id === "P05" || c.id === "P09") && resolveSolutions(C("P44"), none, d).solutions.length === 0 && C("P44").scope === "study", null);
 const bib = resolveSolutions(C("P23"), none, d).solutions[0];
 ok("BIB: นาทีรายโปรแกรม null ทุกขั้น · ขั้นให้เลือกมี 2 ตัวเลือก", bib.steps.every((s) => s.minutes === null) && bib.steps[1].options.length === 2, bib.steps);
 const t20 = resolveSolutions(C("P23"), { ...none, course: 10 }, d).solutions[1];
@@ -27,7 +27,7 @@ const sum = (rg: string) => t20.steps.filter((s) => s.sessions === rg).reduce((a
 ok("PRO-CARD-020: นาทีรายขั้นรวมกันเท่านาทีต่อครั้งของแต่ละช่วง", (t20.minutesByRange ?? []).every((m) => sum(m.range) === m.minutes), [t20.minutesByRange, t20.steps]);
 const layers = d.concerns.map((c) => resolveSolutions(c, none, d).solutions[0]?.layer ?? "none");
 const cnt = (k: string) => layers.filter((l) => l === k).length;
-ok("ภาพรวม 50 ปัญหา: BIB 36 · โปรแกรมตรง 6 · ไม่มี 8", cnt("bib") === 36 && cnt("program") === 6 && cnt("none") === 8, [cnt("bib"), cnt("template"), cnt("program"), cnt("none")]);
+ok("ภาพรวม 48 ปัญหา: BIB 36 · โปรแกรมตรง 6 · ชวนศึกษา 6", d.concerns.length === 48 && cnt("bib") === 36 && cnt("program") === 6 && cnt("none") === 6, [cnt("bib"), cnt("template"), cnt("program"), cnt("none")]);
 const g = (goal: Fit["goal"]) => d.concerns.filter((c) => concernMatchesGoal(c, goal, d)).length;
 console.log("เป้าหมาย → จำนวนปัญหาที่แสดง", { all: g(null), Toning: g("Toning"), Reshaping: g("Reshaping"), AntiAgeing: g("Anti-Ageing"), Drainage: g("Drainage"), Healthcare: g("Healthcare") });
 const p = loadBodyMap("present");
