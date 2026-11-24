@@ -3,7 +3,7 @@
 export type EventType =
   | "เปิดหน้า" | "เลือก Fit" | "หมุนรูป" | "กดจุด" | "เปิดปัญหา" | "เปิด Program ย่อ" | "เปิด Program ละเอียด"
   | "เปิดหลักฐานย่อ" | "เปิดหลักฐานละเอียด" | "เปิด Insight" | "เลือกหัวเครื่อง" | "เริ่มกรอกฟอร์ม" | "ส่งฟอร์ม" | "กด LINE"
-  | "คำนวณ ROI" | "ขอเอกสาร" | "ขอใบเสนอราคา";
+  | "คำนวณ ROI" | "ขอเอกสาร" | "บูธ" | "ขอใบเสนอราคา";
 export type BmEvent = {
   key: string; session: string; at: string; type: EventType; p?: string; z?: string; program?: string;
   evidence?: string; fit?: string; mode?: string; note?: string;

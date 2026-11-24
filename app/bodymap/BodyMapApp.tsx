@@ -32,6 +32,15 @@ export default function BodyMapApp({ data: initial }: { data: BodyMapData }) {
   const [head, setHead] = useState<HeadChoice>({ hp: "RS", suc: 50, led: false, las: false });
 
   useEffect(() => { setContext({ fit: fitLabel(DEFAULT_FIT), mode: data.mode === "internal" ? "ภายใน" : "นำเสนอ" }); track("เปิดหน้า"); }, [data.mode]);
+  // มาจาก QR ของจอบูธ: ?p=รหัสปัญหา&src=booth → เปิดบริเวณและปัญหาที่หมอเลือกไว้บนจอบูธ
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const p = q.get("p");
+    const c = p ? initial.concerns.find((x) => x.id === p) : undefined;
+    if (!c) return;
+    setZoneId(c.zones[0] ?? null); setConcernId(c.id);
+    if (q.get("src") === "booth") track("บูธ", { p: c.id, note: `สแกน QR · ${q.get("bt") ?? ""}` });
+  }, [initial.concerns]);
 
   const shown = useMemo(() => data.concerns.filter((c) => concernMatchesGoal(c, fit.goal, data)), [data, fit.goal]);
   const counts = useMemo(() => {

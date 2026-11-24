@@ -2,7 +2,7 @@
 import { T, clean, createRows, hasToken, waitToken } from "@/lib/bodymap/airtable";
 
 export const runtime = "edge";
-const TYPES = new Set(["เปิดหน้า", "เลือก Fit", "หมุนรูป", "กดจุด", "เปิดปัญหา", "เปิด Program ย่อ", "เปิด Program ละเอียด", "เปิดหลักฐานย่อ", "เปิดหลักฐานละเอียด", "เปิด Insight", "เลือกหัวเครื่อง", "เริ่มกรอกฟอร์ม", "ส่งฟอร์ม", "กด LINE", "คำนวณ ROI", "ขอเอกสาร", "ขอใบเสนอราคา"]);
+const TYPES = new Set(["เปิดหน้า", "เลือก Fit", "หมุนรูป", "กดจุด", "เปิดปัญหา", "เปิด Program ย่อ", "เปิด Program ละเอียด", "เปิดหลักฐานย่อ", "เปิดหลักฐานละเอียด", "เปิด Insight", "เลือกหัวเครื่อง", "เริ่มกรอกฟอร์ม", "ส่งฟอร์ม", "กด LINE", "คำนวณ ROI", "ขอเอกสาร", "ขอใบเสนอราคา", "บูธ"]);
 
 export async function POST(req: Request) {
   if (!hasToken()) return waitToken();

@@ -266,3 +266,19 @@ Assignment ID ที่ทำ: **BM-R05-20261123-v004** (ไฟล์มาถ�
 - Airtable Change Log: บันทึก 3 แถว (ชื่อ 12 กลุ่ม · ช่อง MI · Sport Lover)
 - ยังว่าง: Wellness Traveler · Express Silhouette ไม่มี Insight ใน Body Map Content (การ์ดแสดงเฉพาะคำค้น · จุดเริ่มสนใจ · สิ่งที่ไม่อยากเจอ)
 - Deploy: preview https://ea65111e.bib-bodymap-preview.pages.dev · demo https://53dcde5e.bib-bodymap-demo.pages.dev · ตรวจโหมด + API อ่าน Airtable สดแล้ว · ตรวจหน้าจอ 1280px
+
+## 25 พ.ย. 2026 · โหมดบูธ "Design your Signature" (ไนน์สั่งทำต่อระหว่างนอน)
+- Research best practice (ผู้ช่วยค้น 36 แหล่ง · Claude เช็กซ้ำ 4 แหล่ง: WCAG 2.2.1, NN/g animation, QR ไทย 61.5%, ประกาศ อย. โฆษณาเครื่องมือแพทย์ 2568) · สรุปเป็นหน้าเว็บใน Drive: `WOW_OS/02_BIB_ICOONE/See_The_Unseen_Campaign/BIB_SeeTheUnseen_BoothKiosk_Research_v1.0_2026-11-25.html` (ยังไม่ publish)
+- หน้าใหม่ `/bodymap/booth` (จอ 16:9 ทัชสกรีน · ใช้ข้อมูล Airtable ชุดเดียวกัน):
+  - หน้ารอ: Design your Signature · ออกแบบทรีตเมนต์ซิกเนเจอร์ของคลินิกคุณ · แตะเพื่อเริ่ม · นับ Signature วันนี้บนจอนี้ (นับจริงในเครื่อง)
+  - 1 Your Business: 5 ประเภทธุรกิจ (ร่างเดิม lib/bodymap/business.ts)
+  - 2 Your Focus: Body Map + ปัญหาของบริเวณ (จุดแตะขยายเป็น 44 px)
+  - 3 Your Signature: เส้นทองเซ็นชื่อ → ชื่อแผนดูแล/นาที/คอร์ส + No. + วันที่ → 01 Clients (กลุ่มที่ตรงทั้งธุรกิจและปัญหา หลักก่อนรอง ไม่เกิน 3 · ไม่ตรง = กลุ่มของปัญหา + "กลุ่มคนไข้ใหม่ที่คลินิกคุณยังไม่ได้ดูแล") · 02 Machine (MechanismAnim ปรับหัว แรงดูด LED Laser ได้) · 03 Return (Consumable Cost % + คน/เดือน 3 แผน + สมมติฐาน + "ประมาณการ ไม่ใช่การรับประกันรายได้") · QR
+  - QR → `/bodymap?p=<ปัญหา>&bt=<ธุรกิจ>&src=booth` เปิดปัญหาเดิมบนมือถือ (BodyMapApp อ่าน ?p) · เก็บลีดบนมือถือเท่านั้น
+  - ไม่มีใครแตะ 45 วินาที → "ยังดูอยู่ไหม" 20 วินาที → กลับหน้ารอ (WCAG 2.2.1)
+  - ขอบล่าง: "Advertise to Healthcare Professional and Health Official" (ประกาศ อย. 2568)
+  - event ใหม่ "บูธ" (เริ่ม · ธุรกิจ · Signature No. · สแกน QR · หมดเวลา) → Airtable Body Map Events
+- แผนแรกเปลี่ยนชื่อเป็น THE EXCLUSIVE (ไนน์ 25 พ.ย.)
+- ⚠️ ยังขาด: เลขใบอนุญาตโฆษณา (ฆพ.) และชื่อ/ช่องทางติดต่อผู้โฆษณาบนจอ ตามประกาศ อย. 2568 · ตรวจคำต้องห้าม (เช่น "พิเศษ") ทั้งเว็บ · ประเภทธุรกิจยังเป็นร่าง
+- Deploy: preview https://450918e5.bib-bodymap-preview.pages.dev/bodymap/booth · demo https://e91a7d39.bib-bodymap-demo.pages.dev/bodymap/booth · ตรวจที่ 1920×1080 ทุกขั้น + QR บนมือถือแล้ว · ภาพหน้าจอขั้น 3 ใน Drive โฟลเดอร์เดียวกัน
+- บทเรียน: ไนน์ไม่ชอบคำถามจุกจิก · ตัดสินใจเองในเรื่องที่ตัดสินได้ ถามเฉพาะเรื่องที่เปลี่ยนผลงานจริง
