@@ -82,7 +82,7 @@ for x in R("patient_situation_pain_links.csv"): (ps_pri if x["match"] == "Primar
 
 # ---------- evidence (กรอง: เอกสารลับ · ไม่มี "หมอ")
 QMAP = {"01": "works", "03": "works", "02": "how", "04": "how", "05": "protocol", "08": "protocol", "06": "safety", "12": "safety", "10": "patient", "09": "patient", "11": "peers", "07": "peers"}
-REL_RANK = {"ใช้ icoone ตรง": 0, "เครื่องประเภทเดียวกัน": 1, "กลไกพื้นฐาน": 2, "เอกสารผู้ผลิต": 3, "ไม่เกี่ยวกับเครื่อง": 4}
+REL_RANK = {"ใช้ icoone ตรง": 0, "เครื่องประเภทเดียวกัน": 1, "กลไกพื้นฐาน": 2, "เอกสารผู้ผลิต": 3, "ไม่เกี่ยวกับเครื่อง": 4, "สื่อ": 5}
 LVL_RANK = {"Systematic review / Meta-analysis": 0, "RCT": 0, "มีกลุ่มเทียบ": 1}
 evidence = []; ev_skip = collections.Counter(); ev_by_p = collections.defaultdict(list); ev_by_prg = collections.defaultdict(list)
 for r in A("research_evidence.json"):
@@ -102,6 +102,14 @@ for r in A("research_evidence.json"):
         "short": EVC.get(eid, {}).get("short_doctor", ""), "detail": EVC.get(eid, {}).get("detail_doctor", ""), "headline": EVC.get(eid, {}).get("headline_number", ""), "rank": [REL_RANK.get(rel, 9), LVL_RANK.get(lvl, 2)], "locked": bool(v.get("fldXCdw6WnLhzkT52"))})
     for p in P: ev_by_p[p].append(eid)
     for g in G: ev_by_prg[g].append(eid)
+# หลักฐานจากเอกสารขาย/สื่อใน Google Drive (ไนน์สั่ง 24 พ.ย.: บอกที่มาให้หมอพิจารณาเอง ไม่ตัดออกเพราะระดับหลักฐาน)
+for r in csv.DictReader(open(os.path.join(ROOT, "_ai/content/evidence_sales_docs.csv"), encoding="utf-8-sig")) if os.path.exists(os.path.join(ROOT, "_ai/content/evidence_sales_docs.csv")) else []:
+    P = [x for x in r["pains"].split(";") if x]
+    evidence.append({"id": r["evidence_id"], "title": r["title"], "year": None, "authors": r["authors"], "categories": [], "questions": [q for q in r["questions"].split(";") if q],
+        "relation": r["relation"], "level": r["level"], "n": None, "summary": "", "direction": "", "canSay": "", "limits": "", "url": "",
+        "reviewStatus": "ร่าง · จากเอกสารใน Google Drive", "pains": P, "programs": [], "short": r["short_doctor"], "detail": r["detail_doctor"], "headline": "",
+        "rank": [REL_RANK.get(r["relation"], 5), 3], "locked": False})
+    for p in P: ev_by_p[p].append(r["evidence_id"])
 evidence.sort(key=lambda e: (e["rank"], e["id"]))
 
 # ---------- cases (กรอง: demo · อายุต่ำกว่า 18 · ไม่มี "หมอ" · ห้ามใช้ภายนอก) · ตัดชื่อคลินิกออก
