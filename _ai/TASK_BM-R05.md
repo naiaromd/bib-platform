@@ -167,3 +167,11 @@ Assignment ID ที่ทำ: **BM-R05-20261123-v004** (ไฟล์มาถ�
 - ผล: ทุกปัญหาที่มีแผนดูแลมีแท็บหลักฐานแล้ว
 - ไนน์ตัดสิน 8 ปัญหาที่ไม่มีแผน: ปัญหาสีผิว (P05 สีคอและเนินอกไม่สม่ำเสมอ · P09 จุดแดดหลังมือ) icoone ไม่ได้ช่วย → เอาออกจากหน้า (ยังอยู่ใน Airtable) · อีก 6 (P08 P16 P37 P44 P45 P50) ขอบเขตใหญ่ icoone อาจเป็นส่วนหนึ่ง → หน้าแสดงการ์ด "icoone อาจเป็นส่วนหนึ่งของแผนดูแล" ชวนกดขอเดโม/คุยทาง LINE เพื่อศึกษาร่วมกัน
 - ทดสอบ 16 กรณีผ่าน (ปรับ 2 กรณีให้ตรง 48 ปัญหา) · deploy preview เดิม · ยังไม่ได้เปิดดูการ์ดใหม่ด้วยตา
+
+## 24 พ.ย. 2026 · ไนน์ใส่ AIRTABLE_TOKEN แล้ว
+- token อยู่ใน `.env.local` (git ไม่เก็บ · สิทธิ์ไฟล์เฉพาะเจ้าของ) · อ่าน/เขียน records ได้ · อ่าน schema ไม่ได้ (token ไม่มีสิทธิ์ schema.bases:read · ไม่กระทบงานตอนนี้)
+- Cloudflare Pages `bib-bodymap-preview`: ตั้ง AIRTABLE_TOKEN · AIRTABLE_BASE_ID · BODYMAP_SECRET (สร้างใหม่ เก็บใน `.env.local` ด้วย) แล้ว deploy ใหม่
+- ทดสอบจริงบนลิงก์ preview: `/api/bodymap-event` เขียน 1 แถว (session `BM-TESTLIVE-0001`) · `/api/bodymap-lead` สร้างลีด `recc2kod9nAJvR5GT` รหัสอ้างอิง `BM-MWUKWTWU-A161` และผูก event 1 แถว — **แถวทดสอบ ไนน์ลบได้**
+- `push_content.py --write`: Programs แก้ 4 · Research Evidence แก้ 54 · Cases แก้ 44 · Body Map Content แก้ 30 + เพิ่ม 54 (ผูกหลักฐาน/เคสตาม proof_ref ล่าสุด รวม SD) · Change Log ชุดละ 1 แถว · รันซ้ำแล้วเหลือ 0 = Airtable ตรงกับหน้าเว็บ
+- Todo: งาน 5 · 8 · 9 = Done
+- ยังไม่ได้ทำ: งาน 6 (หน้าอ่าน Airtable สด แทนไฟล์สำเนา) · automation ยังไม่ได้กด Test · ปุ่ม LINE ยังไม่เด้งไป LINE จริง (รอบัญชี OA)

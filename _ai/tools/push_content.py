@@ -48,9 +48,10 @@ sync("tblqUf6RMxUvjxhrb", "Research Evidence", "fld24fsyv4kRLUTqB", rd("evidence
 sync("tblkFaN6uZfUsSkP6", "Cases", "fldM1ioKMrTD5gBYp", rd("cases_doctor.csv"), "case_id", {"short_doctor": "fldhWcExcnz1qOjZo"})
 # Insight: payload มี link ครบ (สร้างจาก insights.csv) · แก้แถวเดิมเฉพาะข้อความ · เพิ่มแถวที่ยังไม่มี
 T, KEY, SHORT, LONG = "tblMeVbqZO3aiWRxF", "fldX1RLSkjqhNVd8M", "fldiZPtTCQ00gNxt8", "fldmsxxdqDhgzTyQ8"
-cur = {r["fields"].get(KEY): r for r in fetch(T, [KEY, SHORT, LONG])}
+EVL, CAL = "fld7eHVHCaUhOlMcL", "fldKIszGDsAfHWVVF"
+cur = {r["fields"].get(KEY): r for r in fetch(T, [KEY, SHORT, LONG, EVL, CAL])}
 pay = json.load(open(os.path.join(ROOT, "_ai/payload/insight_payload.json")))
-upd = [{"id": cur[x["fields"][KEY]]["id"], "fields": {k: x["fields"][k] for k in (SHORT, LONG) if (cur[x["fields"][KEY]]["fields"].get(k) or "") != x["fields"][k]}} for x in pay if x["fields"][KEY] in cur]
+upd = [{"id": cur[x["fields"][KEY]]["id"], "fields": {k: x["fields"][k] for k in (SHORT, LONG, EVL, CAL) if (cur[x["fields"][KEY]]["fields"].get(k) or ([] if k in (EVL, CAL) else "")) != x["fields"].get(k, [])}} for x in pay if x["fields"][KEY] in cur]
 send(T, "Body Map Content", "PATCH", [u for u in upd if u["fields"]])
 send(T, "Body Map Content", "POST", [x for x in pay if x["fields"][KEY] not in cur])
 print("เสร็จ" if WRITE else "ยังไม่ได้เขียน · เติม --write เพื่อเขียนจริง")
