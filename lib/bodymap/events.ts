@@ -2,7 +2,8 @@
 // ส่งเป็นชุดทุก 10 วินาที หรือเมื่อออกจากหน้า · ส่งเฉพาะเมื่อผู้ใช้กด "ยอมรับ" ที่แถบล่าง
 export type EventType =
   | "เปิดหน้า" | "เลือก Fit" | "หมุนรูป" | "กดจุด" | "เปิดปัญหา" | "เปิด Program ย่อ" | "เปิด Program ละเอียด"
-  | "เปิดหลักฐานย่อ" | "เปิดหลักฐานละเอียด" | "เปิด Insight" | "เลือกหัวเครื่อง" | "เริ่มกรอกฟอร์ม" | "ส่งฟอร์ม" | "กด LINE";
+  | "เปิดหลักฐานย่อ" | "เปิดหลักฐานละเอียด" | "เปิด Insight" | "เลือกหัวเครื่อง" | "เริ่มกรอกฟอร์ม" | "ส่งฟอร์ม" | "กด LINE"
+  | "คำนวณ ROI" | "ขอเอกสาร";
 export type BmEvent = {
   key: string; session: string; at: string; type: EventType; p?: string; z?: string; program?: string;
   evidence?: string; fit?: string; mode?: string; note?: string;
@@ -23,7 +24,8 @@ const store = (k: string, v?: string) => {
   } catch { /* storage ปิดอยู่ = ถือว่ายังไม่ตอบ */ }
   return null;
 };
-export const getConsent = (): "yes" | "no" | null => (typeof window === "undefined" ? null : (store(CONSENT_KEY) as "yes" | "no" | null));
+// ไนน์ตัดสิน 24 พ.ย.: ไม่ขึ้นแถบถาม · เก็บการใช้งานแบบไม่ระบุตัวตนเป็นค่าเริ่มต้น · ผูกกับตัวตนเมื่อหมอส่งฟอร์มและติ๊กยินยอมเท่านั้น
+export const getConsent = (): "yes" | "no" | null => (typeof window === "undefined" ? null : store(CONSENT_KEY) === "no" ? "no" : "yes");
 export function setConsent(v: "yes" | "no") { store(CONSENT_KEY, v); if (v === "no") queue = []; else start(); }
 export function sessionId(): string {
   if (typeof window === "undefined") return "";
@@ -67,5 +69,6 @@ export function summary() {
     programs_short: uniq(of("เปิด Program ย่อ").map((e) => e.program)), programs_detail: uniq(of("เปิด Program ละเอียด").map((e) => e.program)),
     evidence_short: uniq(of("เปิดหลักฐานย่อ").map((e) => e.evidence)), evidence_detail: uniq(of("เปิดหลักฐานละเอียด").map((e) => e.evidence)),
     insights: uniq(of("เปิด Insight").map((e) => e.p)), handpiece: of("เลือกหัวเครื่อง").slice(-1)[0]?.note ?? "",
+    roi: of("คำนวณ ROI").slice(-1)[0]?.note ?? "", docs_requested: uniq(of("ขอเอกสาร").map((e) => e.evidence)),
   };
 }

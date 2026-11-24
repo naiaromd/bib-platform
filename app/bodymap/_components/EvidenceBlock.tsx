@@ -9,7 +9,7 @@ const QUESTIONS: [QuestionKey, string][] = [
   ["safety", "ปลอดภัย ผ่านการรับรองไหม"], ["patient", "คนไข้ชอบไหม คุ้มไหม"], ["peers", "หมอคนอื่นใช้ไหม"],
 ];
 
-function PaperCard({ e, internal }: { e: Evidence; internal: boolean }) {
+function PaperCard({ e, internal, onRequest }: { e: Evidence; internal: boolean; onRequest?: (e: Evidence) => void }) {
   const [open, setOpen] = useState(false);
   return (
     <article className="rounded-xl border border-line bg-card p-4">
@@ -30,7 +30,11 @@ function PaperCard({ e, internal }: { e: Evidence; internal: boolean }) {
         e.detail ? (
           <div className="mt-2 border-t border-line pt-2 text-sm text-ink">
             <p className="m-0 whitespace-pre-line break-words">{e.detail}</p>
-            {e.url ? <a href={e.url} target="_blank" rel="noreferrer" className="mt-1 inline-block break-all underline">เปิดงานวิจัยต้นฉบับ</a> : null}
+            {e.url ? (
+              <a href={e.url} target="_blank" rel="noreferrer" onClick={() => track("เปิดหลักฐานละเอียด", { evidence: e.id, note: "เปิดฉบับเต็ม" })} className="mt-2 inline-block rounded-full border border-ink px-4 py-1.5 text-sm text-ink hover:bg-ink hover:text-paper">อ่านฉบับเต็ม ↗</a>
+            ) : onRequest ? (
+              <button type="button" onClick={() => { track("ขอเอกสาร", { evidence: e.id }); onRequest(e); }} className="mt-2 rounded-full border border-ink px-4 py-1.5 text-sm text-ink hover:bg-ink hover:text-paper">ขอฉบับเต็มจากทีม</button>
+            ) : null}
           </div>
         ) : (
         <dl className="m-0 mt-2">
@@ -88,7 +92,7 @@ export function evidenceCount(concern: Concern, data: BodyMapData): number {
 }
 
 /** หลักฐาน = งานวิจัย + เคส · แยกตาม 6 คำถามที่หมอถาม */
-export default function EvidenceBlock({ concern, data }: { concern: Concern; data: BodyMapData }) {
+export default function EvidenceBlock({ concern, data, onRequest }: { concern: Concern; data: BodyMapData; onRequest?: (e: Evidence) => void }) {
   const internal = data.mode === "internal";
   const papers = concern.evidence.map((id) => data.evidence.find((e) => e.id === id)).filter((e): e is Evidence => Boolean(e))
     .sort((a, b) => a.rank[0] - b.rank[0] || a.rank[1] - b.rank[1] || a.id.localeCompare(b.id));
@@ -125,7 +129,7 @@ export default function EvidenceBlock({ concern, data }: { concern: Concern; dat
             <p className="m-0 mt-2 text-sm text-ink">ปัญหานี้อยู่ในข้อบ่งใช้ที่ FDA รับรอง · เลขทะเบียน K211272</p>
           </div>
         ) : null}
-        {cur.papers.map((e) => <PaperCard key={e.id} e={e} internal={internal} />)}
+        {cur.papers.map((e) => <PaperCard key={e.id} e={e} internal={internal} onRequest={onRequest} />)}
         {cur.cases.map((c) => <CaseCard key={c.id} c={c} data={data} />)}
       </div>
     </div>

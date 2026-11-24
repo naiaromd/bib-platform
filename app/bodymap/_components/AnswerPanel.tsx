@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import type { BodyMapData, Concern, Zone } from "@/lib/bodymap/data";
+import type { BodyMapData, Concern, Evidence, Zone } from "@/lib/bodymap/data";
 import { track } from "@/lib/bodymap/events";
 import { resolveAnswer, type Course, type Fit, type Solution, type SolutionStep } from "@/lib/bodymap/solution";
+import ChanceTab from "./ChanceTab";
 import EvidenceBlock, { evidenceCount } from "./EvidenceBlock";
 import HandpiecePicker, { headText, type HeadChoice } from "./HandpiecePicker";
 import LeadForm from "./LeadForm";
@@ -95,6 +96,7 @@ export default function AnswerPanel({
   const [alt, setAlt] = useState<string | null>(null);
   const [tab, setTab] = useState<TabKey>("how");
   const [form, setForm] = useState<null | "demo" | "line">(null);
+  const [doc, setDoc] = useState<Evidence | null>(null);
   useEffect(() => { setAlt(null); setTab("how"); }, [concern?.id]);
 
   const picked = ans?.alternatives.find((s) => s.id === alt) ?? null;
@@ -154,18 +156,8 @@ export default function AnswerPanel({
                 <HandpiecePicker value={head} onChange={onHead} />
               </>
             ) : null}
-            {cur === "proof" ? <EvidenceBlock key={concern.id} concern={concern} data={data} /> : null}
-            {cur === "chance" && insight ? (
-              <div>
-                <div className="flex flex-wrap gap-1.5"><Status show={internal && !insight.locked}>ร่าง</Status>{internal ? <Tag>{insight.id}</Tag> : null}</div>
-                {([["คนไข้กลุ่มไหนมาด้วยเรื่องนี้", insight.who], ["โอกาสของคลินิก", insight.opportunity], ["หลักฐานที่ใช้คุยกับคนไข้", insight.proof]] as [string, string][]).filter(([, t]) => t).map(([h, t]) => (
-                  <section key={h} className="mt-3 first:mt-0">
-                    <h4 className="mb-1 mt-0 text-sm font-normal text-muted">{h}</h4>
-                    <p className="m-0 whitespace-pre-line break-words text-base leading-relaxed text-ink">{t}</p>
-                  </section>
-                ))}
-              </div>
-            ) : null}
+            {cur === "proof" ? <EvidenceBlock key={concern.id} concern={concern} data={data} onRequest={(e) => { setDoc(e); setForm("line"); }} /> : null}
+            {cur === "chance" && insight ? <ChanceTab insight={insight} course={course} minutes={main?.totalMinutes ?? plan?.totalMinutes ?? null} internal={internal} /> : null}
             {cur === "other" ? (
               <div className="grid gap-2">
                 {others.map((s) => (
@@ -178,12 +170,12 @@ export default function AnswerPanel({
         </>
       ) : <div className="hidden flex-1 lg:block" />}
       <div className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-line bg-paper p-3 lg:static lg:z-auto lg:rounded-b-2xl">
-        <button type="button" onClick={() => setForm("demo")} className="flex-1 rounded-full border border-ink bg-ink px-4 py-2.5 text-base text-paper">ขอเดโม</button>
-        <button type="button" onClick={() => setForm("line")} className="flex-1 rounded-full border border-good bg-card px-4 py-2.5 text-base text-good hover:bg-good hover:text-paper">คุยทาง LINE</button>
+        <button type="button" onClick={() => { setDoc(null); setForm("demo"); }} className="flex-1 rounded-full border border-ink bg-ink px-4 py-2.5 text-base text-paper">ขอเดโม</button>
+        <button type="button" onClick={() => { setDoc(null); setForm("line"); }} className="flex-1 rounded-full border border-good bg-card px-4 py-2.5 text-base text-good hover:bg-good hover:text-paper">คุยทาง LINE</button>
       </div>
       {form ? (
-        <Sheet title={form === "demo" ? "ขอเดโม" : "คุยทาง LINE"} onClose={() => setForm(null)}>
-          <LeadForm viaLine={form === "line"} context={{ concern: concern?.id, concernLabel: concern?.label, zone: zone?.id, fit: fitText, plan: main ? planTitle(main) : undefined, head: main ? headText(head) : undefined }} />
+        <Sheet title={doc ? "ขอฉบับเต็ม" : form === "demo" ? "ขอเดโม" : "คุยทาง LINE"} onClose={() => { setForm(null); setDoc(null); }}>
+          <LeadForm viaLine={form === "line"} context={{ concern: concern?.id, concernLabel: concern?.label, zone: zone?.id, fit: fitText, plan: main ? planTitle(main) : undefined, head: main ? headText(head) : undefined, doc: doc?.id, docTitle: doc?.title }} />
         </Sheet>
       ) : null}
     </div>

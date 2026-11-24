@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { summary, track, flush, sessionId } from "@/lib/bodymap/events";
 
-export type LeadContext = { concern?: string; concernLabel?: string; zone?: string; fit: string; plan?: string; head?: string };
+export type LeadContext = { concern?: string; concernLabel?: string; zone?: string; fit: string; plan?: string; head?: string; doc?: string; docTitle?: string };
 const FIELDS: [string, string, boolean, string][] = [
   ["name", "ชื่อแพทย์", true, "text"], ["license", "เลขใบประกอบวิชาชีพ (ถ้าสะดวก)", false, "text"], ["clinic", "คลินิก", true, "text"],
   ["province", "จังหวัด", true, "text"], ["cases_per_month", "เคสหัตถการต่อเดือน (โดยประมาณ)", false, "text"],
@@ -13,7 +13,6 @@ const FIELDS: [string, string, boolean, string][] = [
 export default function LeadForm({ context, viaLine }: { context: LeadContext; viaLine: boolean }) {
   const [v, setV] = useState<Record<string, string>>({});
   const [contact, setContact] = useState(false);
-  const [line, setLine] = useState(viaLine);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [started, setStarted] = useState(false);
@@ -25,13 +24,12 @@ export default function LeadForm({ context, viaLine }: { context: LeadContext; v
     if (miss.length) return setErr("กรอกให้ครบ: " + miss.join(" · "));
     if ((v.phone ?? "").replace(/\D/g, "").length < 9) return setErr("เบอร์โทรต้องมีอย่างน้อย 9 หลัก");
     if (!contact) return setErr("ติ๊กยินยอมให้ทีมติดต่อกลับก่อนส่ง");
-    if (viaLine && !line) return setErr("ติ๊กยินยอมให้ติดต่อทาง LINE ก่อนส่ง");
     setBusy(true);
     track(viaLine ? "กด LINE" : "ส่งฟอร์ม", { p: context.concern });
     try {
       const res = await fetch("/api/bodymap-lead", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lead: { ...v, consent_contact: contact, consent_line: line }, website: v.website ?? "", via_line: viaLine, session: sessionId(), context, clicks: summary() }),
+        body: JSON.stringify({ lead: { ...v, consent_contact: contact, consent_line: Boolean((v.line_id ?? "").trim()) }, website: v.website ?? "", via_line: viaLine, session: sessionId(), context, clicks: summary() }),
       });
       const j = (await res.json().catch(() => null)) as { ok?: boolean; ref?: string } | null;
       if (!res.ok || !j?.ok || !j.ref) throw new Error("fail");
@@ -45,7 +43,7 @@ export default function LeadForm({ context, viaLine }: { context: LeadContext; v
 
   return (
     <form className="grid gap-2" onSubmit={(e) => { e.preventDefault(); void send(); }} noValidate>
-      <p className="m-0 text-sm text-ink-2">{viaLine ? "ทีมจะทักไปทาง LINE พร้อมแผนดูแลที่คุณเพิ่งดู" : "ทีมจะติดต่อกลับเพื่อนัดเดโมกับแผนดูแลที่คุณเพิ่งดู"}</p>
+      <p className="m-0 text-sm text-ink-2">{context.doc ? `ทีมจะส่งฉบับเต็มของ "${context.docTitle ?? context.doc}" ให้ทาง LINE` : viaLine ? "ทีมจะทักไปทาง LINE พร้อมแผนดูแลที่คุณเพิ่งดู" : "ทีมจะติดต่อกลับเพื่อนัดเดโมกับแผนดูแลที่คุณเพิ่งดู"}</p>
       {FIELDS.map(([k, label, req, type]) => (
         <label key={k} className="block min-w-0 text-sm text-ink-2">
           {label}{req ? " *" : ""}
@@ -56,11 +54,7 @@ export default function LeadForm({ context, viaLine }: { context: LeadContext; v
       <input type="text" name="website" tabIndex={-1} autoComplete="off" value={v.website ?? ""} onChange={(e) => setV((o) => ({ ...o, website: e.target.value }))} className="hidden" aria-hidden />
       <label className="flex items-start gap-2 text-sm text-ink">
         <input type="checkbox" checked={contact} onChange={(e) => setContact(e.target.checked)} className="mt-1 h-4 w-4 flex-none accent-ink" />
-        <span>ยินยอมให้ BIB เก็บข้อมูลนี้และติดต่อกลับเรื่อง icoone Laser Med ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล *</span>
-      </label>
-      <label className="flex items-start gap-2 text-sm text-ink">
-        <input type="checkbox" checked={line} onChange={(e) => setLine(e.target.checked)} className="mt-1 h-4 w-4 flex-none accent-ink" />
-        <span>ยินยอมให้ติดต่อทาง LINE{viaLine ? " *" : ""}</span>
+        <span>ยินยอมให้ BIB ติดต่อกลับ และเก็บข้อมูลนี้ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล</span>
       </label>
       {err ? <p role="alert" className="m-0 text-sm text-bad">{err}</p> : null}
       <button type="submit" disabled={busy} className="mt-1 rounded-full border border-ink bg-ink px-5 py-2.5 text-base text-paper disabled:opacity-50">

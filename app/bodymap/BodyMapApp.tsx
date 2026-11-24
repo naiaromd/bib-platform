@@ -5,7 +5,6 @@ import { setContext, track } from "@/lib/bodymap/events";
 import { concernMatchesGoal, DEFAULT_FIT, type Fit } from "@/lib/bodymap/solution";
 import AnswerPanel from "./_components/AnswerPanel";
 import BodyFigure, { type View } from "./_components/BodyFigure";
-import ConsentBar from "./_components/ConsentBar";
 import FitPanel from "./_components/FitPanel";
 import { headText, type HeadChoice } from "./_components/HandpiecePicker";
 import ProblemPicker from "./_components/ProblemPicker";
@@ -85,7 +84,6 @@ export default function BodyMapApp({ data: initial }: { data: BodyMapData }) {
         />
       </div>
       {programId ? <ProgramSheet key={programId} id={programId} data={data} onClose={() => setProgramId(null)} /> : null}
-      <ConsentBar onAnswer={(v) => { if (v === "yes") track("เปิดหน้า", { note: "ยอมรับการเก็บข้อมูล" }); }} />
     </main>
   );
 }
