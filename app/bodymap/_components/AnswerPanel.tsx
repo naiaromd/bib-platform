@@ -171,7 +171,7 @@ export default function AnswerPanel({
           </div>
         </>
       ) : <div className="hidden flex-1 lg:block" />}
-      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-line bg-paper p-3 lg:static lg:z-auto lg:rounded-b-2xl">
+      <div className={`fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-line bg-paper p-3 lg:static lg:z-auto lg:rounded-b-2xl${concern && cur === "chance" ? " hidden lg:hidden" : ""}`}>
         <button type="button" onClick={() => { setDoc(null); setForm("demo"); }} className="flex-1 rounded-full border border-ink bg-ink px-4 py-2.5 text-base text-paper">ขอเดโม</button>
         <button type="button" onClick={() => { setDoc(null); setForm("line"); }} className="flex-1 rounded-full border border-good bg-card px-4 py-2.5 text-base text-good hover:bg-good hover:text-paper">คุยทาง LINE</button>
       </div>

@@ -60,7 +60,6 @@ export default function BodyMapApp({ data: initial }: { data: BodyMapData }) {
             <img src="/assets/brand/icoone-laser-med-logo.png" alt="icoone Laser Med" className="h-6 w-auto md:h-8" />
           </div>
           <h1 className="m-0 text-lg font-semibold leading-tight text-ink md:text-3xl">นวัตกรรมฟื้นฟูผิวและรูปร่างจากประเทศอิตาลี</h1>
-          <p className="m-0 mt-1 text-sm text-ink-2 md:text-base">ลูกกลิ้งแรงดูดกระตุ้นเนื้อเยื่อ ร่วมกับ Laser และ LED · เลือกปัญหาคนไข้ แล้วดูแผนดูแล หลักฐาน และความคุ้มค่า</p>
         </div>
         {data.mode === "internal" ? (
           <span className="rounded-full border border-warn px-3 py-1 text-xs text-warn">โหมดภายใน · ข้อมูลร่าง ยังไม่ผ่านการตรวจ</span>
