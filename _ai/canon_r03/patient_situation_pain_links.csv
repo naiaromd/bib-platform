@@ -81,13 +81,13 @@ P29,PS11,G11,Primary,เห็นรอยในบางแสง เชื่�
 P29,PS10,G10,Secondary,เห็นรอยในบางแสง เชื่อมกับบริบท คนดูแลต่อหลังหัตถการ,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
 P30,PS11,G11,Primary,ตึงรบกวนการขยับ เชื่อมกับบริบท คนมีแผลเดิมที่ยังรบกวน,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
 P30,PS12,G12,Secondary,ตึงรบกวนการขยับ เชื่อมกับบริบท คนมีอาการบวมหรือปวดต่อเนื่อง,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
-P31,PS03,G03,Primary,รองเท้าแน่นท้ายวัน เชื่อมกับบริบท คนทำงานยืนหรือเดินมาก,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
+P31,PS03,G03,Secondary,รองเท้าแน่นท้ายวัน เชื่อมกับบริบท คนทำงานยืนหรือเดินมาก,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-25
 P31,PS04,G04,Secondary,รองเท้าแน่นท้ายวัน เชื่อมกับบริบท คนเดินทางบ่อย,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
 P31,PS02,G02,Secondary,รองเท้าแน่นท้ายวัน เชื่อมกับบริบท คนทำงานหน้าจอ,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
-P32,PS03,G03,Primary,หนักขารบกวนกิจวัตร เชื่อมกับบริบท คนทำงานยืนหรือเดินมาก,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
+P32,PS03,G03,Secondary,หนักขารบกวนกิจวัตร เชื่อมกับบริบท คนทำงานยืนหรือเดินมาก,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-25
 P32,PS04,G04,Secondary,หนักขารบกวนกิจวัตร เชื่อมกับบริบท คนเดินทางบ่อย,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
 P32,PS12,G12,Secondary,หนักขารบกวนกิจวัตร เชื่อมกับบริบท คนมีอาการบวมหรือปวดต่อเนื่อง,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
-P33,PS03,G03,Primary,ความตึงต่างจากเดิม เชื่อมกับบริบท คนทำงานยืนหรือเดินมาก,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
+P33,PS03,G03,Secondary,ความตึงต่างจากเดิม เชื่อมกับบริบท คนทำงานยืนหรือเดินมาก,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-25
 P33,PS04,G04,Secondary,ความตึงต่างจากเดิม เชื่อมกับบริบท คนเดินทางบ่อย,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
 P33,PS12,G12,Secondary,ความตึงต่างจากเดิม เชื่อมกับบริบท คนมีอาการบวมหรือปวดต่อเนื่อง,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
 P34,PS12,G12,Primary,พบอาการที่ไม่เข้าใจ เชื่อมกับบริบท คนมีอาการบวมหรือปวดต่อเนื่อง,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
@@ -116,7 +116,7 @@ P44,PS02,G02,Secondary,กินหรืออ้าปากไม่สบา
 P45,PS12,G12,Primary,อยากเข้าใจสาเหตุ เชื่อมกับบริบท คนมีอาการบวมหรือปวดต่อเนื่อง,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
 P45,PS02,G02,Secondary,อยากเข้าใจสาเหตุ เชื่อมกับบริบท คนทำงานหน้าจอ,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
 P46,PS05,G05,Primary,หลังฝึก เชื่อมกับบริบท คนออกกำลังกายและดูแลรูปร่าง,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
-P46,PS03,G03,Secondary,หลังฝึก เชื่อมกับบริบท คนทำงานยืนหรือเดินมาก,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
+P46,PS03,G03,Primary,หลังฝึก · Sport Lover (ไนน์ 25 พ.ย.),Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-25
 P47,PS02,G02,Primary,กิจกรรมเดิมกระตุ้นซ้ำ เชื่อมกับบริบท คนทำงานหน้าจอ,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
 P47,PS03,G03,Secondary,กิจกรรมเดิมกระตุ้นซ้ำ เชื่อมกับบริบท คนทำงานยืนหรือเดินมาก,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23
 P47,PS05,G05,Secondary,กิจกรรมเดิมกระตุ้นซ้ำ เชื่อมกับบริบท คนออกกำลังกายและดูแลรูปร่าง,Strategic hypothesis;ไม่ใช่ incidence,BIB_CANON/02_Master_Data_Workbook.xlsx · 03_PAIN_AUDIENCE_MATCH,2026-11-23

@@ -4,6 +4,7 @@ import type { BodyMapData, Concern, Evidence, Zone } from "@/lib/bodymap/data";
 import { track } from "@/lib/bodymap/events";
 import { resolveAnswer, type Course, type Fit, type Solution, type SolutionStep } from "@/lib/bodymap/solution";
 import ChanceTab from "./ChanceTab";
+import MarketTab from "./MarketTab";
 import { FACE_ZONES } from "@/lib/bodymap/pricing";
 import EvidenceBlock, { evidenceCount } from "./EvidenceBlock";
 import HandpiecePicker, { headText, type HeadChoice } from "./HandpiecePicker";
@@ -13,7 +14,7 @@ import ProgramIcon from "./ProgramIcon";
 import { Sheet, Status, Tag } from "./ui";
 import { GOAL_TH, LAYER, freqTh, planSub, planTitle, targetTh } from "./words";
 
-type TabKey = "how" | "proof" | "chance" | "other";
+type TabKey = "how" | "proof" | "chance" | "market" | "other";
 
 function Steps({ steps, data, onProgram }: { steps: SolutionStep[]; data: BodyMapData; onProgram: (id: string) => void }) {
   const prog = (id: string) => data.programs.find((p) => p.id === id);
@@ -99,6 +100,10 @@ export default function AnswerPanel({
   const [tab, setTab] = useState<TabKey>("how");
   const [form, setForm] = useState<null | "demo" | "line">(null);
   const [doc, setDoc] = useState<Evidence | null>(null);
+  // กลุ่มคนไข้ที่หมอเลือก · ใช้ร่วมกันระหว่างแท็บคืนทุนกับ Market Insight · ตั้งต้น = กลุ่มที่ผูกกับปัญหาที่เปิดอยู่
+  const [segs, setSegs] = useState<string[]>(() => (concern ? [...concern.psPrimary, ...concern.psSecondary] : []));
+  useEffect(() => { setSegs(concern ? [...concern.psPrimary, ...concern.psSecondary] : []); }, [concern]);
+  const togglePs = (id: string) => setSegs((x) => (x.includes(id) ? x.filter((y) => y !== id) : [...x, id]));
   useEffect(() => { setAlt(null); setTab("how"); }, [concern?.id]);
 
   const picked = ans?.alternatives.find((s) => s.id === alt) ?? null;
@@ -110,10 +115,11 @@ export default function AnswerPanel({
   if (main) tabs.push(["how", "วิธีทำ"]);
   if (concern && evidenceCount(concern, data) > 0) tabs.push(["proof", "หลักฐาน"]);
   tabs.push(["chance", "คำนวณการคืนทุน"]);
+  tabs.push(["market", "Market Insight"]);
   if (others.length) tabs.push(["other", "ทางเลือกอื่น"]);
   const cur = tabs.some(([k]) => k === tab) ? tab : tabs[0]?.[0];
   const fitText = [fit.sex === "f" ? "หญิง" : fit.sex === "m" ? "ชาย" : "", fit.goal ? GOAL_TH[fit.goal] : "", `คอร์ส ${course} ครั้ง`].filter(Boolean).join(" · ");
-  const go = (k: TabKey) => { setTab(k); if (k === "chance") track("เปิด Insight", { p: concern?.id }); if (k === "proof") track("เปิดหลักฐานย่อ", { p: concern?.id }); };
+  const go = (k: TabKey) => { setTab(k); if (k === "chance") track("เปิด Insight", { p: concern?.id }); if (k === "market") track("เปิด Insight", { p: concern?.id, note: "market" }); if (k === "proof") track("เปิดหลักฐานย่อ", { p: concern?.id }); };
 
   return (
     <div className={`flex min-w-0 flex-col rounded-2xl lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:border lg:border-line lg:bg-paper ${concern ? "border border-line bg-paper" : ""}`}>
@@ -159,7 +165,8 @@ export default function AnswerPanel({
               </>
             ) : null}
             {cur === "proof" ? <EvidenceBlock key={concern.id} concern={concern} data={data} onRequest={(e) => { setDoc(e); setForm("line"); }} /> : null}
-            {cur === "chance" ? <ChanceTab insight={insight ?? null} concern={concern} data={data} internal={internal} face={concern.zones.every((z) => FACE_ZONES.includes(z))} sex={fit.sex} onDemo={() => { setDoc(null); setForm("demo"); }} onLine={() => { setDoc(null); setForm("line"); }} /> : null}
+            {cur === "chance" ? <ChanceTab insight={insight ?? null} concern={concern} data={data} picked={segs} onToggle={togglePs} internal={internal} face={concern.zones.every((z) => FACE_ZONES.includes(z))} sex={fit.sex} onDemo={() => { setDoc(null); setForm("demo"); }} onLine={() => { setDoc(null); setForm("line"); }} /> : null}
+            {cur === "market" ? <MarketTab groups={data.patientSituations} picked={segs} onToggle={togglePs} /> : null}
             {cur === "other" ? (
               <div className="grid gap-2">
                 {others.map((s) => (

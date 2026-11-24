@@ -2,11 +2,12 @@
 // แท็บ "คำนวณการคืนทุน" · หน้าที่สำคัญที่สุด (ไนน์ 24–25 พ.ย.)
 // 1) Patient Segments 12 กลุ่ม · แสดงชื่ออังกฤษอย่างเดียว · เลือกได้ไม่บังคับ
 // 2) สมมติฐาน: 5,000 บาท/ครั้ง (40 นาที) · คอร์ส 5 ครั้ง · หักค่าวัสดุสิ้นเปลืองแล้ว
-// 3) จุดคุ้มทุน: คอร์สใหม่ต่อเดือนที่ครอบคลุมค่างวด แยกตามแผน + ซื้อขาด 2,000,000 บาท
+// 3) 3 ทางเลือกการลงทุน · แต่ละแผนบอก "คนไข้ใหม่ต่อเดือน" ที่ครอบคลุมค่างวด
+//    คนไข้ 1 คน = คอร์ส × (ราคาต่อครั้ง − ค่าวัสดุสิ้นเปลืองต่อครั้ง)
 // 4) ปุ่ม 3 อย่าง: ขอเดโม · ขอใบเสนอราคา (อีเมล) · สอบถามทาง LINE
 import { useEffect, useRef, useState } from "react";
 import type { BodyMapData, Concern, Insight } from "@/lib/bodymap/data";
-import { CONSUMABLE, FULL_PRICE, PAY_PLANS, PRICE_NOTE, WORK_DAYS } from "@/lib/bodymap/pricing";
+import { CONSUMABLE, PAY_PLANS, PRICE_NOTE } from "@/lib/bodymap/pricing";
 import { QUOTE_EMAIL } from "@/lib/bodymap/cta";
 import { track } from "@/lib/bodymap/events";
 import { Status, Tag } from "./ui";
@@ -31,24 +32,22 @@ function Field({ label, unit, value, onChange, prefix }: { label: string; unit: 
   );
 }
 
-export default function ChanceTab({ insight, concern, data, internal, face, sex, onDemo, onLine }: {
-  insight: Insight | null; concern: Concern; data: BodyMapData; internal: boolean; face: boolean; sex: "f" | "m" | null;
+export default function ChanceTab({ insight, concern, data, picked, onToggle, internal, face, sex, onDemo, onLine }: {
+  insight: Insight | null; concern: Concern; data: BodyMapData; picked: string[]; onToggle: (id: string) => void; internal: boolean; face: boolean; sex: "f" | "m" | null;
   onDemo: () => void; onLine: () => void;
 }) {
-  const [picked, setPicked] = useState<string[]>(() => [...concern.psPrimary, ...concern.psSecondary]);
   const [price, setPrice] = useState(String(DEFAULT_PRICE));
   const [course, setCourse] = useState(String(DEFAULT_COURSE));
   const [plan, setPlan] = useState("");
-  useEffect(() => { setPicked([...concern.psPrimary, ...concern.psSecondary]); }, [concern]);
 
   const supply = face ? CONSUMABLE.face : sex === "f" ? CONSUMABLE.bodyF : CONSUMABLE.bodyM;
   const p = num(price), c = num(course);
-  const perCourse = p && c && p > supply ? (p - supply) * c : null; // รายได้สุทธิต่อคอร์ส หลังหักค่าวัสดุ
-  const courses = (amount: number) => (perCourse ? Math.ceil(amount / perCourse) : null);
-  const perDay = (n: number | null) => (n && c ? (n * c) / WORK_DAYS : null);
+  const perPatient = p && c && p > supply ? (p - supply) * c : null; // ต่อคนไข้ 1 คน (1 คอร์ส) หลังหักค่าวัสดุ
+  const costPct = p ? (Math.round((supply / p) * 1000) / 10).toLocaleString("en-US", { maximumFractionDigits: 1 }) : null;
+  const patients = (perMonth: number) => (perPatient ? Math.ceil(perMonth / perPatient) : null);
   const groups = data.patientSituations;
   const pickedLabels = groups.filter((g) => picked.includes(g.id)).map((g) => g.label);
-  const toggle = (id: string) => setPicked((x) => (x.includes(id) ? x.filter((y) => y !== id) : [...x, id]));
+  const toggle = onToggle;
   const planLabel = PAY_PLANS.find((x) => x.id === plan)?.label;
 
   const sent = useRef("");
@@ -71,15 +70,13 @@ export default function ChanceTab({ insight, concern, data, internal, face, sex,
     window.location.href = `mailto:${QUOTE_EMAIL}?subject=${encodeURIComponent("ขอใบเสนอราคา icoone Laser Med")}&body=${encodeURIComponent(lines.join("\n"))}`;
   };
 
-  const cash = courses(FULL_PRICE);
-
   return (
     <div>
       {internal && insight ? <div className="mb-3 flex flex-wrap gap-1.5"><Status show={!insight.locked}>ร่าง</Status><Tag>{insight.id}</Tag></div> : null}
 
       {/* หัวเรื่อง */}
       <p className="m-0 text-[11px] uppercase tracking-[0.18em] text-rose-ink">Break-even Analysis</p>
-      <h3 className="m-0 mt-1 font-display text-2xl font-normal leading-snug text-ink">จุดคุ้มทุนของคลินิก</h3>
+      <h3 className="m-0 mt-1 text-2xl font-semibold leading-snug text-ink">จุดคุ้มทุนของคลินิก</h3>
 
       {/* กลุ่มคนไข้ */}
       <div className="mt-5">
@@ -101,44 +98,42 @@ export default function ChanceTab({ insight, concern, data, internal, face, sex,
       {/* สมมติฐาน */}
       <div className="mt-6 grid grid-cols-2 gap-5 sm:grid-cols-3">
         <Field label="ราคาต่อครั้ง · 40 นาที" prefix="฿" unit="" value={price} onChange={setPrice} />
-        <Field label="คอร์ส" unit="ครั้ง" value={course} onChange={setCourse} />
+        <Field label="คอร์สละ" unit="ครั้ง" value={course} onChange={setCourse} />
         <div className="col-span-2 min-w-0 sm:col-span-1">
-          <span className="block text-[11px] uppercase tracking-[0.12em] text-muted">รายได้สุทธิต่อคอร์ส</span>
-          <span className="mt-1.5 block border-b border-transparent pb-1.5 font-display text-2xl text-ink">{perCourse ? `฿${baht(perCourse)}` : "—"}</span>
+          <span className="block text-[11px] uppercase tracking-[0.12em] text-muted">Consumable Cost</span>
+          <span className="mt-1.5 block font-display text-2xl leading-tight text-rose-ink">{costPct ?? "—"}%</span>
+          <span className="block text-xs text-muted">ค่าวัสดุสิ้นเปลืองเพียง ฿{supply} ต่อครั้ง</span>
         </div>
       </div>
 
-      {/* ผลลัพธ์ */}
-      <div className="mt-6 overflow-hidden rounded-2xl bg-ink text-paper">
-        <div className="px-5 pb-1 pt-4">
-          <p className="m-0 text-sm text-paper/70">คอร์สใหม่ต่อเดือนที่ครอบคลุมค่างวด</p>
-        </div>
-        <div className="grid sm:grid-cols-3">
+      {/* 3 ทางเลือก */}
+      <div className="mt-7">
+        <p className="m-0 text-[11px] uppercase tracking-[0.12em] text-muted">3 ทางเลือกการลงทุน</p>
+        <p className="m-0 mt-1 text-sm text-ink-2">จำนวนคนไข้ใหม่ต่อเดือน ที่ครอบคลุมค่างวดของแต่ละแผน</p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
           {PAY_PLANS.map((x, i) => {
-            const n = courses(x.perMonth), d = perDay(n), on = plan === x.id;
+            const n = patients(x.perMonth), on = plan === x.id, dark = i === 0;
             return (
               <button key={x.id} type="button" onClick={() => setPlan(x.id)} aria-pressed={on}
-                className={`relative flex min-w-0 flex-col px-5 pb-5 pt-4 text-left transition-colors ${i ? "border-t border-paper/15 sm:border-l sm:border-t-0" : ""} ${on ? "bg-paper/10" : "hover:bg-paper/5"}`}>
-                {on ? <span aria-hidden className="absolute inset-x-5 top-0 h-0.5 bg-rose" /> : null}
-                <span className="block text-sm font-semibold">{x.label}</span>
-                <span className="block text-xs text-paper/60">฿{baht(x.perMonth)} ต่อเดือน</span>
-                {x.note ? <span className="mt-1.5 self-start rounded-full bg-rose/25 px-2 py-0.5 text-[11px] text-paper">{x.note}</span> : null}
-                <span className="mt-auto flex items-baseline gap-2 pt-4">
-                  <span className="font-display text-5xl leading-none">{n ?? "—"}</span>
-                  <span className="text-sm text-paper/70">คอร์ส / เดือน</span>
+                className={`relative flex min-w-0 flex-col overflow-hidden rounded-2xl border p-4 text-left transition ${dark ? "border-ink bg-ink text-paper" : "border-line bg-card text-ink hover:border-ink"} ${on ? "ring-2 ring-rose ring-offset-2 ring-offset-paper" : ""}`}>
+                <span className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${dark ? "text-rose" : "text-rose-ink"}`}>{x.tag}</span>
+                <span className="mt-1.5 block text-base font-semibold leading-snug">{x.title}</span>
+                <span className={`mt-1 block text-xs leading-relaxed ${dark ? "text-paper/65" : "text-muted"}`}>{x.sub}</span>
+                {x.note ? <span className={`mt-2 self-start rounded-full px-2 py-0.5 text-[11px] ${dark ? "bg-rose/25 text-paper" : "bg-rose-soft text-rose-ink"}`}>{x.note}</span> : null}
+                <span className={`mt-auto block border-t pt-0 ${dark ? "border-paper/15" : "border-line"}`}>
+                  <span className={`block pt-3 text-xs ${dark ? "text-paper/65" : "text-muted"}`}>฿{baht(x.perMonth)} ต่อเดือน</span>
+                  <span className="mt-1 flex items-baseline gap-2">
+                    <span className="font-display text-5xl leading-none">{n ?? "—"}</span>
+                    <span className={`text-sm ${dark ? "text-paper/75" : "text-ink-2"}`}>คน / เดือน</span>
+                  </span>
                 </span>
-                <span className="mt-1.5 block text-xs text-paper/60">{d ? `≈ ${d.toLocaleString("th-TH", { maximumFractionDigits: 1 })} treatment ต่อวัน` : " "}</span>
               </button>
             );
           })}
         </div>
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t border-paper/15 px-5 py-3.5">
-          <span className="text-sm text-paper/70">ซื้อขาด · ราคาเครื่อง ฿{baht(FULL_PRICE)}</span>
-          <span className="text-sm">คืนทุนเมื่อครบ <span className="font-display text-2xl">{cash ?? "—"}</span> คอร์ส</span>
-        </div>
       </div>
-      <p className="m-0 mt-2.5 text-[11px] leading-relaxed text-muted">
-        ประมาณการเบื้องต้น · หักค่าวัสดุสิ้นเปลือง ฿{supply} ต่อครั้งแล้ว · treatment ต่อวันคิดจาก {WORK_DAYS} วันทำการ · {PRICE_NOTE}
+      <p className="m-0 mt-3 text-[11px] leading-relaxed text-muted">
+        คนไข้ 1 คน = คอร์ส {c ?? "—"} ครั้ง × ราคาต่อครั้ง หักค่าวัสดุสิ้นเปลืองแล้ว · ประมาณการเบื้องต้น · {PRICE_NOTE}
       </p>
 
       {/* CTA */}

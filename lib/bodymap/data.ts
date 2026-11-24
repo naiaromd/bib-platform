@@ -42,7 +42,10 @@ export type BibProtocol = {
 };
 export type PatientSituation = {
   id: string; canon: string; label: string; trigger: string; job: string; avoid: string; status: string; locked: boolean;
+  mi: MarketInsight;
 };
+/** Market Insight ของกลุ่มคนไข้ · เรียบเรียงจากข้อมูลจริงใน Airtable (ไนน์อนุมัติ 25 พ.ย.) · ช่องว่าง = ไม่แสดง */
+export type MarketInsight = { summary: string; keywords: string[]; reads: string; key: string; services: string[]; crosssell: string; proof: string };
 export type QuestionKey = "works" | "how" | "protocol" | "safety" | "patient" | "peers";
 export type Evidence = {
   id: string; title: string; year: number | null; authors: string; categories: string[]; questions: QuestionKey[];

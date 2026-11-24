@@ -57,7 +57,8 @@ async function buildLive(): Promise<BodyMapData> {
     fetchAll("tblxN0XvHZXhy3FlC", ["fldg0ZSL1ORhVX56D", "fldqCS21tsziTkuFY"]),
     fetchAll("tbld0RiSgMZy7BTkk", ["fldKlFB9FVbDhssg5", "fldFVE4G4eCvV76x8"]),
     fetchAll("tbloX37wnKCQ0q6XP", ["fldfjJNEat5e3J0CG", "fldJagQd06EnMKkXx", "fldts9Vj6ghnRcLFd"]),
-    fetchAll("tblxFlB9j735dTN5i", ["fldmjxHmvwYazidjc", "fldztRLFy9dEQusDl", "fldoXwvvsK183ioRl"]),
+    fetchAll("tblxFlB9j735dTN5i", ["fldmjxHmvwYazidjc", "fldztRLFy9dEQusDl", "fldoXwvvsK183ioRl", "fld4TLpmtMo9sl8Sn", "fld5VgRDwLnh5n0zl", "fldvDouasAilDE8ga",
+      "fldY0yetV9bQL2Tl9", "fldLYV73hfWzB0XdA", "fldJK3tcQTh7wwS6j", "fld3aH4W2e8PGXmTg", "fldYT74NASg5npkQY", "fldwKTWQx5ZEjwCzd", "fldWQMlOshZygokY7"]),
     fetchAll("tblMeVbqZO3aiWRxF", ["fldX1RLSkjqhNVd8M", "fldmsxxdqDhgzTyQ8", "fld2DGMxrRWazBnPx"]),
   ]);
   const P = byKey(programs, "fldVsuhHbYugeVaOJ"), E = byKey(evidence, "fld24fsyv4kRLUTqB"), K = byKey(cases, "fldM1ioKMrTD5gBYp");
@@ -94,7 +95,17 @@ async function buildLive(): Promise<BodyMapData> {
     }),
     patientSituations: base.patientSituations.map((s) => {
       const f = S.get(s.id);
-      return f ? { ...s, label: str(f.fldztRLFy9dEQusDl) || s.label, locked: f.fldoXwvvsK183ioRl === true } : s;
+      if (!f) return s;
+      // Market Insight สด: ช่องว่างใน Airtable = ไม่แสดง (ไม่ตกไปใช้ค่าเดิม เพื่อให้ไนน์ลบข้อความได้)
+      const lines = (v: unknown, sep: RegExp) => str(v).split(sep).map((x) => x.trim()).filter(Boolean);
+      return {
+        ...s, label: str(f.fldztRLFy9dEQusDl) || s.label, locked: f.fldoXwvvsK183ioRl === true,
+        trigger: str(f.fld4TLpmtMo9sl8Sn), job: str(f.fld5VgRDwLnh5n0zl), avoid: str(f.fldvDouasAilDE8ga),
+        mi: {
+          summary: str(f.fldY0yetV9bQL2Tl9), keywords: lines(f.fldLYV73hfWzB0XdA, /\|/), reads: str(f.fldJK3tcQTh7wwS6j),
+          key: str(f.fld3aH4W2e8PGXmTg), services: lines(f.fldYT74NASg5npkQY, /\n/), crosssell: str(f.fldwKTWQx5ZEjwCzd), proof: str(f.fldWQMlOshZygokY7),
+        },
+      };
     }),
     insights: base.insights.map((i) => {
       const f = I.get(i.id);

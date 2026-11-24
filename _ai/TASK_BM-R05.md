@@ -255,3 +255,14 @@ Assignment ID ที่ทำ: **BM-R05-20261123-v004** (ไฟล์มาถ�
 - ตัวอย่าง 5,000 × 5 ผู้ชาย: รายได้สุทธิ/คอร์ส 24,608 · 0% 10 งวด = 9 คอร์ส/เดือน · Rent to Own = 5 · Leasing = 2 · ซื้อขาด = 82 คอร์ส
 - Deploy: preview https://75e697d8.bib-bodymap-preview.pages.dev · demo https://adec94c6.bib-bodymap-demo.pages.dev · ตรวจโหมดแล้ว · ตรวจหน้าจอ 1280×900 และ 1920×1080
 - เก็บงานต่อ (ไนน์ "แก้อันนี้ให้จบก่อน" · พักโหมดบูธไว้): ช่องราคาแสดงคอมม่า (5,000) · ป้าย "ราคาพิเศษในงาน" แยกเป็นป้ายเล็ก และตัวเลขคอร์สทั้ง 3 แผนเรียงแนวเดียวกัน · deploy preview https://429f0d33.bib-bodymap-preview.pages.dev · demo https://49a4287c.bib-bodymap-demo.pages.dev
+
+## 25 พ.ย. 2026 · คืนทุนแบบ 3 ทางเลือก + แท็บ Market Insight (ไนน์อนุมัติข้อความก่อนทำ)
+- บทเรียน: ไนน์สั่ง "ห้ามทำก่อนปรับ text ให้เสร็จ" → ทวนข้อความทั้งชุดก่อนแก้โค้ดทุกครั้ง · ข้อความที่ไนน์ตั้งเอง ห้ามเปลี่ยนโดยไม่ถาม · ฟอนต์ Cormorant ไม่มีตัวไทย ใช้กับตัวเลข/อังกฤษเท่านั้น
+- คืนทุน: ตัดแถวซื้อขาด และช่องรายได้สุทธิต่อคอร์ส · หน่วย "คน / เดือน" · Consumable Cost % (78.5/5,000 = 1.6%) · 3 การ์ด ชุด B: THE SIGNATURE "เส้นทางที่สั้นที่สุด สู่การเป็นเจ้าของ" / THE PRELUDE "สัมผัสก่อน ตัดสินใจเมื่อพร้อม" / THE ESSENTIAL "เริ่มอย่างเบา เติบโตอย่างมั่นคง" · ตัดป้ายราคาพิเศษในงาน · หัวข้อไทยใช้ IBM Plex Sans Thai
+- Market Insight: แท็บใหม่ · เลือกกลุ่มคนไข้ร่วมกับแท็บคืนทุน · การ์ดอ่านสดจาก Airtable ช่อง MI … (7 ช่องใหม่ในตาราง Patient Situations) + trigger/avoid · ช่องว่าง = ไม่แสดง
+  - เนื้อหาเรียบเรียงจากข้อมูลจริงเท่านั้น (Body Map Content + คำค้นลูกค้าใน Concerns · สคริปต์ `_ai/tools/build_market_insight.py` · สำเนา `_ai/content/market_insight.csv`) · "สิ่งที่คำค้นบอก" มีเฉพาะ PS02 PS03 ที่ไนน์อนุมัติ
+  - คำค้นลูกค้า: ไนน์ยืนยันว่า research มาแล้ว แต่ใน Airtable ยังไม่ได้จดที่มา (ควรใส่)
+- Sport Lover (PS03): trigger "หลังฝึก" · job "มองหาการฟื้นตัวหลังฝึก" · avoid ว่าง · ปัญหาหลัก P46 (เดิม P31-33 ย้ายเป็นรอง) · การ์ดใช้ Post-Sport Recovery + หลักฐาน PX-023 (ระบุว่าเป็นงานวิจัยการนวดทั่วไป ไม่ใช่ icoone)
+- Airtable Change Log: บันทึก 3 แถว (ชื่อ 12 กลุ่ม · ช่อง MI · Sport Lover)
+- ยังว่าง: Wellness Traveler · Express Silhouette ไม่มี Insight ใน Body Map Content (การ์ดแสดงเฉพาะคำค้น · จุดเริ่มสนใจ · สิ่งที่ไม่อยากเจอ)
+- Deploy: preview https://ea65111e.bib-bodymap-preview.pages.dev · demo https://53dcde5e.bib-bodymap-demo.pages.dev · ตรวจโหมด + API อ่าน Airtable สดแล้ว · ตรวจหน้าจอ 1280px

@@ -77,6 +77,11 @@ menu2bib = {k: "BIB:" + m["name"] for k, m in menus.items() if m["menu_set"] == 
 # ---------- patient situations
 ps = [{"id": p["ps_id"], "canon": p["canon_name"], "label": p["label_doctor"] or p["canon_name"], "trigger": p["trigger"], "job": p["job"], "avoid": p["avoid"],
        "status": p["group_status"], "locked": False} for p in R("patient_situations_12.csv")]
+MI = {m["ps_id"]: m for m in csv.DictReader(open(os.path.join(ROOT, "_ai/content/market_insight.csv"), encoding="utf-8"))}
+for x in ps:
+    m = MI.get(x["id"], {})
+    x["mi"] = {"summary": m.get("summary", ""), "keywords": [k.strip() for k in m.get("keywords", "").split("|") if k.strip()], "reads": m.get("reads", ""),
+               "key": m.get("key", ""), "services": [l.strip() for l in m.get("services", "").split("\n") if l.strip()], "crosssell": m.get("crosssell", ""), "proof": m.get("proof", "")}
 ps_pri = collections.defaultdict(list); ps_sec = collections.defaultdict(list)
 for x in R("patient_situation_pain_links.csv"): (ps_pri if x["match"] == "Primary" else ps_sec)[x["pain_id"]].append(x["ps_id"])
 
