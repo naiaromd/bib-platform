@@ -3,7 +3,7 @@
 export type EventType =
   | "เปิดหน้า" | "เลือก Fit" | "หมุนรูป" | "กดจุด" | "เปิดปัญหา" | "เปิด Program ย่อ" | "เปิด Program ละเอียด"
   | "เปิดหลักฐานย่อ" | "เปิดหลักฐานละเอียด" | "เปิด Insight" | "เลือกหัวเครื่อง" | "เริ่มกรอกฟอร์ม" | "ส่งฟอร์ม" | "กด LINE"
-  | "คำนวณ ROI" | "ขอเอกสาร";
+  | "คำนวณ ROI" | "ขอเอกสาร" | "ขอใบเสนอราคา";
 export type BmEvent = {
   key: string; session: string; at: string; type: EventType; p?: string; z?: string; program?: string;
   evidence?: string; fit?: string; mode?: string; note?: string;
@@ -69,6 +69,6 @@ export function summary() {
     programs_short: uniq(of("เปิด Program ย่อ").map((e) => e.program)), programs_detail: uniq(of("เปิด Program ละเอียด").map((e) => e.program)),
     evidence_short: uniq(of("เปิดหลักฐานย่อ").map((e) => e.evidence)), evidence_detail: uniq(of("เปิดหลักฐานละเอียด").map((e) => e.evidence)),
     insights: uniq(of("เปิด Insight").map((e) => e.p)), handpiece: of("เลือกหัวเครื่อง").slice(-1)[0]?.note ?? "",
-    roi: of("คำนวณ ROI").slice(-1)[0]?.note ?? "", docs_requested: uniq(of("ขอเอกสาร").map((e) => e.evidence)),
+    roi: of("คำนวณ ROI").slice(-1)[0]?.note ?? "", docs_requested: uniq(of("ขอเอกสาร").map((e) => e.evidence)), quote_requested: of("ขอใบเสนอราคา").length > 0,
   };
 }

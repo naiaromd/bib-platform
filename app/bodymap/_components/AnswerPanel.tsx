@@ -138,7 +138,7 @@ export default function AnswerPanel({
             {tabs.map(([k, t]) => (
               <button key={k} type="button" role="tab" aria-selected={cur === k} onClick={() => go(k)}
                 className={`-mb-px border-b-2 px-2.5 py-2.5 text-sm transition ${cur === k ? "border-ink font-semibold text-ink" : "border-transparent text-ink-2 hover:text-ink"}`}>
-                {t}
+                {t}{k === "chance" ? <span aria-hidden className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-rose align-middle" /> : null}
               </button>
             ))}
           </div>
@@ -159,7 +159,7 @@ export default function AnswerPanel({
               </>
             ) : null}
             {cur === "proof" ? <EvidenceBlock key={concern.id} concern={concern} data={data} onRequest={(e) => { setDoc(e); setForm("line"); }} /> : null}
-            {cur === "chance" ? <ChanceTab insight={insight ?? null} concern={concern} data={data} course={course} internal={internal} face={concern.zones.every((z) => FACE_ZONES.includes(z))} sex={fit.sex} /> : null}
+            {cur === "chance" ? <ChanceTab insight={insight ?? null} concern={concern} data={data} internal={internal} face={concern.zones.every((z) => FACE_ZONES.includes(z))} sex={fit.sex} onDemo={() => { setDoc(null); setForm("demo"); }} onLine={() => { setDoc(null); setForm("line"); }} /> : null}
             {cur === "other" ? (
               <div className="grid gap-2">
                 {others.map((s) => (
