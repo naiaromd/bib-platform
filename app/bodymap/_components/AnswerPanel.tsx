@@ -4,6 +4,7 @@ import type { BodyMapData, Concern, Evidence, Zone } from "@/lib/bodymap/data";
 import { track } from "@/lib/bodymap/events";
 import { resolveAnswer, type Course, type Fit, type Solution, type SolutionStep } from "@/lib/bodymap/solution";
 import ChanceTab from "./ChanceTab";
+import { FACE_ZONES } from "@/lib/bodymap/pricing";
 import EvidenceBlock, { evidenceCount } from "./EvidenceBlock";
 import HandpiecePicker, { headText, type HeadChoice } from "./HandpiecePicker";
 import LeadForm from "./LeadForm";
@@ -158,7 +159,7 @@ export default function AnswerPanel({
               </>
             ) : null}
             {cur === "proof" ? <EvidenceBlock key={concern.id} concern={concern} data={data} onRequest={(e) => { setDoc(e); setForm("line"); }} /> : null}
-            {cur === "chance" && insight ? <ChanceTab insight={insight} course={course} minutes={main?.totalMinutes ?? plan?.totalMinutes ?? null} internal={internal} /> : null}
+            {cur === "chance" && insight ? <ChanceTab insight={insight} course={course} minutes={main?.totalMinutes ?? plan?.totalMinutes ?? null} internal={internal} face={concern.zones.every((z) => FACE_ZONES.includes(z))} sex={fit.sex} /> : null}
             {cur === "other" ? (
               <div className="grid gap-2">
                 {others.map((s) => (

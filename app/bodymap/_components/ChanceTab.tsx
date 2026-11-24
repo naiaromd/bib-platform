@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Insight } from "@/lib/bodymap/data";
 import { track } from "@/lib/bodymap/events";
 import { Status, Tag } from "./ui";
-import { FULL_PRICE, PAY_PLANS, PRICE_NOTE } from "@/lib/bodymap/pricing";
+import { CONSUMABLE, COST_SOURCE, FULL_PRICE, PAY_PLANS, PRICE_NOTE, SAMPLE_PRICE } from "@/lib/bodymap/pricing";
 
 type Line = { label: string; text: string; icon: string };
 const RULES: [RegExp, string, string][] = [
@@ -34,7 +34,10 @@ function Stat({ label, value, strong }: { label: string; value: string; strong?:
   );
 }
 
-function Roi({ course, minutes, concernId }: { course: number; minutes: number | null; concernId: string }) {
+function Roi({ course, minutes, concernId, face, sex }: { course: number; minutes: number | null; concernId: string; face: boolean; sex: "f" | "m" | null }) {
+  // ค่าวัสดุสิ้นเปลืองต่อครั้ง · ตัว: ไม่ระบุเพศใช้ค่าชุดผู้ชาย (สูงกว่า) เพื่อไม่ให้กำไรดูเกินจริง
+  const supply = face ? CONSUMABLE.face : sex === "f" ? CONSUMABLE.bodyF : CONSUMABLE.bodyM;
+  const supplyWhat = face ? "แผ่นลูกกลิ้งหน้าและไส้กรอง" : `ชุดใส่ทำ${sex === "f" ? "ผู้หญิง" : sex === "m" ? "ผู้ชาย" : ""} แผ่นลูกกลิ้งและไส้กรอง`;
   const [price, setPrice] = useState("");
   const [costPer, setCostPer] = useState("");
   const [people, setPeople] = useState("");
@@ -42,7 +45,7 @@ function Roi({ course, minutes, concernId }: { course: number; minutes: number |
   const [pay, setPay] = useState("");
   const [mins, setMins] = useState(minutes ? String(minutes) : "");
   useEffect(() => { setMins(minutes ? String(minutes) : ""); }, [minutes]);
-  const p = num(price), cp = num(costPer) ?? 0, n = num(people), m = num(machine), mi = num(mins);
+  const p = num(price), cp = (num(costPer) ?? 0) + supply, n = num(people), m = num(machine), mi = num(mins);
   const marginPerPerson = p ? (p - cp) * course : null;
   const perMonth = marginPerPerson && n ? marginPerPerson * n : null;
   const hours = mi && n ? (mi * course * n) / 60 : null;
@@ -50,7 +53,7 @@ function Roi({ course, minutes, concernId }: { course: number; minutes: number |
   const sent = useRef("");
   useEffect(() => {
     if (!p && !n && !m) return;
-    const note = `ราคา/ครั้ง ${price || "-"} · ต้นทุน/ครั้ง ${costPer || "-"} · คนไข้ใหม่/เดือน ${people || "-"} · ค่าเครื่อง/เดือน ${machine || "-"}${pay ? ` (${PAY_PLANS.find((x) => x.id === pay)?.label})` : ""} · นาที/ครั้ง ${mins || "-"} · คอร์ส ${course}`;
+    const note = `ราคา/ครั้ง ${price || "-"} · วัสดุ/ครั้ง ${supply} · ค่าแรง/ครั้ง ${costPer || "-"} · คนไข้ใหม่/เดือน ${people || "-"} · ค่าเครื่อง/เดือน ${machine || "-"}${pay ? ` (${PAY_PLANS.find((x) => x.id === pay)?.label})` : ""} · นาที/ครั้ง ${mins || "-"} · คอร์ส ${course}`;
     const id = window.setTimeout(() => { if (sent.current !== note) { sent.current = note; track("คำนวณ ROI", { p: concernId, note }); } }, 1200);
     return () => window.clearTimeout(id);
   }, [price, costPer, people, machine, pay, mins, course, concernId, p, n, m]);
@@ -65,7 +68,7 @@ function Roi({ course, minutes, concernId }: { course: number; minutes: number |
     </label>
   );
   const choose = (id: string) => { const x = PAY_PLANS.find((q) => q.id === id); if (!x) return; setPay(id); setMachine(String(Math.round(x.perMonth))); };
-  const sample = () => { setPrice("3500"); setCostPer("500"); setPeople("8"); choose("lease60"); };
+  const sample = () => { setPrice(String(face ? SAMPLE_PRICE.face : SAMPLE_PRICE.body)); setCostPer(""); setPeople("8"); choose("lease60"); };
   return (
     <section className="rounded-xl border border-ink bg-paper p-3">
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -77,10 +80,11 @@ function Roi({ course, minutes, concernId }: { course: number; minutes: number |
       </div>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
         {field("ราคาต่อครั้ง", price, setPrice, "เช่น 3500", "บาท")}
-        {field("ต้นทุนต่อครั้ง (ค่าแรง วัสดุ คอมมิชชั่น)", costPer, setCostPer, "เช่น 500", "บาท")}
+        {field("ค่าแรงและคอมมิชชั่นต่อครั้ง (ถ้ามี)", costPer, setCostPer, "เช่น 500", "บาท")}
         {field("คนไข้ใหม่ที่เริ่มคอร์สต่อเดือน", people, setPeople, "เช่น 8", "คน")}
         {field("นาทีต่อครั้ง", mins, setMins, "นาที", "นาที")}
       </div>
+      <p className="m-0 mt-2 text-sm text-ink-2">ค่าวัสดุสิ้นเปลืองต่อครั้ง <b className="text-ink">{supply} บาท</b> ({supplyWhat} · ต่อครั้ง 40 นาที ตาม{COST_SOURCE}) หักให้แล้ว</p>
       <div className="mt-3 rounded-lg bg-card p-3">
         <p className="m-0 text-sm text-ink-2">ค่าเครื่องต่อเดือน · ราคาเต็ม {baht(FULL_PRICE)} บาท รวม VAT</p>
         <div className="mt-2 grid gap-2 sm:grid-cols-3">
@@ -97,7 +101,7 @@ function Roi({ course, minutes, concernId }: { course: number; minutes: number |
         <p className="m-0 mt-2 text-xs text-muted">{PRICE_NOTE}</p>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <Stat label="กำไรต่อคนต่อคอร์ส (หลังหักต้นทุนต่อครั้ง)" value={marginPerPerson ? `฿${baht(marginPerPerson)}` : "—"} />
+        <Stat label="กำไรต่อคนต่อคอร์ส (หลังหักค่าวัสดุและค่าแรง)" value={marginPerPerson ? `฿${baht(marginPerPerson)}` : "—"} />
         <Stat label="กำไรจากคนไข้ใหม่ทั้งเดือน (เมื่อทำครบคอร์ส)" value={perMonth ? `฿${baht(perMonth)}` : "—"} />
         <Stat label="เวลาเครื่องที่ต้องใช้ (ทั้งคอร์สของคนไข้เดือนนี้)" value={hours ? `${baht(hours)} ชม.` : "—"} />
         <Stat strong label="คนไข้ใหม่ที่ต้องมีต่อเดือนเพื่อคุ้มค่าเครื่อง" value={breakeven ? `${breakeven} คน` : "—"} />
@@ -107,12 +111,12 @@ function Roi({ course, minutes, concernId }: { course: number; minutes: number |
   );
 }
 
-export default function ChanceTab({ insight, course, minutes, internal }: { insight: Insight; course: number; minutes: number | null; internal: boolean }) {
+export default function ChanceTab({ insight, course, minutes, internal, face, sex }: { insight: Insight; course: number; minutes: number | null; internal: boolean; face: boolean; sex: "f" | "m" | null }) {
   const lines = parse(insight.opportunity);
   return (
     <div>
       {internal ? <div className="mb-2 flex flex-wrap gap-1.5"><Status show={!insight.locked}>ร่าง</Status><Tag>{insight.id}</Tag></div> : null}
-      <Roi course={course} minutes={minutes} concernId={insight.painId} />
+      <Roi course={course} minutes={minutes} concernId={insight.painId} face={face} sex={sex} />
       {insight.who ? (
         <section className="mt-4">
           <h4 className="mb-1 mt-0 text-sm font-normal text-muted">คนไข้กลุ่มนี้</h4>
