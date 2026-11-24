@@ -254,3 +254,4 @@ Assignment ID ที่ทำ: **BM-R05-20261123-v004** (ไฟล์มาถ�
 - ซ่อนแถบปุ่มล่างที่ซ้ำ เมื่ออยู่แท็บคืนทุน
 - ตัวอย่าง 5,000 × 5 ผู้ชาย: รายได้สุทธิ/คอร์ส 24,608 · 0% 10 งวด = 9 คอร์ส/เดือน · Rent to Own = 5 · Leasing = 2 · ซื้อขาด = 82 คอร์ส
 - Deploy: preview https://75e697d8.bib-bodymap-preview.pages.dev · demo https://adec94c6.bib-bodymap-demo.pages.dev · ตรวจโหมดแล้ว · ตรวจหน้าจอ 1280×900 และ 1920×1080
+- เก็บงานต่อ (ไนน์ "แก้อันนี้ให้จบก่อน" · พักโหมดบูธไว้): ช่องราคาแสดงคอมม่า (5,000) · ป้าย "ราคาพิเศษในงาน" แยกเป็นป้ายเล็ก และตัวเลขคอร์สทั้ง 3 แผนเรียงแนวเดียวกัน · deploy preview https://429f0d33.bib-bodymap-preview.pages.dev · demo https://49a4287c.bib-bodymap-demo.pages.dev

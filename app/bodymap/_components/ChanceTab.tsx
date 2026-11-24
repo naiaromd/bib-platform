@@ -23,7 +23,7 @@ function Field({ label, unit, value, onChange, prefix }: { label: string; unit: 
       <span className="block text-[11px] uppercase tracking-[0.12em] text-muted">{label}</span>
       <span className="mt-1.5 flex items-baseline gap-1.5 border-b border-chalk pb-1.5 focus-within:border-ink">
         {prefix ? <span className="text-lg text-muted">{prefix}</span> : null}
-        <input inputMode="numeric" value={value} onChange={(e) => onChange(e.target.value)}
+        <input inputMode="numeric" value={value ? Number(value).toLocaleString("en-US") : ""} onChange={(e) => onChange(e.target.value.replace(/[^\d]/g, ""))}
           className="w-full min-w-0 bg-transparent font-display text-2xl text-ink outline-none" />
         <span className="flex-none text-sm text-muted">{unit}</span>
       </span>
@@ -118,11 +118,12 @@ export default function ChanceTab({ insight, concern, data, internal, face, sex,
             const n = courses(x.perMonth), d = perDay(n), on = plan === x.id;
             return (
               <button key={x.id} type="button" onClick={() => setPlan(x.id)} aria-pressed={on}
-                className={`relative min-w-0 px-5 pb-5 pt-4 text-left transition-colors ${i ? "border-t border-paper/15 sm:border-l sm:border-t-0" : ""} ${on ? "bg-paper/10" : "hover:bg-paper/5"}`}>
+                className={`relative flex min-w-0 flex-col px-5 pb-5 pt-4 text-left transition-colors ${i ? "border-t border-paper/15 sm:border-l sm:border-t-0" : ""} ${on ? "bg-paper/10" : "hover:bg-paper/5"}`}>
                 {on ? <span aria-hidden className="absolute inset-x-5 top-0 h-0.5 bg-rose" /> : null}
                 <span className="block text-sm font-semibold">{x.label}</span>
-                <span className="block text-xs text-paper/60">฿{baht(x.perMonth)} ต่อเดือน{x.note ? ` · ${x.note}` : ""}</span>
-                <span className="mt-4 flex items-baseline gap-2">
+                <span className="block text-xs text-paper/60">฿{baht(x.perMonth)} ต่อเดือน</span>
+                {x.note ? <span className="mt-1.5 self-start rounded-full bg-rose/25 px-2 py-0.5 text-[11px] text-paper">{x.note}</span> : null}
+                <span className="mt-auto flex items-baseline gap-2 pt-4">
                   <span className="font-display text-5xl leading-none">{n ?? "—"}</span>
                   <span className="text-sm text-paper/70">คอร์ส / เดือน</span>
                 </span>
