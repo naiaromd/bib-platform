@@ -1,0 +1,48 @@
+plan_id,original_name,name_th,status
+BIB:Lymph Drainage Therapy,Lymph Drainage Therapy,ระบายน้ำเหลือง,ร่าง
+BIB:Blood Circulation Therapy,Blood Circulation Therapy,กระตุ้นการไหลเวียนเลือด,ร่าง
+BIB:Body Detox Signature,Body Detox Signature,ระบายทั้งตัว,ร่าง
+BIB:Anti-Cellulite Therapy,Anti-Cellulite Therapy,ลดเซลลูไลต์,ร่าง
+BIB:Body Contouring,Body Contouring,ปรับรูปร่าง,ร่าง
+BIB:Body Toning,Body Toning,กระชับสัดส่วน,ร่าง
+BIB:Body Firming,Body Firming,กระชับผิวกาย,ร่าง
+BIB:Body Relaxation,Body Relaxation,ผ่อนคลายทั้งตัว,ร่าง
+BIB:Hand Care,Hand Care,ดูแลผิวมือ,ร่าง
+BIB:Face Detox,Face Detox,ระบายบวมใบหน้า,ร่าง
+BIB:Face Lifting,Face Lifting,ยกกระชับใบหน้า,ร่าง
+BIB:Face Contouring,Face Contouring,ปรับกรอบหน้า,ร่าง
+BIB:Anti-Aging Facial,Anti-Aging Facial,ดูแลริ้วรอยใบหน้า,ร่าง
+BIB:Eye De-Puff Care,Eye De-Puff Care,ลดบวมรอบตา,ร่าง
+BIB:Cloud Facial Signature,Cloud Facial Signature,,DATA GAP · ต้นทางไม่มีขั้นโปรแกรม จึงยังตั้งชื่อไทยไม่ได้
+BIB:Post-Surgery Recovery,Post-Surgery Recovery,ฟื้นตัวหลังผ่าตัด,ร่าง
+BIB:Scar Care,Scar Care,ดูแลแผลเป็น,ร่าง
+BIB:Stretch Mark Care,Stretch Mark Care,ดูแลรอยแตกลาย,ร่าง
+BIB:Office Syndrome Relief,Office Syndrome Relief,คลายออฟฟิศซินโดรม,ร่าง
+BIB:Pre-Sport Preparation,Pre-Sport Preparation,เตรียมร่างกายก่อนออกกำลัง,ร่าง
+BIB:Post-Sport Recovery,Post-Sport Recovery,ฟื้นตัวหลังออกกำลัง,ร่าง
+PRO-CARD-001,Inner Thigh 10,กระชับต้นขาด้านใน,ร่าง
+PRO-CARD-002,Inner Thigh 5,กระชับต้นขาด้านใน,ร่าง
+PRO-CARD-003,Buttocks 5,กระชับก้น,ร่าง
+PRO-CARD-004,Buttocks 10,กระชับก้น,ร่าง
+PRO-CARD-005,Specific Action 5,กระชับเฉพาะจุด,ร่าง
+PRO-CARD-006,Specific Action 10,กระชับเฉพาะจุด,ร่าง
+PRO-CARD-007,Arms 5,กระชับแขน,ร่าง
+PRO-CARD-008,Arms 10,กระชับแขน,ร่าง
+PRO-CARD-009,Abdomen 5,กระชับหน้าท้อง,ร่าง
+PRO-CARD-010,Abdomen 10,กระชับหน้าท้อง,ร่าง
+PRO-CARD-011,Face 5,กระชับใบหน้าและคอ,ร่าง
+PRO-CARD-012,Face 10,กระชับใบหน้าและคอ,ร่าง
+PRO-CARD-013,Full Body 5,กระชับทั้งตัว,ร่าง
+PRO-CARD-014,Full Body 10,กระชับทั้งตัว,ร่าง
+PRO-CARD-015,Waist Line 5,ปรับรูปร่างเอวและหน้าท้อง,ร่าง
+PRO-CARD-016,Waist Line 10,ปรับรูปร่างเอวและหน้าท้อง,ร่าง
+PRO-CARD-017,Upper Body 5,ปรับรูปร่างลำตัวช่วงบน,ร่าง
+PRO-CARD-018,Upper Body 10,ปรับรูปร่างลำตัวช่วงบน,ร่าง
+PRO-CARD-019,Full Body 5,ปรับรูปร่างทั้งตัว,ร่าง
+PRO-CARD-020,Full Body 10,ปรับรูปร่างทั้งตัว,ร่าง
+PRO-CARD-021,Face 5 (Double chin),ปรับรูปร่างใต้คาง,ร่าง
+PRO-CARD-022,Face 10 (Double chin),ปรับรูปร่างใต้คาง,ร่าง
+PRO-CARD-023,Face 5,ต้านริ้วรอยใบหน้าและคอ,ร่าง
+PRO-CARD-024,Face 10,ต้านริ้วรอยใบหน้าและคอ,ร่าง
+PRO-CARD-025,Venous Drainage,ระบายหลอดเลือดดำ,ร่าง
+PRO-CARD-026,Lymphatic Drainage,ระบายน้ำเหลือง,ร่าง

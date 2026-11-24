@@ -6,17 +6,18 @@ import { useEffect, useRef, useState } from "react";
 import type { Insight } from "@/lib/bodymap/data";
 import { track } from "@/lib/bodymap/events";
 import { Status, Tag } from "./ui";
+import { FULL_PRICE, PAY_PLANS, PRICE_NOTE } from "@/lib/bodymap/pricing";
 
 type Line = { label: string; text: string; icon: string };
 const RULES: [RegExp, string, string][] = [
-  [/^แผนดูแลที่เปิดขายได้:\s*/, "แผนของ BIB ที่เปิดขายได้", "◆"],
+  [/^แผนดูแลที่เปิดขายได้:\s*/, "แผนดูแลที่เปิดขายได้", "◆"],
   [/^แผนดูแลอื่นที่ใช้ได้:\s*/, "ใช้แผนอื่นแทนได้", "◇"],
-  [/^คอร์ส\s\d+\sครั้ง\sตามแผนของผู้ผลิต\s*/, "หรือทำตามแผนของผู้ผลิต (นาทีต่างจากแผนของ BIB)", "◷"],
   [/^คนไข้กลุ่มเดียวกันมักมีเรื่อง\s*/, "ต่อยอดไปเรื่องอื่น", "↗"],
   [/^ใช้โปรแกรม\s/, "โปรแกรม", "◆"],
 ];
 function parse(text: string): Line[] {
-  return text.split("\n").map((t) => t.trim()).filter(Boolean).map((t) => {
+  // ไนน์ 24 พ.ย.: ไม่ระบุว่าแผนของใคร · ตัดบรรทัดแผนของผู้ผลิตออก (นาทีไม่ตรงกับแผนที่แสดง)
+  return text.split("\n").map((t) => t.trim()).filter((t) => t && !/ตามแผนของผู้ผลิต/.test(t)).map((t) => {
     const hit = RULES.find(([re]) => re.test(t));
     return hit ? { label: hit[1], text: t.replace(hit[0], ""), icon: hit[2] } : { label: "", text: t, icon: "•" };
   });
@@ -38,6 +39,7 @@ function Roi({ course, minutes, concernId }: { course: number; minutes: number |
   const [costPer, setCostPer] = useState("");
   const [people, setPeople] = useState("");
   const [machine, setMachine] = useState("");
+  const [pay, setPay] = useState("");
   const [mins, setMins] = useState(minutes ? String(minutes) : "");
   useEffect(() => { setMins(minutes ? String(minutes) : ""); }, [minutes]);
   const p = num(price), cp = num(costPer) ?? 0, n = num(people), m = num(machine), mi = num(mins);
@@ -48,10 +50,10 @@ function Roi({ course, minutes, concernId }: { course: number; minutes: number |
   const sent = useRef("");
   useEffect(() => {
     if (!p && !n && !m) return;
-    const note = `ราคา/ครั้ง ${price || "-"} · ต้นทุน/ครั้ง ${costPer || "-"} · คนไข้ใหม่/เดือน ${people || "-"} · ค่าเครื่อง/เดือน ${machine || "-"} · นาที/ครั้ง ${mins || "-"} · คอร์ส ${course}`;
+    const note = `ราคา/ครั้ง ${price || "-"} · ต้นทุน/ครั้ง ${costPer || "-"} · คนไข้ใหม่/เดือน ${people || "-"} · ค่าเครื่อง/เดือน ${machine || "-"}${pay ? ` (${PAY_PLANS.find((x) => x.id === pay)?.label})` : ""} · นาที/ครั้ง ${mins || "-"} · คอร์ส ${course}`;
     const id = window.setTimeout(() => { if (sent.current !== note) { sent.current = note; track("คำนวณ ROI", { p: concernId, note }); } }, 1200);
     return () => window.clearTimeout(id);
-  }, [price, costPer, people, machine, mins, course, concernId, p, n, m]);
+  }, [price, costPer, people, machine, pay, mins, course, concernId, p, n, m]);
   const field = (label: string, v: string, set: (x: string) => void, ph: string, unit: string) => (
     <label className="block min-w-0 text-sm text-ink-2">
       {label}
@@ -62,7 +64,8 @@ function Roi({ course, minutes, concernId }: { course: number; minutes: number |
       </span>
     </label>
   );
-  const sample = () => { setPrice("3500"); setCostPer("500"); setPeople("8"); setMachine("60000"); };
+  const choose = (id: string) => { const x = PAY_PLANS.find((q) => q.id === id); if (!x) return; setPay(id); setMachine(String(Math.round(x.perMonth))); };
+  const sample = () => { setPrice("3500"); setCostPer("500"); setPeople("8"); choose("lease60"); };
   return (
     <section className="rounded-xl border border-ink bg-paper p-3">
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -76,8 +79,22 @@ function Roi({ course, minutes, concernId }: { course: number; minutes: number |
         {field("ราคาต่อครั้ง", price, setPrice, "เช่น 3500", "บาท")}
         {field("ต้นทุนต่อครั้ง (ค่าแรง วัสดุ คอมมิชชั่น)", costPer, setCostPer, "เช่น 500", "บาท")}
         {field("คนไข้ใหม่ที่เริ่มคอร์สต่อเดือน", people, setPeople, "เช่น 8", "คน")}
-        {field("ค่าเครื่องต่อเดือน (ค่าผ่อนหรือค่าเช่า)", machine, setMachine, "เช่น 60000", "บาท")}
         {field("นาทีต่อครั้ง", mins, setMins, "นาที", "นาที")}
+      </div>
+      <div className="mt-3 rounded-lg bg-card p-3">
+        <p className="m-0 text-sm text-ink-2">ค่าเครื่องต่อเดือน · ราคาเต็ม {baht(FULL_PRICE)} บาท รวม VAT</p>
+        <div className="mt-2 grid gap-2 sm:grid-cols-3">
+          {PAY_PLANS.map((x) => (
+            <button key={x.id} type="button" onClick={() => choose(x.id)} aria-pressed={pay === x.id}
+              className={`min-w-0 rounded-lg border px-3 py-2 text-left ${pay === x.id ? "border-ink bg-ink text-paper" : "border-line bg-paper text-ink hover:border-ink"}`}>
+              <span className="block text-sm">{x.label}</span>
+              <span className="block text-base font-semibold">{baht(x.perMonth)} บาท/เดือน</span>
+              {x.note ? <span className={`block text-xs ${pay === x.id ? "text-paper/80" : "text-muted"}`}>{x.note}</span> : null}
+            </button>
+          ))}
+        </div>
+        <div className="mt-2">{field("หรือใส่ค่าเครื่องต่อเดือนเอง", machine, (v) => { setMachine(v); setPay(""); }, "บาท", "บาท")}</div>
+        <p className="m-0 mt-2 text-xs text-muted">{PRICE_NOTE}</p>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
         <Stat label="กำไรต่อคนต่อคอร์ส (หลังหักต้นทุนต่อครั้ง)" value={marginPerPerson ? `฿${baht(marginPerPerson)}` : "—"} />

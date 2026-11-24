@@ -71,7 +71,7 @@ function PlanCard({ s, course, internal, selected, onClick }: { s: Solution; cou
   const inner = (
     <>
       <span className="flex flex-wrap items-center gap-1.5">
-        <Tag tone={s.layer === "bib" ? "rose" : "line"}>{LAYER[s.layer]}</Tag>
+        {internal ? <Tag tone={s.layer === "bib" ? "rose" : "line"}>{LAYER[s.layer]}</Tag> : null}
         {s.family ? <Tag>{GOAL_TH[s.family] ?? s.family}</Tag> : null}
         <Status show={internal}>ร่าง</Status>
       </span>
@@ -148,7 +148,7 @@ export default function AnswerPanel({
                 {plan ? (
                   <div className="mt-4 rounded-xl border border-line bg-card/60 p-3">
                     <p className="mb-2 mt-0 flex flex-wrap items-center gap-1.5 text-sm text-ink">
-                      <Tag>{LAYER.template}</Tag><Tag>คอร์ส {plan.course} ครั้ง</Tag>
+                      {internal ? <Tag>{LAYER.template}</Tag> : null}<Tag>คอร์ส {plan.course} ครั้ง</Tag>
                       <span className="break-words">แผนรายครั้ง · {planTitle(plan)}</span>
                     </p>
                     <Plan sol={plan} data={data} onProgram={onProgram} />
