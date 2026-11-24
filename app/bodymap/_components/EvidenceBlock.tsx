@@ -20,21 +20,23 @@ function PaperCard({ e, internal, onRequest }: { e: Evidence; internal: boolean;
         <Status show={internal && !e.short}>รอเนื้อหาย่อ</Status>
         <Status show={internal && !e.locked}>{e.reviewStatus || "ร่าง"}</Status>
       </div>
-      {e.headline ? <p className="m-0 text-2xl font-semibold leading-tight text-ink">{e.headline}</p> : null}
+      {e.headline && !/^[\d,.]+\s*(คน|งาน|โปรแกรม|ราย)$/.test(e.headline.trim()) ? <p className="m-0 text-2xl font-semibold leading-tight text-ink">{e.headline}</p> : null}
       <p className="m-0 text-base leading-snug text-ink">{e.short || e.title}</p>
       <p className="m-0 mt-1 text-xs text-muted">{[e.authors, e.year].filter(Boolean).join(" · ")}{internal ? ` · ${e.id}` : ""}</p>
-      <button type="button" onClick={() => { if (!open) track("เปิดหลักฐานละเอียด", { evidence: e.id }); setOpen(!open); }} aria-expanded={open} className="mt-2 text-sm text-ink underline underline-offset-4">
-        {open ? "ซ่อนรายละเอียด" : "ดูการ์ดงานวิจัย"}
-      </button>
+      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <button type="button" onClick={() => { if (!open) track("เปิดหลักฐานละเอียด", { evidence: e.id }); setOpen(!open); }} aria-expanded={open} className="text-sm text-ink underline underline-offset-4">
+          {open ? "ซ่อนรายละเอียด" : "ดูสรุปงานวิจัย"}
+        </button>
+        {e.url ? (
+          <a href={e.url} target="_blank" rel="noreferrer" onClick={() => track("เปิดหลักฐานละเอียด", { evidence: e.id, note: "เปิดฉบับเต็ม" })} className="rounded-full border border-ink px-4 py-1.5 text-sm text-ink hover:bg-ink hover:text-paper">อ่านฉบับเต็ม ↗</a>
+        ) : onRequest ? (
+          <button type="button" onClick={() => { track("ขอเอกสาร", { evidence: e.id }); onRequest(e); }} className="rounded-full border border-ink px-4 py-1.5 text-sm text-ink hover:bg-ink hover:text-paper">ขอฉบับเต็มจากทีม</button>
+        ) : null}
+      </div>
       {open ? (
         e.detail ? (
           <div className="mt-2 border-t border-line pt-2 text-sm text-ink">
             <p className="m-0 whitespace-pre-line break-words">{e.detail}</p>
-            {e.url ? (
-              <a href={e.url} target="_blank" rel="noreferrer" onClick={() => track("เปิดหลักฐานละเอียด", { evidence: e.id, note: "เปิดฉบับเต็ม" })} className="mt-2 inline-block rounded-full border border-ink px-4 py-1.5 text-sm text-ink hover:bg-ink hover:text-paper">อ่านฉบับเต็ม ↗</a>
-            ) : onRequest ? (
-              <button type="button" onClick={() => { track("ขอเอกสาร", { evidence: e.id }); onRequest(e); }} className="mt-2 rounded-full border border-ink px-4 py-1.5 text-sm text-ink hover:bg-ink hover:text-paper">ขอฉบับเต็มจากทีม</button>
-            ) : null}
           </div>
         ) : (
         <dl className="m-0 mt-2">

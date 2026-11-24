@@ -13,14 +13,26 @@ function Chip({ c, on, internal, onClick }: { c: Concern; on: boolean; internal:
 
 /** บริเวณ + ชิปปัญหา · จอใหญ่อยู่บนสุดของคอลัมน์ขวา · มือถืออยู่ข้างรูปคนในจอแรก */
 export default function ProblemPicker({
-  zone, concerns, concernId, internal, onConcern,
-}: { zone: Zone | null; concerns: Concern[]; concernId: string | null; internal: boolean; onConcern: (id: string) => void }) {
+  zone, concerns, concernId, internal, onConcern, zones, counts, onZone,
+}: {
+  zone: Zone | null; concerns: Concern[]; concernId: string | null; internal: boolean; onConcern: (id: string) => void;
+  zones?: Zone[]; counts?: Record<string, number>; onZone?: (id: string) => void;
+}) {
   const [openAny, setOpenAny] = useState(false);
   if (!zone) {
     return (
       <div className="min-w-0">
-        <h3 className="mb-2 mt-0 text-xl font-semibold text-ink">แตะจุดบนร่างกาย</h3>
-        <p className="m-0 text-ink-2">เลือกบริเวณที่คนไข้มาปรึกษา แล้วดูว่า icoone ใช้แผนดูแลไหน ทำกี่นาที และมีหลักฐานอะไรรองรับ</p>
+        <h3 className="mb-2 mt-0 text-xl font-semibold text-ink">คนไข้มาปรึกษาเรื่องบริเวณไหน</h3>
+        <p className="m-0 text-ink-2">แตะจุดบนร่างกาย หรือเลือกจากรายการนี้</p>
+        {zones && onZone ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {zones.filter((z) => (counts?.[z.id] ?? 0) > 0).map((z) => (
+              <button key={z.id} type="button" onClick={() => onZone(z.id)} className="rounded-full border border-line bg-card px-3 py-1.5 text-left text-sm text-ink-2 hover:border-ink">
+                <span className="mr-1 text-xs text-muted">{z.id.slice(1)}</span>{z.th}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
     );
   }

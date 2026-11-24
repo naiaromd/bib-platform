@@ -8,6 +8,7 @@ export async function POST(req: Request) {
   if (!hasToken()) return waitToken();
   let body: { events?: Record<string, unknown>[] };
   try { body = await req.json(); } catch { return Response.json({ ok: false, error: "invalid json" }, { status: 400 }); }
+  if (!body || typeof body !== "object") return Response.json({ ok: false, error: "invalid json" }, { status: 400 });
   const events = (Array.isArray(body.events) ? body.events : []).filter((e) => TYPES.has(String(e.type)) && /^BM-[A-Z0-9-]{6,40}$/.test(String(e.session))).slice(0, 50);
   if (!events.length) return Response.json({ ok: true, written: 0 });
   const rows = events.map((e) => ({

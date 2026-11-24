@@ -85,10 +85,11 @@ function PlanCard({ s, course, internal, selected, onClick }: { s: Solution; cou
 }
 
 export default function AnswerPanel({
-  data, zone, concerns, concern, onConcern, fit, head, onHead, onProgram,
+  data, zone, concerns, concern, onConcern, fit, head, onHead, onProgram, counts, onZone,
 }: {
   data: BodyMapData; zone: Zone | null; concerns: Concern[]; concern: Concern | null; onConcern: (id: string) => void;
   fit: Fit; head: HeadChoice; onHead: (h: HeadChoice) => void; onProgram: (id: string) => void;
+  counts?: Record<string, number>; onZone?: (id: string) => void;
 }) {
   const internal = data.mode === "internal";
   const course: Course = fit.course ?? 5;
@@ -116,7 +117,7 @@ export default function AnswerPanel({
   return (
     <div className={`flex min-w-0 flex-col rounded-2xl lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:border lg:border-line lg:bg-paper ${concern ? "border border-line bg-paper" : ""}`}>
       <div className={`min-w-0 p-4 md:p-5 ${concern ? "" : "hidden lg:block"}`}>
-        <div className="hidden lg:block"><ProblemPicker zone={zone} concerns={concerns} concernId={concern?.id ?? null} internal={internal} onConcern={onConcern} /></div>
+        <div className="hidden lg:block"><ProblemPicker zone={zone} concerns={concerns} concernId={concern?.id ?? null} internal={internal} onConcern={onConcern} zones={data.zones} counts={counts} onZone={onZone} /></div>
             {concern && ans ? (
               <div className="lg:mt-4">
                 <p className="mb-2 mt-0 text-sm text-muted">แผนดูแล</p>

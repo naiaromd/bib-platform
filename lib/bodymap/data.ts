@@ -4,7 +4,8 @@
 // เมื่อมี AIRTABLE_TOKEN → เปลี่ยน loadAll() ไปอ่าน Airtable ฝั่ง server (ดู _ai/PENDING_BM-R05.html หัวข้อ ระบบ)
 import raw from "./data.generated.json";
 
-export type Mode = "present" | "internal";
+/** present = เว็บจริง (เฉพาะ 🔒) · internal = ทีมตรวจ (ทุกแถว + ป้าย + รหัส) · showcase = ทดสอบกับหมอ (ทุกแถว ไม่มีป้าย/รหัส) */
+export type Mode = "present" | "internal" | "showcase";
 
 export type Zone = { id: string; th: string; view: string };
 export type ProgramLink = { programId: string; type: string };
@@ -79,7 +80,7 @@ export function loadBodyMap(mode: Mode): BodyMapData {
 /** กรองตามโหมด · นำเสนอ = เฉพาะแถวที่ติ๊ก 🔒 (ใช้ทั้งกับไฟล์สำเนาและข้อมูลสดจาก Airtable) */
 export function filterByMode(input: BodyMapData, mode: Mode): BodyMapData {
   const base: BodyMapData = { ...input, mode };
-  if (mode === "internal") return base;
+  if (mode === "internal" || mode === "showcase") return base;
   const keep = <T extends { locked: boolean }>(rows: T[]) => rows.filter((r) => r.locked);
   const programs = keep(base.programs);
   const templates = keep(base.templates);
@@ -104,5 +105,7 @@ export function filterByMode(input: BodyMapData, mode: Mode): BodyMapData {
 }
 
 export function currentMode(): Mode {
-  return process.env.BODYMAP_INTERNAL === "1" ? "internal" : "present";
+  if (process.env.BODYMAP_INTERNAL === "1") return "internal";
+  if (process.env.BODYMAP_SHOWCASE === "1") return "showcase";
+  return "present";
 }

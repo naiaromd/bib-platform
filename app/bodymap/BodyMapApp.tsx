@@ -44,6 +44,7 @@ export default function BodyMapApp({ data: initial }: { data: BodyMapData }) {
   const concern = inZone.find((c) => c.id === concernId) ?? null;
 
   const setFit = (f: Fit) => { setFitState(f); setContext({ fit: fitLabel(f) }); track("เลือก Fit", { note: fitLabel(f) }); };
+  const pickZone = (z: string) => { setZoneId(z); setConcernId(null); track("กดจุด", { z }); };
   const pickConcern = (id: string) => { setConcernId(id); track("เปิดปัญหา", { p: id, z: zoneId ?? undefined }); };
   const changeHead = (h: HeadChoice) => { setHead(h); track("เลือกหัวเครื่อง", { p: concern?.id, note: headText(h) }); };
 
@@ -58,8 +59,8 @@ export default function BodyMapApp({ data: initial }: { data: BodyMapData }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/assets/brand/icoone-laser-med-logo.png" alt="icoone Laser Med" className="h-6 w-auto md:h-8" />
           </div>
-          <h1 className="m-0 text-xl font-semibold leading-tight text-ink md:text-3xl">นวัตกรรมฟื้นฟูผิวและรูปร่างจากประเทศอิตาลี</h1>
-          <p className="m-0 mt-1 text-sm text-ink-2 md:text-base">เครื่องเดียว ดูแลได้ทั้งตัว · ปรับตามคนไข้แต่ละคน</p>
+          <h1 className="m-0 text-lg font-semibold leading-tight text-ink md:text-3xl">นวัตกรรมฟื้นฟูผิวและรูปร่างจากประเทศอิตาลี</h1>
+          <p className="m-0 mt-1 text-sm text-ink-2 md:text-base">ลูกกลิ้งแรงดูดกระตุ้นเนื้อเยื่อ ร่วมกับ Laser และ LED · เลือกปัญหาคนไข้ แล้วดูแผนดูแล หลักฐาน และความคุ้มค่า</p>
         </div>
         {data.mode === "internal" ? (
           <span className="rounded-full border border-warn px-3 py-1 text-xs text-warn">โหมดภายใน · ข้อมูลร่าง ยังไม่ผ่านการตรวจ</span>
@@ -71,14 +72,14 @@ export default function BodyMapApp({ data: initial }: { data: BodyMapData }) {
           <BodyFigure
             sex={fit.sex ?? "f"} view={view} zones={data.zones} points={data.figurePoints} counts={counts} active={zoneId}
             onView={(v) => { setView(v); track("หมุนรูป", { note: v === "front" ? "ด้านหน้า" : "ด้านหลัง" }); }}
-            onPick={(z) => { setZoneId(z); setConcernId(null); track("กดจุด", { z }); }}
+            onPick={pickZone}
           />
           <div className="min-w-0 lg:hidden">
-            <ProblemPicker zone={zone} concerns={inZone} concernId={concernId} internal={data.mode === "internal"} onConcern={pickConcern} />
+            <ProblemPicker zone={zone} concerns={inZone} concernId={concernId} internal={data.mode === "internal"} onConcern={pickConcern} zones={data.zones} counts={counts} onZone={pickZone} />
           </div>
         </div>
         <AnswerPanel
-          data={data} zone={zone} concerns={inZone} concern={concern} fit={fit} head={head} onHead={changeHead}
+          data={data} zone={zone} concerns={inZone} concern={concern} fit={fit} head={head} onHead={changeHead} counts={counts} onZone={pickZone}
           onConcern={pickConcern}
           onProgram={setProgramId}
         />
