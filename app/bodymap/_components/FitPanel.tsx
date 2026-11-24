@@ -30,7 +30,7 @@ export default function FitPanel({ fit, onChange }: { fit: Fit; onChange: (f: Fi
         </span>
         <span className="flex-none rounded-full border border-ink bg-ink px-3 py-1.5 text-sm text-paper">{open ? "ปิด ▴" : "เปลี่ยน ▾"}</span>
       </button>
-      {!open ? <p className="m-0 mt-2 text-xs text-muted lg:hidden">แตะ "เปลี่ยน" เพื่อเลือกเพศ เป้าหมาย และคอร์ส</p> : null}
+      {!open ? <p className="m-0 mt-2 text-xs text-muted lg:hidden">แตะ &quot;เปลี่ยน&quot; เพื่อเลือกเพศ เป้าหมาย และคอร์ส</p> : null}
       <div className={`${open ? "mt-3 block" : "hidden"} space-y-4 lg:mt-4 lg:block`}>
         <div>
           <p className="mb-2 mt-0 text-sm text-ink-2">เพศคนไข้</p>

@@ -73,6 +73,12 @@ const all = raw as unknown as Raw;
 export function loadBodyMap(mode: Mode): BodyMapData {
   const base: BodyMapData = { ...(all as unknown as Omit<BodyMapData, "mode">), mode };
   base.insights = base.insights ?? [];
+  return filterByMode(base, mode);
+}
+
+/** กรองตามโหมด · นำเสนอ = เฉพาะแถวที่ติ๊ก 🔒 (ใช้ทั้งกับไฟล์สำเนาและข้อมูลสดจาก Airtable) */
+export function filterByMode(input: BodyMapData, mode: Mode): BodyMapData {
+  const base: BodyMapData = { ...input, mode };
   if (mode === "internal") return base;
   const keep = <T extends { locked: boolean }>(rows: T[]) => rows.filter((r) => r.locked);
   const programs = keep(base.programs);

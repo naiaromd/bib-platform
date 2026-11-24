@@ -14,7 +14,17 @@ import { GOAL_TH } from "./_components/words";
 
 const fitLabel = (f: Fit) => [f.sex === "f" ? "หญิง" : f.sex === "m" ? "ชาย" : "ไม่ระบุเพศ", f.goal ? GOAL_TH[f.goal] : "ทุกเป้าหมาย", `คอร์ส ${f.course ?? 5}`].join(" · ");
 
-export default function BodyMapApp({ data }: { data: BodyMapData }) {
+export default function BodyMapApp({ data: initial }: { data: BodyMapData }) {
+  // เริ่มจากข้อมูลที่ฝังมากับหน้า แล้วดึงข้อมูลสดจาก Airtable มาแทน (ถ้าโหมดตรงกัน)
+  const [data, setData] = useState<BodyMapData>(initial);
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/bodymap-data", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j: { data?: BodyMapData } | null) => { if (alive && j?.data && j.data.mode === initial.mode) setData(j.data); })
+      .catch(() => undefined);
+    return () => { alive = false; };
+  }, [initial.mode]);
   const [fit, setFitState] = useState<Fit>(DEFAULT_FIT);
   const [view, setView] = useState<View>("front");
   const [zoneId, setZoneId] = useState<string | null>(null);
