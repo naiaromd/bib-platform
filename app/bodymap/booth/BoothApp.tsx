@@ -14,7 +14,7 @@ import { DEFAULT_FIT, resolveAnswer, type Solution } from "@/lib/bodymap/solutio
 import { HANDPIECES, HANDPIECE_ORDER, type HandpieceKey } from "@/lib/handpieces";
 import { FIGURES } from "@/lib/assets";
 import MechanismAnim from "../_components/MechanismAnim";
-import { planSub, planTitle } from "../_components/words";
+import { boothEligible, effectTh, programLibrary } from "@/lib/bodymap/programLibrary";
 
 type Stage = "attract" | "business" | "focus" | "machine" | "signature";
 type View = "front" | "back";
@@ -186,7 +186,9 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
   }, [stage, reset]);
 
   const zone = data.zones.find((z) => z.id === zoneId) ?? null;
-  const inZone = zone ? data.concerns.filter((c) => c.zones.includes(zone.id)) : [];
+  // จอบูธ: แสดงเฉพาะปัญหาที่ผ่านกฎ (ไม่มีคำเชิงการแพทย์ · มีโปรแกรม icoone ที่ขึ้นจอได้) · ตรวจซ้ำด้วย _ai/tools/test_booth.ts ก่อนขึ้นลิงก์
+  const boothConcerns = useMemo(() => data.concerns.filter((c) => boothEligible(c, data)), [data]);
+  const inZone = zone ? boothConcerns.filter((c) => c.zones.includes(zone.id)) : [];
   const chosen = useMemo(() => picked.map((id) => data.concerns.find((c) => c.id === id)).filter(Boolean) as Concern[], [picked, data.concerns]);
   const pickedZoneIds = useMemo(() => {
     const s = new Set<string>();
@@ -195,17 +197,9 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
     return s;
   }, [chosen]);
 
-  // เมนู: ปัญหาที่ได้แผนดูแลเดียวกันรวมเป็นรายการเดียว
+  // แผนดูแลใช้แค่หาหัวเครื่องแนะนำ · หน้าสุดท้ายใช้คลังโปรแกรม icoone 2 ระดับ (แบบ C)
   const plans = useMemo(() => chosen.map((c) => ({ c, s: resolveAnswer(c, { ...DEFAULT_FIT, course: COURSE }, data).primary ?? null })), [chosen, data]);
-  const menu = useMemo(() => {
-    const m = new Map<string, { title: string; sub: string; minutes: number | null; concerns: Concern[] }>();
-    for (const { c, s } of plans) {
-      const key = s?.id ?? c.id;
-      const cur = m.get(key) ?? { title: s ? planTitle(s) : c.label, sub: s ? planSub(s) : "", minutes: s?.totalMinutes ?? null, concerns: [] };
-      cur.concerns.push(c); m.set(key, cur);
-    }
-    return [...m.values()];
-  }, [plans]);
+  const lib = useMemo(() => programLibrary(chosen, data), [chosen, data]);
   const segs = chosen.length && bt ? matchSegments(chosen, bt, data.patientSituations) : null;
   const recHead = useMemo(() => headFrom(plans.map((p) => p.s)), [plans]);
 
@@ -239,7 +233,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
   };
   const toSignature = () => {
     const n = bumpCount(); setSerial(n); setCount(n);
-    setStage("signature"); track("บูธ", { p: picked[0], note: `Signature No.${n} · ${bt?.th ?? ""} · ${picked.join(",")} · ${HANDPIECES[hp].name}` });
+    setStage("signature"); track("บูธ", { p: picked[0], note: `Signature No.${n} · ${bt?.th ?? ""} · ${picked.join(",")} · ${HANDPIECES[hp].name} · คู่มือ ${lib.manual.map((x) => x.p.name).join("/") || "-"}` });
   };
 
   // QR → หน้าเดิมบนมือถือ เปิดปัญหาแรกที่เลือก พร้อมรายการทั้งหมด (เก็บลีดบนมือถือ ไม่เก็บบนจอ) · สร้างในเครื่อง ไม่ต้องใช้เน็ต
@@ -352,7 +346,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={view === "front" ? FIGURES.f.front : FIGURES.f.back} alt="" draggable={false} className="h-full w-full object-contain opacity-90" />
               <span aria-hidden className="bscan absolute -inset-x-[60%] h-[2px]" style={{ background: "linear-gradient(90deg, transparent, #C9A96E 30%, #F4E2B8 50%, #C9A96E 70%, transparent)", boxShadow: "0 0 18px 4px rgba(201,169,110,.35)" }} />
-              {data.zones.filter((z) => zoneOnView(z.id)).flatMap((z) => (pts[z.id.slice(1)] ?? []).map(([x, y], i) => {
+              {data.zones.filter((z) => zoneOnView(z.id) && boothConcerns.some((c) => c.zones.includes(z.id))).flatMap((z) => (pts[z.id.slice(1)] ?? []).map(([x, y], i) => {
                 const on = z.id === zoneId, has = pickedZoneIds.has(z.id);
                 return (
                   <button key={z.id + i} type="button" onClick={() => pickZone(z.id)} aria-label={z.th} aria-pressed={on}
@@ -474,35 +468,53 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
 
           <header className="bfade flex items-end justify-between" style={{ animationDelay: "2100ms" }}>
             <div>
-              <Eyebrow tone={GOLD}>Your Signature Menu · {bt.th}</Eyebrow>
+              <Eyebrow tone={GOLD}>Your Signature · Program Library · {bt.th}</Eyebrow>
               <h2 className="m-0 mt-1 font-display text-[4.2rem] font-medium leading-none">The Signature Collection</h2>
             </div>
-            <span className="font-display text-[1.2rem] tracking-[0.2em] text-[#B9AE9E]">No. {String(serial).padStart(3, "0")} · {dateTh}</span>
+            <div className="flex flex-col items-end gap-2">
+              <span className="font-display text-[1.2rem] tracking-[0.2em] text-[#B9AE9E]">No. {String(serial).padStart(3, "0")} · {dateTh}</span>
+              <button type="button" onClick={() => { track("บูธ", { note: "แก้ไขที่เลือก" }); setStage("focus"); }} className="rounded-full border border-[#5a554e] px-5 py-2 text-[1.1rem] text-[#E4DCCD]">← แก้ไขที่เลือก</button>
+            </div>
           </header>
 
-          {/* เมนูซิกเนเจอร์ · แบบเมนูหรู */}
-          <div className="bfade mt-5 rounded-[2rem] bg-[#F4EFE5] px-9 py-7 text-[#2C2A28] shadow-[0_30px_60px_-30px_rgba(0,0,0,.6)]" style={{ animationDelay: "2300ms" }}>
+          {/* คลังโปรแกรม icoone 2 ระดับ · ให้ตัวเลือก + ที่มา แล้วให้หมอออกแบบเอง (ไม่สั่งสูตร) */}
+          <div className="bfade mt-5 rounded-[2rem] bg-[#F4EFE5] px-9 py-6 text-[#2C2A28] shadow-[0_30px_60px_-30px_rgba(0,0,0,.6)]" style={{ animationDelay: "2300ms" }}>
             <div className="flex items-center gap-4">
               <span className="h-px flex-1 bg-[#C9A96E]" />
               <span className="text-[2.6rem] leading-none text-[#A8864E]" style={SIG_FONT}>Signature</span>
               <span className="h-px flex-1 bg-[#C9A96E]" />
             </div>
-            <ol className="m-0 mt-3 list-none p-0">
-              {menu.map((m, i) => (
-                <li key={i} className="border-b border-[#E4DCCD] py-3.5 last:border-0">
-                  <div className="flex items-baseline gap-3">
-                    <span className="font-display text-[1.5rem] text-[#A8864E]">{String(i + 1).padStart(2, "0")}</span>
-                    <span className="text-[1.75rem] font-semibold leading-tight">{m.title}</span>
-                    <span aria-hidden className="mx-1 flex-1 border-b border-dotted border-[#C9BBA4]" />
-                    <span className="whitespace-nowrap text-[1.15rem] text-[#4A4641]">{m.minutes ? `${m.minutes} นาที · ` : ""}{COURSE} ครั้ง</span>
-                  </div>
-                  <p className="m-0 pl-[2.6rem] text-[1.05rem] text-[#8A7F70]">
-                    {m.sub ? <span className="font-display text-[1.2rem] italic">{m.sub} · </span> : null}
-                    {m.concerns.map((c) => c.label).join(" · ")}
-                  </p>
-                </li>
-              ))}
-            </ol>
+            <p className="m-0 mt-1 text-center text-[1.05rem] text-[#8A7F70]">จากที่คุณเลือก: {chosen.map((c) => c.label).join(" · ")}</p>
+
+            {lib.manual.length ? (
+              <div className="mt-3">
+                <p className="m-0 font-display text-[1rem] uppercase tracking-[0.22em] text-[#A8864E]">ตามคู่มือ icoone</p>
+                <ol className="m-0 list-none p-0">
+                  {lib.manual.map((it) => (
+                    <li key={it.p.id} className="flex items-center gap-4 border-b border-[#E4DCCD] py-2.5 last:border-0">
+                      <div className="min-w-0 flex-1">
+                        <p className="m-0 flex items-baseline gap-3"><span className="font-display text-[1.9rem] font-semibold leading-tight">{it.p.name}</span><span className="text-[0.85rem] uppercase tracking-[0.15em] text-[#A8864E]">{it.p.group}</span><span className="text-[1.05rem] text-[#4A4641]">{effectTh(it.p)}</span></p>
+                        <p className="m-0 text-[1rem] text-[#8A7F70]">สำหรับ {it.concerns.map((c) => c.label).join(" · ")}</p>
+                      </div>
+                      <span className="whitespace-nowrap rounded-full bg-[#2C2A28] px-3 py-1 text-[0.9rem] text-[#E4C88F]">คู่มือ หน้า {it.p.sourcePage}</span>
+                    </li>
+                  ))}
+                </ol>
+                {lib.manualMore ? <p className="m-0 text-[0.95rem] text-[#8A7F70]">และอีก {lib.manualMore} โปรแกรมตามคู่มือ</p> : null}
+              </div>
+            ) : null}
+
+            {lib.mechanism.length ? (
+              <div className="mt-3 rounded-2xl border border-[#C9BBA4] px-5 py-3">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="m-0 font-display text-[1rem] uppercase tracking-[0.22em] text-[#A8864E]">{lib.manual.length ? "เสริมด้วยกลไกเดียวกัน" : "โปรแกรมที่ทำงานกลไกเดียวกัน"}</p>
+                  <span className="whitespace-nowrap rounded-full border border-[#8A7F70] px-3 py-0.5 text-[0.9rem] text-[#4A4641]">ทีม BIB ช่วยเลือก</span>
+                </div>
+                <p className="m-0 mt-1 font-display text-[1.45rem] leading-snug">{lib.mechanism.map((it) => it.p.name).join(" · ")}{lib.mechanismMore ? <span className="text-[1.05rem] text-[#8A7F70]"> และอีก {lib.mechanismMore}</span> : null}</p>
+              </div>
+            ) : null}
+
+            <p className="m-0 mt-3 text-[0.98rem] leading-snug text-[#8A7F70]">{[...lib.manual, ...lib.mechanism].some((it) => it.p.group !== "healthcare") ? "สูตร icoone: เริ่มด้วยโปรแกรมพื้นฐาน (Base) แล้วต่อด้วยโปรแกรมเฉพาะจุด (Focus) · คลินิกคุณออกแบบลำดับเองได้" : "คลินิกคุณออกแบบลำดับโปรแกรมเองได้ · ทีม BIB ช่วยวางแผนให้เหมาะกับคนไข้"}</p>
           </div>
 
           {/* กลุ่มคนไข้ */}
@@ -539,16 +551,15 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
               </div>
             </div>
             <div className="flex min-w-0 flex-col items-center justify-center rounded-3xl border border-[#C9A96E] px-4 py-4 text-center">
-              <p className="m-0 text-[1.5rem] leading-snug">รับเมนู Signature ของคุณ</p>
-              <p className="m-0 text-[1rem] text-[#B9AE9E]">ขอเดโม · ใบเสนอราคา · LINE</p>
+              <p className="m-0 text-[1.5rem] leading-snug">ออกแบบ Signature จริง<br />กับทีม BIB</p>
+              <p className="m-0 text-[1rem] text-[#B9AE9E]">จุดเริ่มต้น · ขอเดโม · ใบเสนอราคา</p>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               {qr ? <img src={qr} alt="QR code ไปหน้าบนมือถือ" className="mt-2 h-[10.5rem] w-[10.5rem] rounded-lg" /> : <span className="mt-2 h-[10.5rem] w-[10.5rem] rounded-lg bg-[#3a3733]" />}
               <button type="button" onClick={() => { track("บูธ", { note: "เริ่มใหม่" }); reset(); }} className="mt-3 rounded-full border border-[#5a554e] px-6 py-2.5 text-[1.1rem] text-[#E4DCCD]">↺ ออกแบบใหม่</button>
             </div>
           </div>
 
-          {/* ภาพหัวเครื่องทำงานจริง · ช่วงล่างของจอ ไม่ต้องกด */}
-          <video src={video || undefined} autoPlay muted loop playsInline aria-hidden className="bfade mt-6 w-full rounded-3xl object-contain" style={{ aspectRatio: "1920 / 810", animationDelay: "3200ms" }} />
+          {/* วิดีโอหัวเครื่องเอาออกจากหน้านี้ (ซ้ำกับหน้าแรก · คลังโปรแกรมต้องใช้พื้นที่ · ข้อความกำกับโฆษณาด้านล่างต้องไม่ล้นจอ) */}
 
           <footer className="bfade mt-auto pt-4 text-[0.82rem] leading-relaxed text-[#8A7F70]" style={{ animationDelay: "3300ms" }}>
             <p className="m-0">หัวเครื่องที่ดู: {HANDPIECES[hp].name} · คนไข้ใหม่ต่อเดือนที่ครอบคลุมค่างวด · คนไข้ 1 คน = คอร์ส {COURSE} ครั้ง × ฿{baht(price)} หักค่าวัสดุแล้ว · ประมาณการ ไม่ใช่การรับประกันรายได้ · {PRICE_NOTE}</p>
