@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { currentMode, loadBodyMap } from "@/lib/bodymap/data";
+import { Mrs_Saint_Delafield } from "next/font/google";
 import BoothApp from "./BoothApp";
+
+// ฟอนต์ลายมือสำหรับ "ลายเซ็น" (ไนน์: ทำให้เป็นลายเซ็นจริง) · เก็บไฟล์ในเว็บเอง ใช้ได้ตอนไม่มีเน็ต
+const sig = Mrs_Saint_Delafield({ weight: "400", subsets: ["latin"], variable: "--font-sig", display: "block" });
 
 export const dynamic = "force-static";
 export const metadata: Metadata = {
@@ -11,5 +15,5 @@ export const metadata: Metadata = {
 
 export default function BoothPage() {
   const data = loadBodyMap(currentMode());
-  return <BoothApp data={data} />;
+  return <div className={sig.variable}><BoothApp data={data} /></div>;
 }

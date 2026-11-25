@@ -188,6 +188,8 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
       <style>{`html{font-size:min(1.6vw,0.9vh)}
 .bfade{animation:bfade .4s cubic-bezier(.2,.8,.2,1) both}@keyframes bfade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .bsig{stroke-dasharray:1600;stroke-dashoffset:1600;animation:bsig 2s cubic-bezier(.6,0,.2,1) forwards,bsigfade .8s ease 2.1s forwards}@keyframes bsig{to{stroke-dashoffset:0}}@keyframes bsigfade{to{opacity:.1}}
+.bsign{clip-path:inset(0 100% 0 0);animation:bsign 1.9s cubic-bezier(.55,.05,.35,1) .3s forwards}@keyframes bsign{to{clip-path:inset(0 -5% 0 0)}}
+.bsignfade{animation:bsignfade .9s ease 2.6s forwards}@keyframes bsignfade{to{opacity:0}}
 .bloop{stroke-dasharray:900;stroke-dashoffset:900;animation:bloop 5s cubic-bezier(.6,0,.2,1) infinite}@keyframes bloop{0%{stroke-dashoffset:900;opacity:1}55%{stroke-dashoffset:0;opacity:1}85%{opacity:0}100%{stroke-dashoffset:0;opacity:0}}
 .bpulse{animation:bpulse 2.4s ease-in-out infinite}@keyframes bpulse{0%,100%{opacity:.55}50%{opacity:1}}
 .bhero{animation:bhero 14s ease-in-out infinite alternate}@keyframes bhero{from{transform:scale(1)}to{transform:scale(1.06)}}
@@ -212,10 +214,10 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
           </div>
           <div className="absolute inset-x-[7%] top-[44%] flex flex-col">
             <p className="m-0 font-display text-[1.25rem] uppercase tracking-[0.5em] text-[#6E4A3E]">Precision Beauty</p>
-            <h1 className="m-0 mt-3 font-display text-[8.4rem] font-medium leading-[0.88] tracking-[0.01em]">Design<br />your <span className="italic">Signature</span></h1>
-            <svg viewBox="0 0 600 50" className="-mt-1 w-[26rem]" aria-hidden>
-              <path d="M8 34 C 90 2, 140 2, 170 26 S 250 48, 290 22 S 370 2, 400 28 S 500 46, 592 14" fill="none" stroke="#A8864E" strokeWidth="2.2" strokeLinecap="round" className="bloop" />
-            </svg>
+            <h1 className="m-0 mt-3 font-display text-[8.4rem] font-medium leading-[0.88] tracking-[0.01em]">
+              Design your
+              <span key={hero} className="bsign -mt-[1.2rem] block pb-2 pl-2 text-[12.5rem] font-normal leading-[1.1] text-[#A8864E]" style={{ fontFamily: "var(--font-sig), cursive" }}>Signature</span>
+            </h1>
             <p className="m-0 mt-3 text-[1.9rem] leading-snug text-[#4A4641]">ออกแบบทรีตเมนต์ซิกเนเจอร์ของคลินิกคุณ<br />ใน 3 ขั้นตอน</p>
             <span className="mt-9 flex items-center justify-between rounded-full bg-[#2C2A28] py-5 pl-10 pr-5 text-[1.8rem] text-[#FAF7F1]">
               <span className="flex items-center gap-4"><span className="bdot inline-block h-3 w-3 rounded-full bg-[#C9A96E]" />แตะเพื่อเริ่มออกแบบ</span>
@@ -281,14 +283,14 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
 
       {/* ---------------- ขั้น 3 Your Signature ---------------- */}
       {sig && concern && bt ? (
-        <section className="relative flex h-full flex-col px-[6%] pb-[4%] pt-[5%]">
-          <svg viewBox="0 0 900 1600" className="pointer-events-none absolute inset-0 h-full w-full" preserveAspectRatio="none" aria-hidden>
-            <path d="M120 820 C 220 560, 300 540, 340 700 S 430 900, 500 690 S 600 520, 650 740 S 740 900, 800 640" fill="none" stroke={GOLD} strokeWidth="3" strokeLinecap="round" className="bsig" />
-          </svg>
+        <section className="relative flex h-full flex-col px-[6%] pb-[3%] pt-[4%]">
+          <div aria-hidden className="bsignfade pointer-events-none absolute inset-0 flex items-center justify-center">
+            <span className="bsign whitespace-nowrap text-[13rem] leading-none text-[#C9A96E]" style={{ fontFamily: "var(--font-sig), cursive" }}>Your Signature</span>
+          </div>
 
-          <header className="bfade border-b border-[#C9A96E] pb-5" style={{ animationDelay: "2000ms" }}>
-            <div className="flex items-center justify-between"><Eyebrow>Your Signature · {bt.th}</Eyebrow><span className="flex items-center gap-5"><span className="font-display text-[1.2rem] tracking-[0.2em] text-[#B9AE9E]">No. {String(serial).padStart(3, "0")} · {dateTh}</span><button type="button" onClick={() => { track("บูธ", { note: "เริ่มใหม่" }); reset(); }} className="rounded-full border border-[#5a554e] px-5 py-2 text-[1.1rem] text-[#E4DCCD]">↺ ออกแบบใหม่</button></span></div>
-            <h2 className="m-0 mt-2 text-[3.4rem] font-semibold leading-tight">{main ? planTitle(main) : concern.label}</h2>
+          <header className="bfade border-b border-[#C9A96E] pb-4" style={{ animationDelay: "2000ms" }}>
+            <div className="flex items-center justify-between"><Eyebrow>Your Signature · {bt.th}</Eyebrow><span className="font-display text-[1.2rem] tracking-[0.2em] text-[#B9AE9E]">No. {String(serial).padStart(3, "0")} · {dateTh}</span></div>
+            <h2 className="m-0 mt-1 text-[3rem] font-semibold leading-tight">{main ? planTitle(main) : concern.label}</h2>
             <p className="m-0 mt-1 text-[1.35rem] text-[#B9AE9E]">
               {concern.label}{main && planSub(main) ? <span className="font-display text-[1.55rem]"> · {planSub(main)}</span> : null}
               {main?.totalMinutes ? ` · ${main.totalMinutes} นาทีต่อครั้ง` : ""} · คอร์ส {COURSE} ครั้ง
@@ -296,13 +298,13 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
           </header>
 
           {/* 01 Clients */}
-          <div className="bfade mt-6" style={{ animationDelay: "2300ms" }}>
+          <div className="bfade mt-4" style={{ animationDelay: "2300ms" }}>
             <div className="flex items-baseline justify-between"><Eyebrow>01 · Your Clients</Eyebrow>{segs?.isNew ? <span className="text-[1.1rem] text-[#C9A96E]">กลุ่มคนไข้ใหม่ที่คลินิกคุณยังไม่ได้ดูแล</span> : null}</div>
             <div className="mt-3 grid gap-4" style={{ gridTemplateColumns: `repeat(${segs?.list.length ?? 1}, minmax(0,1fr))` }}>
               {segs?.list.map((g) => (
                 <div key={g.id} className="min-w-0 rounded-2xl border border-[#4A4641] p-4">
                   <p className="m-0 font-display text-[1.6rem] uppercase leading-tight tracking-[0.06em]">{en(g.label)}</p>
-                  {g.mi.summary ? <p className="m-0 mt-2 line-clamp-3 text-[1.1rem] leading-relaxed text-[#E4DCCD]">{g.mi.summary}</p> : null}
+                  {g.mi.summary ? <p className="m-0 mt-1 line-clamp-2 text-[1.05rem] leading-snug text-[#E4DCCD]">{g.mi.summary}</p> : null}
                   {g.mi.keywords.length ? <p className="m-0 mt-2 text-[1rem] leading-snug text-[#B9AE9E]">{g.mi.keywords.slice(0, 2).map((k) => `“${k}”`).join(" ")}</p> : null}
                   {g.mi.key ? <p className="m-0 mt-2 text-[1.05rem] leading-snug text-[#C9A96E]">{g.mi.key}</p> : null}
                 </div>
@@ -311,7 +313,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
           </div>
 
           {/* 02 Machine */}
-          <div className="bfade mt-6" style={{ animationDelay: "2700ms" }}>
+          <div className="bfade mt-4" style={{ animationDelay: "2700ms" }}>
             <Eyebrow>02 · Your Machine</Eyebrow>
             {/* หัวเครื่อง · ภาพจริงจากคลัง BIB (ลบลายน้ำมุมล่าง) วางแบบตู้โชว์ */}
             <div className="mt-3 grid grid-cols-4 gap-3">
@@ -320,7 +322,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
                 return (
                   <button key={k} type="button" aria-pressed={on} onClick={() => { setHp(k); track("เลือกหัวเครื่อง", { p: concern.id, note: `บูธ ${h.name}` }); }}
                     className={`relative flex min-w-0 flex-col overflow-hidden rounded-2xl text-left transition-[transform,box-shadow,filter] duration-300 ease-out ${on ? "-translate-y-1 ring-2 ring-[#C9A96E] ring-offset-4 ring-offset-[#2C2A28]" : "brightness-[0.78]"}`}>
-                    <span className="flex aspect-[4/3] items-center justify-center bg-white p-2">
+                    <span className="flex aspect-[16/10] items-center justify-center bg-white p-1.5">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={`/assets/handpieces/${k}.jpg`} alt={h.name} className={`h-full w-full object-contain transition-transform duration-500 ease-out ${on ? "scale-105" : "scale-95"}`} draggable={false} />
                     </span>
@@ -334,7 +336,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
                 );
               })}
             </div>
-            <div className="mt-4 grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-5">
+            <div className="mt-3 grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] gap-5">
               <div className="rounded-2xl border border-[#C9A96E]/40 bg-[#F4EFE5] p-2 text-[#2C2A28]">
                 <MechanismAnim suc={suc} led={HANDPIECES[hp].hasLight && led} las={HANDPIECES[hp].hasLight && las} headName={HANDPIECES[hp].name} />
               </div>
@@ -356,36 +358,37 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
             </div>
           </div>
 
-          {/* 03 Return */}
-          <div className="bfade mt-6" style={{ animationDelay: "3000ms" }}>
-            <Eyebrow>03 · Your Return</Eyebrow>
-            <div className="mt-3 grid grid-cols-[minmax(0,0.85fr)_repeat(3,minmax(0,1fr))] gap-3">
-              <div className="rounded-2xl bg-[#3a3733] p-4">
-                <p className="m-0 text-[1rem] text-[#B9AE9E]">Consumable Cost</p>
-                <p className="m-0 mt-1 font-display text-[3.6rem] leading-none">{costShown}%</p>
-                <p className="m-0 mt-1 text-[0.95rem] leading-snug text-[#B9AE9E]">ค่าวัสดุสิ้นเปลืองเพียง ฿{supply} ต่อครั้ง</p>
-              </div>
-              {PAY_PLANS.map((x, i) => (
-                <div key={x.id} className={`flex flex-col rounded-2xl border p-4 ${i === 0 ? "border-[#C9A96E]" : "border-[#4A4641]"}`}>
-                  <p className="m-0 font-display text-[1.05rem] tracking-[0.14em] text-[#C9A96E]">{x.tag}</p>
-                  <p className="m-0 text-[0.9rem] text-[#B9AE9E]">{x.sub}</p>
-                  <p className="m-0 mt-auto pt-2"><span className="font-display text-[3.6rem] leading-none">{planNums[i]}</span> <span className="text-[1.05rem]">คน/เดือน</span></p>
-                  <p className="m-0 text-[0.85rem] text-[#8A7F70]">฿{baht(x.perMonth)}/เดือน</p>
+          {/* 03 Return + QR · อยู่ช่วงกลางค่อนล่างของจอ ให้ยืนสแกนและกดได้ (จอตั้งพื้น) */}
+          <div className="bfade mt-4 grid grid-cols-[minmax(0,1.75fr)_minmax(0,1fr)] gap-4" style={{ animationDelay: "3000ms" }}>
+            <div className="min-w-0">
+              <Eyebrow>03 · Your Return</Eyebrow>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="rounded-2xl bg-[#3a3733] p-4">
+                  <p className="m-0 text-[1rem] text-[#B9AE9E]">Consumable Cost</p>
+                  <p className="m-0 mt-1 font-display text-[3.4rem] leading-none">{costShown}%</p>
+                  <p className="m-0 mt-1 text-[0.9rem] leading-snug text-[#B9AE9E]">ค่าวัสดุสิ้นเปลืองเพียง ฿{supply} ต่อครั้ง</p>
                 </div>
-              ))}
+                {PAY_PLANS.map((x, i) => (
+                  <div key={x.id} className={`flex flex-col rounded-2xl border p-4 ${i === 0 ? "border-[#C9A96E]" : "border-[#4A4641]"}`}>
+                    <p className="m-0 font-display text-[1.05rem] tracking-[0.14em] text-[#C9A96E]">{x.tag}</p>
+                    <p className="m-0 text-[0.85rem] text-[#B9AE9E]">{x.sub} · ฿{baht(x.perMonth)}/เดือน</p>
+                    <p className="m-0 mt-auto pt-1"><span className="font-display text-[3.4rem] leading-none">{planNums[i]}</span> <span className="text-[1.05rem]">คน/เดือน</span></p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <p className="m-0 mt-2 text-[0.85rem] leading-relaxed text-[#8A7F70]">คนไข้ใหม่ต่อเดือนที่ครอบคลุมค่างวด · คนไข้ 1 คน = คอร์ส {COURSE} ครั้ง × ฿{baht(price)} หักค่าวัสดุแล้ว · ประมาณการ ไม่ใช่การรับประกันรายได้ · {PRICE_NOTE}</p>
+            <div className="flex min-w-0 flex-col items-center justify-center rounded-3xl border border-[#C9A96E] px-4 py-4 text-center">
+              <p className="m-0 text-[1.5rem] leading-snug">รับ Signature ของคุณ</p>
+              <p className="m-0 text-[1rem] text-[#B9AE9E]">ขอเดโม · ใบเสนอราคา · LINE</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {qr ? <img src={qr} alt="QR code ไปหน้าบนมือถือ" className="mt-2 h-[10.5rem] w-[10.5rem] rounded-lg" /> : <span className="mt-2 h-[10.5rem] w-[10.5rem] rounded-lg bg-[#3a3733]" />}
+              <button type="button" onClick={() => { track("บูธ", { note: "เริ่มใหม่" }); reset(); }} className="mt-3 rounded-full border border-[#5a554e] px-6 py-2.5 text-[1.1rem] text-[#E4DCCD]">↺ ออกแบบใหม่</button>
+            </div>
           </div>
 
-          <footer className="bfade mt-auto flex items-center justify-between gap-6 pt-5" style={{ animationDelay: "3600ms" }}>
-            <div className="flex flex-col gap-3">
-              <span className="text-[0.85rem] text-[#8A7F70]">Advertise to Healthcare Professional and Health Official</span>
-            </div>
-            <div className="flex items-center gap-5">
-              <p className="m-0 text-right text-[1.6rem] leading-snug">รับ Signature ของคุณ<br /><span className="text-[1.15rem] text-[#B9AE9E]">ขอเดโม · ใบเสนอราคา · LINE</span></p>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              {qr ? <img src={qr} alt="QR code ไปหน้าบนมือถือ" className="h-[11rem] w-[11rem] rounded-lg" /> : <span className="h-[11rem] w-[11rem] rounded-lg bg-[#3a3733]" />}
-            </div>
+          <footer className="bfade mt-auto pt-4 text-[0.82rem] leading-relaxed text-[#8A7F70]" style={{ animationDelay: "3600ms" }}>
+            <p className="m-0">คนไข้ใหม่ต่อเดือนที่ครอบคลุมค่างวด · คนไข้ 1 คน = คอร์ส {COURSE} ครั้ง × ฿{baht(price)} หักค่าวัสดุแล้ว · ประมาณการ ไม่ใช่การรับประกันรายได้ · {PRICE_NOTE}</p>
+            <p className="m-0">Advertise to Healthcare Professional and Health Official</p>
           </footer>
         </section>
       ) : null}
