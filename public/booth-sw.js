@@ -1,0 +1,21 @@
+// Service worker ของจอบูธ (/bodymap/booth) · ให้จอทำงานต่อได้เมื่อเน็ตหลุด หลังเปิดครั้งแรกแล้ว
+// หน้าและข้อมูล: ลองเน็ตก่อน ไม่ได้ค่อยใช้ของที่เก็บไว้ · ไฟล์ static/รูป: ใช้ของที่เก็บไว้ก่อน · ไม่แตะ POST (บันทึกการใช้งาน)
+const CACHE = "bm-booth-v1";
+self.addEventListener("install", (e) => {
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/bodymap/booth", "/assets/brand/bib-logo-white.png", "/assets/brand/icoone-logo-gold.png"])).then(() => self.skipWaiting()));
+});
+self.addEventListener("activate", (e) => {
+  e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k.startsWith("bm-booth-") && k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
+});
+self.addEventListener("fetch", (e) => {
+  const r = e.request;
+  if (r.method !== "GET") return;
+  const u = new URL(r.url);
+  const isStatic = u.pathname.startsWith("/_next/static/") || u.pathname.startsWith("/assets/") || u.hostname.includes("fonts.g");
+  if (isStatic) {
+    e.respondWith(caches.match(r).then((hit) => hit || fetch(r).then((res) => { const cp = res.clone(); caches.open(CACHE).then((c) => c.put(r, cp)); return res; })));
+    return;
+  }
+  if (u.origin !== self.location.origin) return;
+  e.respondWith(fetch(r).then((res) => { if (res.ok) { const cp = res.clone(); caches.open(CACHE).then((c) => c.put(r, cp)); } return res; }).catch(() => caches.match(r).then((hit) => hit || caches.match("/bodymap/booth"))));
+});
