@@ -334,9 +334,9 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
                 return (
                   <button key={k} type="button" aria-pressed={on} onClick={() => { setHp(k); track("เลือกหัวเครื่อง", { p: concern.id, note: `บูธ ${h.name}` }); }}
                     className={`relative flex min-w-0 flex-col overflow-hidden rounded-2xl text-left transition-[transform,box-shadow,filter] duration-300 ease-out ${on ? "-translate-y-1 ring-2 ring-[#C9A96E] ring-offset-4 ring-offset-[#2C2A28]" : "brightness-[0.78]"}`}>
-                    <span className="flex aspect-[16/10] items-center justify-center p-1" style={{ background: "radial-gradient(ellipse at 50% 45%, #FFFFFF 0%, #F4EFE5 55%, #E4DCCD 100%)" }}>
+                    <span className="flex aspect-[16/10] items-center justify-center bg-white p-1.5">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={`/assets/handpieces/${k}-r01.svg`} alt={h.name} className={`h-full w-full object-contain transition-transform duration-500 ease-out ${on ? "scale-110" : "scale-100"}`} draggable={false} />
+                      <img src={`/assets/handpieces/${k}.jpg`} alt={h.name} className={`h-full w-full object-contain transition-transform duration-500 ease-out ${on ? "scale-105" : "scale-95"}`} draggable={false} />
                     </span>
                     <span className="flex flex-1 flex-col bg-[#FAF7F1] px-3 pb-3 pt-2 text-[#2C2A28]">
                       <span className="font-display text-[1.35rem] leading-tight">{h.name}</span>
@@ -350,7 +350,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
             </div>
             <div className="mt-3 grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] gap-5">
               <div className="rounded-2xl border border-[#C9A96E]/40 bg-[#F4EFE5] p-2 text-[#2C2A28]">
-                <MechanismAnim suc={suc} led={HANDPIECES[hp].hasLight && led} las={HANDPIECES[hp].hasLight && las} headName={HANDPIECES[hp].name} />
+                <MechanismAnim suc={suc} led={HANDPIECES[hp].hasLight && led} las={HANDPIECES[hp].hasLight && las} headName={HANDPIECES[hp].name} headKey={hp} />
               </div>
               <div className="flex min-w-0 flex-col justify-center gap-4">
                 <p className="m-0 text-[1.05rem] leading-snug text-[#E4DCCD]">{HANDPIECES[hp].desc}</p>

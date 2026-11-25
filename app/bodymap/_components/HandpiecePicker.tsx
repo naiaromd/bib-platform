@@ -30,7 +30,7 @@ export default function HandpiecePicker({ value, onChange }: { value: HeadChoice
         })}
       </div>
       <p className="mb-2 mt-2 text-sm text-ink-2">{h.desc} · กระตุ้น {h.ppm} ครั้งต่อนาที</p>
-      <div className="mb-2"><MechanismAnim suc={value.suc} led={light && value.led} las={light && value.las} headName={h.name} /></div>
+      <div className="mb-2"><MechanismAnim suc={value.suc} led={light && value.led} las={light && value.las} headName={h.name} headKey={value.hp} /></div>
       <div className="grid gap-3 rounded-xl border border-line p-3 sm:grid-cols-2">
         <label className="block text-sm text-ink">
           <span className="flex justify-between"><span>แรงดูด (จำลอง)</span><span className="text-ink-2">{sucLabel(value.suc)}</span></span>

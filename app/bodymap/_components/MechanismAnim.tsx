@@ -5,7 +5,7 @@
 // เป็นภาพจำลองเพื่ออธิบายหลักการ ไม่ตามสัดส่วนจริง · ไม่ได้ระบุความลึกของแสงเป็นตัวเลข
 import { useEffect, useState } from "react";
 
-const W = 640, H = 380, SURFACE = 150;
+const W = 640, H = 440, SURFACE = 210;
 // [ชื่อชั้น, ระยะจากผิวถึงขอบล่างของชั้น, สีพื้น, สัดส่วนที่ชั้นนี้ถูกยกตามผิว]
 const LAYERS: [string, number, string, number][] = [
   ["หนังกำพร้า", 14, "#EED9D0", 1],
@@ -16,7 +16,17 @@ const LAYERS: [string, number, string, number][] = [
 ];
 const N = 48;
 
-export default function MechanismAnim({ suc, led, las, headName }: { suc: number; led: boolean; las: boolean; headName: string }) {
+// ภาพหัวเครื่องจริงแบบ vector (ไนน์ 25 พ.ย. · BIB/4_Media/handpiece_svg_r01 · เอาเงาพื้นออก) วางให้ลูกกลิ้งแนบผิว
+// [จุดกึ่งกลางลูกกลิ้ง x, ขอบล่างลูกกลิ้ง y] ในกรอบภาพ 400×400 · RoboMicro หมุน -55° ให้หน้าลูกกลิ้งคว่ำลงผิว
+const HEAD_ART: Record<string, { cx: number; bottom: number; rot: number; size?: number }> = {
+  RS: { cx: 242, bottom: 327, rot: 0 },
+  RT: { cx: 200, bottom: 317, rot: 0 },
+  RM: { cx: 200, bottom: 307, rot: 0 },
+  RC: { cx: 185, bottom: 383, rot: -55, size: 0.8 },
+};
+const ART = 230; // ขนาดภาพหัวเครื่องในภาพจำลอง (หน่วยเดียวกับ viewBox)
+
+export default function MechanismAnim({ suc, led, las, headName, headKey = "RS" }: { suc: number; led: boolean; las: boolean; headName: string; headKey?: string }) {
   const [t, setT] = useState(0);
   const [play, setPlay] = useState(true);
   // เครื่องที่ตั้ง "ลดการเคลื่อนไหว" ไว้: เริ่มแบบหยุดนิ่ง แล้วให้กดเล่นเอง
@@ -38,13 +48,12 @@ export default function MechanismAnim({ suc, led, las, headName }: { suc: number
   const yAt = (x: number, depth: number, k: number) => SURFACE + depth - lift * k * bump(x) + 5 * k * dent(x);
   const line = (depth: number, k: number) => Array.from({ length: N + 1 }, (_, i) => { const x = (i / N) * W; return `${x.toFixed(1)},${yAt(x, depth, k).toFixed(1)}`; });
   const band = (top: number, kTop: number, bottom: number, kBottom: number) => `M${line(top, kTop).join(" L")} L${line(bottom, kBottom).reverse().join(" L")} Z`;
-  const rot = (headX / R) * (180 / Math.PI); // ลูกกลิ้งหมุนตามระยะที่หัวเคลื่อน
   const surfC = yAt(headX, 0, 1);
   const light = led || las;
 
   return (
     <div className="overflow-hidden rounded-xl border border-line bg-paper">
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="ภาพจำลองหัวเครื่องยกผิวด้วยแรงดูดและลูกกลิ้ง เห็นชั้นผิว 5 ชั้น" className="block h-auto w-full">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`ภาพจำลองหัว ${headName} ยกผิวด้วยแรงดูดและลูกกลิ้ง เห็นชั้นผิว 5 ชั้น`} className="block h-auto w-full">
         <rect width={W} height={H} fill="#FAF7F1" />
         {LAYERS.map(([name, bottom, fill, k], i) => {
           const top = i === 0 ? 0 : LAYERS[i - 1][1];
@@ -76,25 +85,20 @@ export default function MechanismAnim({ suc, led, las, headName }: { suc: number
             {las ? <path d={`M${headX - 2},${surfC} L${headX - 18},${SURFACE + 150} L${headX + 46},${SURFACE + 150} L${headX + 14},${surfC} Z`} fill="#C08A5A" opacity={0.3 + 0.1 * pulse} /> : null}
           </g>
         ) : null}
-        {/* หัวเครื่อง: เปลือก + ช่องดูดกลาง + ลูกกลิ้ง 2 ตัว */}
-        <g>
-          <path d={`M${headX - 92},${SURFACE - 26} q0,-74 92,-74 q92,0 92,74 l0,6 l-184,0 Z`} fill="#FFFFFF" stroke="#8A7F70" strokeWidth={1.4} />
-          <rect x={headX - 22} y={SURFACE - 62} width={44} height={50} rx={8} fill="#F4EFE5" stroke="#B9A999" />
-          {[0, 1, 2].map((i) => {
-            const y = SURFACE - 22 - ((t * 40 + i * 14) % 40);
-            return <path key={i} d={`M${headX - 6},${y} l6,-7 l6,7`} fill="none" stroke="#C89B8A" strokeWidth={2} opacity={0.35 + suc / 160} />;
-          })}
-          {[-GAP, GAP].map((dx) => (
-            <g key={dx} transform={`rotate(${rot} ${headX + dx} ${SURFACE - R + 4})`}>
-              <circle cx={headX + dx} cy={SURFACE - R + 4} r={R} fill="#E4DCCD" stroke="#4A4641" strokeWidth={1.4} />
-              {Array.from({ length: 8 }, (_, i) => {
-                const a = (i / 8) * Math.PI * 2;
-                return <circle key={i} cx={headX + dx + Math.cos(a) * 13} cy={SURFACE - R + 4 + Math.sin(a) * 13} r={2.2} fill="#4A4641" />;
-              })}
+        {/* หัวเครื่อง: ภาพจริง ลูกกลิ้งกดแนบผิว (ขอบล่างลูกกลิ้งต่ำกว่าผิว 3 หน่วย = กดเล็กน้อย) · โยกเบาๆ ตามจังหวะกลิ้ง */}
+        {(() => {
+          const a = HEAD_ART[headKey] ?? HEAD_ART.RS;
+          const k = (ART * (a.size ?? 1)) / 400;
+          const x = headX - a.cx * k, y = SURFACE + 3 - a.bottom * k;
+          const rock = Math.sin(t * 6) * 1.2;
+          return (
+            <g transform={`rotate(${rock} ${headX} ${SURFACE})`}>
+              <g transform={`translate(${x} ${y}) scale(${k}) rotate(${a.rot} 200 200)`}>
+                <image href={`/assets/handpieces/${headKey}-anim.svg`} x={0} y={0} width={400} height={400} />
+              </g>
             </g>
-          ))}
-          <text x={headX} y={SURFACE - 76} textAnchor="middle" fontSize={13} fill="#4A4641">{headName}</text>
-        </g>
+          );
+        })()}
         {/* ป้ายชื่อชั้นผิว */}
         {LAYERS.map(([name, bottom], i) => {
           const top = i === 0 ? 0 : LAYERS[i - 1][1];
