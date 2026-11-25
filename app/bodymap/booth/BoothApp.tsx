@@ -11,7 +11,6 @@ import { CONSUMABLE, FACE_ZONES, PAY_PLANS, PRICE_NOTE, SAMPLE_PRICE } from "@/l
 import { setContext, track } from "@/lib/bodymap/events";
 import { DEFAULT_FIT, resolveAnswer } from "@/lib/bodymap/solution";
 import { HANDPIECES, HANDPIECE_ORDER, type HandpieceKey } from "@/lib/handpieces";
-import { FIGURES } from "@/lib/assets";
 import BodyFigure, { type View } from "../_components/BodyFigure";
 import MechanismAnim from "../_components/MechanismAnim";
 import { planSub, planTitle } from "../_components/words";
@@ -22,6 +21,7 @@ const ASK_S = 20;
 const COURSE = 5;
 const SHOW = 8; // ปัญหาที่แสดงก่อนกด "ดูเพิ่ม"
 const GOLD = "#C9A96E";
+const HERO = ["/assets/booth/doctor-f.jpg", "/assets/booth/doctor-m.jpg"]; // ภาพ AI จากไนน์ · สลับทุก 7 วินาที
 const en = (label: string) => label.split(" · ")[0];
 const baht = (n: number) => Math.round(n).toLocaleString("th-TH");
 const today = () => new Date().toISOString().slice(0, 10);
@@ -112,6 +112,12 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
   const [count, setCount] = useState(0);
   const [ask, setAsk] = useState<number | null>(null);
   const [qr, setQr] = useState("");
+  const [hero, setHero] = useState(0);
+  useEffect(() => {
+    if (stage !== "attract") return;
+    const t = window.setInterval(() => setHero((h) => (h + 1) % HERO.length), 7000);
+    return () => window.clearInterval(t);
+  }, [stage]);
 
   useEffect(() => { setCount(readCount()); setContext({ fit: "บูธ", mode: data.mode === "internal" ? "ภายใน" : "นำเสนอ" }); }, [data.mode]);
 
@@ -184,34 +190,41 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
 .bsig{stroke-dasharray:1600;stroke-dashoffset:1600;animation:bsig 2s cubic-bezier(.6,0,.2,1) forwards,bsigfade .8s ease 2.1s forwards}@keyframes bsig{to{stroke-dashoffset:0}}@keyframes bsigfade{to{opacity:.1}}
 .bloop{stroke-dasharray:900;stroke-dashoffset:900;animation:bloop 5s cubic-bezier(.6,0,.2,1) infinite}@keyframes bloop{0%{stroke-dashoffset:900;opacity:1}55%{stroke-dashoffset:0;opacity:1}85%{opacity:0}100%{stroke-dashoffset:0;opacity:0}}
 .bpulse{animation:bpulse 2.4s ease-in-out infinite}@keyframes bpulse{0%,100%{opacity:.55}50%{opacity:1}}
+.bhero{animation:bhero 14s ease-in-out infinite alternate}@keyframes bhero{from{transform:scale(1)}to{transform:scale(1.06)}}
 .bdot{animation:bdot 2.4s ease-in-out infinite}@keyframes bdot{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.6);opacity:1}}
 `}</style>
 
-      {/* ---------------- หน้ารอ ---------------- */}
+      {/* ---------------- หน้ารอ · แบบโฆษณา (ไนน์ 25 พ.ย.: ภาพแพทย์ 2 ภาพ สลับกันช้าๆ) ---------------- */}
       {stage === "attract" ? (
-        <button type="button" onClick={start} className="flex h-full w-full flex-col items-center px-[8%] pb-[6%] pt-[9%] text-center">
-          <Logos />
-          <div className="mt-[9%] flex flex-col items-center gap-5">
-            <p className="m-0 font-display text-[1.3rem] uppercase tracking-[0.45em] text-[#C89B8A]">Precision Beauty</p>
-            <h1 className="m-0 font-display text-[6.6rem] font-medium leading-[0.95] tracking-wide">Design<br />your Signature</h1>
-            <svg viewBox="0 0 600 70" className="w-[30rem]" aria-hidden>
-              <path d="M10 45 C 90 0, 140 0, 170 32 S 250 66, 290 28 S 370 0, 400 35 S 500 62, 590 18" fill="none" stroke={GOLD} strokeWidth="2" strokeLinecap="round" className="bloop" />
-            </svg>
-            <p className="m-0 text-[1.9rem] leading-snug text-[#E4DCCD]">ออกแบบทรีตเมนต์ซิกเนเจอร์<br />ของคลินิกคุณ ใน 3 ขั้นตอน</p>
-          </div>
-          <div className="relative mx-auto my-[4%] min-h-0 flex-1" aria-hidden>
+        <button type="button" onClick={start} className="relative block h-full w-full overflow-hidden bg-[#ECE2D7] text-left text-[#2C2A28]">
+          {HERO.map((src, i) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img key={src} src={src} alt="" draggable={false} aria-hidden
+              className={`bhero absolute inset-0 h-full w-full object-cover object-[82%_20%] transition-opacity duration-[1500ms] ease-in-out ${hero === i ? "opacity-100" : "opacity-0"}`} />
+          ))}
+          <span aria-hidden className="absolute inset-x-0 bottom-0 h-[58%]" style={{ background: "linear-gradient(to bottom, rgba(236,226,215,0) 0%, rgba(236,226,215,.86) 34%, #ECE2D7 56%)" }} />
+          <div className="absolute left-[7%] top-[4.5%] flex items-center gap-5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={FIGURES.f.front} alt="" className="h-full w-auto opacity-25" draggable={false} />
-            {Object.values((data.figurePoints["female_front"] ?? {}) as Record<string, number[][]>).flat().map(([x, y], i) => (
-              <span key={i} className="bdot absolute -ml-1.5 -mt-1.5 h-3 w-3 rounded-full bg-[#C9A96E]" style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${(i % 7) * 0.35}s` }} />
-            ))}
+            <img src="/assets/brand/bib-logo.png" alt="BIB · Beauty Innovation & Beyond" className="h-[4.4rem] w-auto" />
+            <span aria-hidden className="h-[3rem] w-px bg-[#8A7F70]" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/brand/icoone-logo-gold.png" alt="icoone" className="h-[2.3rem] w-auto" />
           </div>
-          <span className="bpulse flex items-center gap-4 rounded-full border border-[#C9A96E] px-14 py-6 text-[1.8rem]">
-            <span className="bdot inline-block h-3 w-3 rounded-full bg-[#C9A96E]" />แตะเพื่อเริ่ม
-          </span>
-          <div className="mt-[6%] flex w-full items-end justify-between text-[0.95rem] text-[#8A7F70]">
-            <span>{count ? `วันนี้ออกแบบ Signature บนจอนี้แล้ว ${count} แบบ` : ""}</span>
-            <span>Advertise to Healthcare Professional and Health Official</span>
+          <div className="absolute inset-x-[7%] bottom-[5%] flex flex-col">
+            <p className="m-0 font-display text-[1.25rem] uppercase tracking-[0.5em] text-[#6E4A3E]">Precision Beauty</p>
+            <h1 className="m-0 mt-3 font-display text-[8.4rem] font-medium leading-[0.88] tracking-[0.01em]">Design<br />your <span className="italic">Signature</span></h1>
+            <svg viewBox="0 0 600 50" className="-mt-1 w-[26rem]" aria-hidden>
+              <path d="M8 34 C 90 2, 140 2, 170 26 S 250 48, 290 22 S 370 2, 400 28 S 500 46, 592 14" fill="none" stroke="#A8864E" strokeWidth="2.2" strokeLinecap="round" className="bloop" />
+            </svg>
+            <p className="m-0 mt-3 text-[1.9rem] leading-snug text-[#4A4641]">ออกแบบทรีตเมนต์ซิกเนเจอร์ของคลินิกคุณ<br />ใน 3 ขั้นตอน</p>
+            <span className="mt-9 flex items-center justify-between rounded-full bg-[#2C2A28] py-5 pl-10 pr-5 text-[1.8rem] text-[#FAF7F1]">
+              <span className="flex items-center gap-4"><span className="bdot inline-block h-3 w-3 rounded-full bg-[#C9A96E]" />แตะเพื่อเริ่มออกแบบ</span>
+              <span className="flex h-[3.8rem] w-[3.8rem] items-center justify-center rounded-full bg-[#C9A96E] text-[1.8rem] text-[#2C2A28]">→</span>
+            </span>
+            <div className="mt-5 flex items-end justify-between text-[0.95rem] text-[#6b655d]">
+              <span>{count ? `วันนี้ออกแบบ Signature บนจอนี้แล้ว ${count} แบบ` : ""}</span>
+              <span>Advertise to Healthcare Professional and Health Official</span>
+            </div>
           </div>
         </button>
       ) : null}
