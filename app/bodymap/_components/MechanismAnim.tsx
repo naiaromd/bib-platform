@@ -28,7 +28,7 @@ const HEAD_ART: Record<string, { cx: number; bottom: number; rot: number; size?:
 };
 const ART = 230; // ขนาดภาพหัวเครื่องในภาพจำลอง (หน่วยเดียวกับ viewBox)
 
-export default function MechanismAnim({ suc, led, las, headName, headKey = "RS" }: { suc: number; led: boolean; las: boolean; headName: string; headKey?: string }) {
+export default function MechanismAnim({ suc, led, las, headName, headKey = "RS", lite = false }: { suc: number; led: boolean; las: boolean; headName: string; headKey?: string; lite?: boolean }) {
   const [t, setT] = useState(0);
   const [play, setPlay] = useState(true);
   // เครื่องที่ตั้ง "ลดการเคลื่อนไหว" ไว้: เริ่มแบบหยุดนิ่ง แล้วให้กดเล่นเอง
@@ -37,9 +37,11 @@ export default function MechanismAnim({ suc, led, las, headName, headKey = "RS" 
   }, []);
   useEffect(() => {
     if (!play) return;
-    const id = window.setInterval(() => setT((x) => x + 0.04), 40);
+    // โหมดเบา: วาดใหม่ 8 ครั้ง/วินาที แทน 25 (ความเร็วการเคลื่อนไหวเท่าเดิม แต่เครื่องเก่าไม่ต้องทำงานหนัก)
+    const ms = lite ? 125 : 40;
+    const id = window.setInterval(() => setT((x) => x + ms / 1000), ms);
     return () => window.clearInterval(id);
-  }, [play]);
+  }, [play, lite]);
 
   const headX = W / 2 + Math.sin(t * 0.9) * 150; // หัวเคลื่อนไปกลับบนผิว
   const pulse = 0.82 + 0.18 * Math.sin(t * 6); // จังหวะดูด–คลาย

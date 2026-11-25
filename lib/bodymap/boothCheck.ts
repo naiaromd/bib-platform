@@ -18,6 +18,9 @@ def(Object,'hasOwn',function(o,k){return Object.prototype.hasOwnProperty.call(o,
 def(String.prototype,'replaceAll',function(a,b){return typeof a==='string'?this.split(a).join(b):this.replace(a,b)});
 def(Promise,'allSettled',function(ps){return Promise.all(Array.from(ps).map(function(p){return Promise.resolve(p).then(function(v){return{status:'fulfilled',value:v}},function(r){return{status:'rejected',reason:r}})}))});
 try{var g=document.createElement('div');g.style.cssText='display:flex;flex-direction:column;gap:1px;position:absolute';g.appendChild(document.createElement('div'));g.appendChild(document.createElement('div'));document.documentElement.appendChild(g);if(g.scrollHeight!==1)document.documentElement.className+=' nfg';g.parentNode.removeChild(g)}catch(e){}
+var q=location.search,cm=navigator.userAgent.match(/Chrome\\/(\\d+)/),mem=navigator.deviceMemory;
+var lite=/[?&]lite=1/.test(q)?true:/[?&]lite=0/.test(q)?false:((cm&&+cm[1]<80)||(mem&&mem<=2));
+W.__bmLite=!!lite;if(lite)document.documentElement.className+=' bm-lite';
 var force=/[?&]check=1/.test(location.search);
 function show(){
  var ok=!!W.__bmReady,m=navigator.userAgent.match(/Chrome\\/(\\d+)/),a=navigator.userAgent.match(/Android ([\\d.]+)/);
@@ -25,7 +28,7 @@ function show(){
  var d=document.getElementById('bm-check')||document.createElement('div');d.id='bm-check';
  d.style.cssText='position:fixed;left:0;right:0;top:0;z-index:99999;white-space:pre-line;font:18px/1.6 sans-serif;padding:18px 22px;color:#fff;background:'+(ok?'#2E6B4F':'#8C3A2A');
  d.textContent=(ok?'✓ จอพร้อมใช้งาน ปุ่มกดได้':'✕ จอยังโหลดระบบไม่สำเร็จ ปุ่มจะกดไม่ได้ · ถ่ายรูปข้อความนี้ส่งทีม BIB')
-  +'\\nเบราว์เซอร์: '+(m?'Chrome/WebView '+m[1]:'ไม่ทราบ')+' · Android '+(a?a[1]:'?')+' · '+(navigator.onLine?'ออนไลน์':'ออฟไลน์')+' · ระบบเก็บหน้าไว้ในเครื่อง: '+('serviceWorker' in navigator?'รองรับ':'ไม่รองรับ')
+  +'\\nเบราว์เซอร์: '+(m?'Chrome/WebView '+m[1]:'ไม่ทราบ')+' · Android '+(a?a[1]:'?')+' · '+(navigator.onLine?'ออนไลน์':'ออฟไลน์')+' · โหมด: '+(W.__bmLite?'เบา':'เต็ม')+' · ระบบเก็บหน้าไว้ในเครื่อง: '+('serviceWorker' in navigator?'รองรับ':'ไม่รองรับ')
   +(errs.length?'\\nError: '+errs.slice(0,3).join(' | '):'')+'\\n'+navigator.userAgent;
  if(!d.parentNode)document.body.appendChild(d);
 }

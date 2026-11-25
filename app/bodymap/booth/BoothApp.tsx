@@ -42,11 +42,15 @@ function readCount(): number {
   try { return Number(localStorage.getItem(`bm-booth-count-${today()}`) ?? "0"); } catch { return 0; }
 }
 
+/** โหมดเบา: จอสเปกต่ำ/เบราว์เซอร์เก่า (ตั้งโดย boothCheck) · ?lite=1 เปิด ?lite=0 ปิด */
+function isLite(): boolean { return typeof window !== "undefined" && !!(window as unknown as { __bmLite?: boolean }).__bmLite; }
+
 /** ตัวเลขนับขึ้น · เริ่มหลัง delay ms */
 function useCountUp(target: number, delay: number, dec = 0, run = true) {
   const [v, setV] = useState(0);
   useEffect(() => {
     if (!run) { setV(0); return; }
+    if (isLite()) { setV(target); return; } // โหมดเบา: ขึ้นตัวเลขเลย
     let raf = 0;
     const t0 = performance.now() + delay;
     const step = (t: number) => {
@@ -143,11 +147,14 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
   const [qr, setQr] = useState("");
   const [hero, setHero] = useState(0);
   // วิดีโอ: โหลดทั้งไฟล์มาเก็บในเครื่องครั้งเดียว แล้วเล่นจากหน่วยความจำ → เล่นได้แม้ไม่มีเน็ต (ไฟล์ถูกเก็บไว้โดย booth-sw.js)
-  const [video, setVideo] = useState("/assets/booth/roller-hd.mp4");
+  const [video, setVideo] = useState("");
+  const [lite, setLite] = useState(false);
   const vref = useRef<HTMLVideoElement>(null);
   useEffect(() => { const v = vref.current; if (v) { v.load(); v.play().catch(() => undefined); } }, [video, stage]);
   useEffect(() => {
     let url = "";
+    if (isLite()) { setLite(true); setVideo("/assets/booth/roller-lite.mp4"); return; } // โหมดเบา: ไฟล์เล็ก เล่นตรง ไม่โหลดเก็บในหน่วยความจำ
+    setVideo("/assets/booth/roller-hd.mp4");
     fetch("/assets/booth/roller-hd.mp4").then((r) => (r.ok ? r.blob() : null)).then((b) => { if (b) { url = URL.createObjectURL(b); setVideo(url); } }).catch(() => undefined);
     return () => { if (url) URL.revokeObjectURL(url); };
   }, []);
@@ -258,6 +265,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
 .bdot{animation:bdot 2.4s ease-in-out infinite}@keyframes bdot{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.6);opacity:1}}
 .bscan{animation:bscan 3.6s cubic-bezier(.45,0,.55,1) infinite}@keyframes bscan{0%{top:6%;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:94%;opacity:0}}
 .bring{animation:bring 2s ease-out infinite}@keyframes bring{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.2);opacity:0}}
+.bm-lite .bhero,.bm-lite .bdot,.bm-lite .bpulse{animation:none}.bm-lite .bscan{display:none}.bm-lite .bring{animation-duration:3s}.bm-lite .bfade{animation-duration:.25s}
 `}</style>
 
       {/* ---------------- หน้ารอ · แบบโฆษณา ---------------- */}
@@ -288,7 +296,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
               <span className="flex h-[3.8rem] w-[3.8rem] items-center justify-center rounded-full bg-[#C9A96E] text-[1.8rem] text-[#2C2A28]">→</span>
             </span>
           </div>
-          <video ref={vref} src={video} autoPlay muted loop playsInline preload="auto" aria-hidden
+          <video ref={vref} src={video || undefined} autoPlay muted loop playsInline preload="auto" aria-hidden
             className="absolute bottom-[5%] left-[10%] w-[80%] rounded-3xl object-contain shadow-[0_20px_50px_-20px_rgba(44,42,40,.45)]" style={{ aspectRatio: "1920 / 810" }} />
           <div className="absolute inset-x-[7%] bottom-[2%] flex items-end justify-between text-[0.95rem] text-[#6b655d]">
             <span>{count ? `วันนี้ออกแบบ Signature บนจอนี้แล้ว ${count} แบบ` : ""}</span>
@@ -410,7 +418,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
           <p className="m-0 text-[1.25rem] text-[#B9AE9E]">ลูกกลิ้งและแรงดูดทำงานกับเนื้อเยื่อ · ปรับหัวเครื่อง แรงดูด และแสง ดูได้เลย</p>
 
           <div className="mt-4 rounded-3xl border border-[#C9A96E]/40 bg-[#F4EFE5] p-2 text-[#2C2A28]">
-            <MechanismAnim suc={suc} led={HANDPIECES[hp].hasLight && led} las={HANDPIECES[hp].hasLight && las} headName={HANDPIECES[hp].name} headKey={hp} />
+            <MechanismAnim lite={lite} suc={suc} led={HANDPIECES[hp].hasLight && led} las={HANDPIECES[hp].hasLight && las} headName={HANDPIECES[hp].name} headKey={hp} />
           </div>
 
           <div className="mt-4 grid grid-cols-4 gap-3">
@@ -540,7 +548,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
           </div>
 
           {/* ภาพหัวเครื่องทำงานจริง · ช่วงล่างของจอ ไม่ต้องกด */}
-          <video src={video} autoPlay muted loop playsInline aria-hidden className="bfade mt-6 w-full rounded-3xl object-contain" style={{ aspectRatio: "1920 / 810", animationDelay: "3200ms" }} />
+          <video src={video || undefined} autoPlay muted loop playsInline aria-hidden className="bfade mt-6 w-full rounded-3xl object-contain" style={{ aspectRatio: "1920 / 810", animationDelay: "3200ms" }} />
 
           <footer className="bfade mt-auto pt-4 text-[0.82rem] leading-relaxed text-[#8A7F70]" style={{ animationDelay: "3300ms" }}>
             <p className="m-0">หัวเครื่องที่ดู: {HANDPIECES[hp].name} · คนไข้ใหม่ต่อเดือนที่ครอบคลุมค่างวด · คนไข้ 1 คน = คอร์ส {COURSE} ครั้ง × ฿{baht(price)} หักค่าวัสดุแล้ว · ประมาณการ ไม่ใช่การรับประกันรายได้ · {PRICE_NOTE}</p>
