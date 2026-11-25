@@ -113,6 +113,15 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
   const [ask, setAsk] = useState<number | null>(null);
   const [qr, setQr] = useState("");
   const [hero, setHero] = useState(0);
+  // วิดีโอ: โหลดทั้งไฟล์มาเก็บในเครื่องครั้งเดียว แล้วเล่นจากหน่วยความจำ → เล่นได้แม้ไม่มีเน็ต (ไฟล์ถูกเก็บไว้โดย booth-sw.js)
+  const [video, setVideo] = useState("/assets/booth/roller-hd.mp4");
+  const vref = useRef<HTMLVideoElement>(null);
+  useEffect(() => { const v = vref.current; if (v) { v.load(); v.play().catch(() => undefined); } }, [video, stage]);
+  useEffect(() => {
+    let url = "";
+    fetch("/assets/booth/roller-hd.mp4").then((r) => (r.ok ? r.blob() : null)).then((b) => { if (b) { url = URL.createObjectURL(b); setVideo(url); } }).catch(() => undefined);
+    return () => { if (url) URL.revokeObjectURL(url); };
+  }, []);
   useEffect(() => {
     if (stage !== "attract") return;
     const t = window.setInterval(() => setHero((h) => (h + 1) % HERO.length), 7000);
@@ -210,7 +219,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
             <img src="/assets/brand/bib-logo.png" alt="BIB · Beauty Innovation & Beyond" className="h-[4.4rem] w-auto" />
             <span aria-hidden className="h-[3rem] w-px bg-[#8A7F70]" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/brand/icoone-laser-med-gold.png" alt="icoone Laser Med" className="h-[3.4rem] w-auto" />
+            <img src="/assets/brand/icoone-laser-med-grey.png" alt="icoone Laser Med" className="h-[3.4rem] w-auto" />
           </div>
           <div className="absolute inset-x-[7%] top-[36%] flex flex-col">
             <p className="m-0 font-display text-[1.25rem] uppercase tracking-[0.5em] text-[#6E4A3E]">Precision Beauty</p>
@@ -225,8 +234,8 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
             </span>
           </div>
           {/* วิดีโอหัวลูกกลิ้งบนผิวจริง (ไนน์ 25 พ.ย.) · ช่วงล่างของจอไม่ต้องกด */}
-          <video src="/assets/booth/roller.mp4" autoPlay muted loop playsInline preload="auto" aria-hidden
-            className="absolute bottom-[5%] left-[10%] w-[80%] rounded-3xl object-contain shadow-[0_20px_50px_-20px_rgba(44,42,40,.45)]" style={{ aspectRatio: "1600 / 676" }} />
+          <video ref={vref} src={video} autoPlay muted loop playsInline preload="auto" aria-hidden
+            className="absolute bottom-[5%] left-[10%] w-[80%] rounded-3xl object-contain shadow-[0_20px_50px_-20px_rgba(44,42,40,.45)]" style={{ aspectRatio: "1920 / 810" }} />
           <div className="absolute inset-x-[7%] bottom-[2%] flex items-end justify-between text-[0.95rem] text-[#6b655d]">
             <span>{count ? `วันนี้ออกแบบ Signature บนจอนี้แล้ว ${count} แบบ` : ""}</span>
             <span>Advertise to Healthcare Professional and Health Official</span>
