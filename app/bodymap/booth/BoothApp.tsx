@@ -202,7 +202,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
             <img key={src} src={src} alt="" draggable={false} aria-hidden
               className={`bhero absolute inset-0 h-full w-full object-cover object-[82%_20%] transition-opacity duration-[1500ms] ease-in-out ${hero === i ? "opacity-100" : "opacity-0"}`} />
           ))}
-          <span aria-hidden className="absolute inset-x-0 bottom-0 h-[58%]" style={{ background: "linear-gradient(to bottom, rgba(236,226,215,0) 0%, rgba(236,226,215,.86) 34%, #ECE2D7 56%)" }} />
+          <span aria-hidden className="absolute inset-x-0 bottom-0 h-[70%]" style={{ background: "linear-gradient(to bottom, rgba(236,226,215,0) 0%, rgba(236,226,215,.88) 26%, #ECE2D7 42%)" }} />
           <div className="absolute left-[7%] top-[4.5%] flex items-center gap-5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/assets/brand/bib-logo.png" alt="BIB · Beauty Innovation & Beyond" className="h-[4.4rem] w-auto" />
@@ -210,7 +210,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/assets/brand/icoone-logo-gold.png" alt="icoone" className="h-[2.3rem] w-auto" />
           </div>
-          <div className="absolute inset-x-[7%] bottom-[5%] flex flex-col">
+          <div className="absolute inset-x-[7%] top-[44%] flex flex-col">
             <p className="m-0 font-display text-[1.25rem] uppercase tracking-[0.5em] text-[#6E4A3E]">Precision Beauty</p>
             <h1 className="m-0 mt-3 font-display text-[8.4rem] font-medium leading-[0.88] tracking-[0.01em]">Design<br />your <span className="italic">Signature</span></h1>
             <svg viewBox="0 0 600 50" className="-mt-1 w-[26rem]" aria-hidden>
@@ -221,10 +221,10 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
               <span className="flex items-center gap-4"><span className="bdot inline-block h-3 w-3 rounded-full bg-[#C9A96E]" />แตะเพื่อเริ่มออกแบบ</span>
               <span className="flex h-[3.8rem] w-[3.8rem] items-center justify-center rounded-full bg-[#C9A96E] text-[1.8rem] text-[#2C2A28]">→</span>
             </span>
-            <div className="mt-5 flex items-end justify-between text-[0.95rem] text-[#6b655d]">
-              <span>{count ? `วันนี้ออกแบบ Signature บนจอนี้แล้ว ${count} แบบ` : ""}</span>
-              <span>Advertise to Healthcare Professional and Health Official</span>
-            </div>
+          </div>
+          <div className="absolute inset-x-[7%] bottom-[3%] flex items-end justify-between text-[0.95rem] text-[#6b655d]">
+            <span>{count ? `วันนี้ออกแบบ Signature บนจอนี้แล้ว ${count} แบบ` : ""}</span>
+            <span>Advertise to Healthcare Professional and Health Official</span>
           </div>
         </button>
       ) : null}
@@ -236,7 +236,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
           <div className="mt-[14%]"><Steps n={1} /></div>
           <div className="mt-5"><Eyebrow>01 · Your Business</Eyebrow></div>
           <h2 className="m-0 mt-2 text-[3.6rem] font-semibold leading-tight">ธุรกิจของคุณคือ</h2>
-          <div className="mt-auto grid gap-4">
+          <div className="mt-[8%] grid gap-4">
             {BUSINESS_TYPES.map((b, i) => (
               <button key={b.id} type="button" onClick={() => pickBt(b)} style={{ animationDelay: `${i * 60}ms` }}
                 className="bfade flex items-center gap-8 rounded-2xl border border-[#5a554e] px-8 py-7 text-left transition-colors active:border-[#C9A96E] active:bg-[#3a3733]">
@@ -255,7 +255,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
           <div className="flex items-center justify-between"><Steps n={2} /><button type="button" onClick={() => setStage("business")} className="text-[1.2rem] text-[#B9AE9E]">← {bt?.th}</button></div>
           <div className="mt-5"><Eyebrow>02 · Your Focus</Eyebrow></div>
           <h2 className="m-0 mt-2 text-[3.2rem] font-semibold leading-tight">ดูแลตรงไหน</h2>
-          <div className="mt-5 flex h-[44%] flex-none items-center justify-center overflow-hidden rounded-3xl bg-[#F4EFE5] p-5 text-[#2C2A28] [&>div]:!static [&_.relative]:!max-w-[21vh] [&_.relative>button]:!h-12 [&_.relative>button]:!w-12 [&_.relative>button]:!text-lg [&>div>button]:!px-6 [&>div>button]:!py-3 [&>div>button]:!text-lg">
+          <div className="mt-5 flex h-[41%] flex-none items-center justify-center overflow-hidden rounded-3xl bg-[#F4EFE5] p-5 text-[#2C2A28] [&>div]:!static [&_.relative]:!max-w-[9.2vh] [&_.relative>button]:!h-12 [&_.relative>button]:!w-12 [&_.relative>button]:!text-lg [&>div>button]:!px-6 [&>div>button]:!py-3 [&>div>button]:!text-lg">
             <BodyFigure sex="f" view={view} zones={data.zones} points={data.figurePoints} counts={counts} active={zoneId} onView={setView} onPick={pickZone} />
           </div>
           <div className="mt-6 min-h-0 flex-1">
@@ -287,7 +287,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
           </svg>
 
           <header className="bfade border-b border-[#C9A96E] pb-5" style={{ animationDelay: "2000ms" }}>
-            <div className="flex items-center justify-between"><Eyebrow>Your Signature · {bt.th}</Eyebrow><span className="font-display text-[1.2rem] tracking-[0.2em] text-[#B9AE9E]">No. {String(serial).padStart(3, "0")} · {dateTh}</span></div>
+            <div className="flex items-center justify-between"><Eyebrow>Your Signature · {bt.th}</Eyebrow><span className="flex items-center gap-5"><span className="font-display text-[1.2rem] tracking-[0.2em] text-[#B9AE9E]">No. {String(serial).padStart(3, "0")} · {dateTh}</span><button type="button" onClick={() => { track("บูธ", { note: "เริ่มใหม่" }); reset(); }} className="rounded-full border border-[#5a554e] px-5 py-2 text-[1.1rem] text-[#E4DCCD]">↺ ออกแบบใหม่</button></span></div>
             <h2 className="m-0 mt-2 text-[3.4rem] font-semibold leading-tight">{main ? planTitle(main) : concern.label}</h2>
             <p className="m-0 mt-1 text-[1.35rem] text-[#B9AE9E]">
               {concern.label}{main && planSub(main) ? <span className="font-display text-[1.55rem]"> · {planSub(main)}</span> : null}
@@ -379,7 +379,6 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
 
           <footer className="bfade mt-auto flex items-center justify-between gap-6 pt-5" style={{ animationDelay: "3600ms" }}>
             <div className="flex flex-col gap-3">
-              <button type="button" onClick={() => { track("บูธ", { note: "เริ่มใหม่" }); reset(); }} className="self-start rounded-full border border-[#5a554e] px-8 py-4 text-[1.3rem] text-[#E4DCCD]">↺ ออกแบบใหม่</button>
               <span className="text-[0.85rem] text-[#8A7F70]">Advertise to Healthcare Professional and Health Official</span>
             </div>
             <div className="flex items-center gap-5">
