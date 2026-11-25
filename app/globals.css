@@ -91,3 +91,39 @@ img {
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+/* === จอ Android รุ่นเก่า (Chrome 70 · จอบูธ rk3288) · ของที่เบราว์เซอร์เก่าไม่รู้จัก ใส่สำรองไว้ === */
+@layer base {
+  button,input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;background-color:transparent;background-image:none}
+  [hidden]{display:none}
+}
+.inset-0{top:0;right:0;bottom:0;left:0}
+@supports not (aspect-ratio:1/1){.aspect-\[16\/10\]{height:8.3rem}.aspect-video{height:0;padding-top:56.25%}}
+/* flex gap ใช้ได้ตั้งแต่ Chrome 84 · เครื่องเก่าใส่ระยะด้วย margin แทน (สคริปต์ตรวจใส่ class nfg ให้) */
+.nfg .flex.gap-1:not(.flex-col):not(.flex-wrap)>*+*,.nfg .inline-flex.gap-1:not(.flex-col)>*+*{margin-left:0.25rem}
+.nfg .flex.flex-col.gap-1>*+*{margin-top:0.25rem}
+.nfg .flex.flex-wrap.gap-1>*{margin-right:0.25rem;margin-bottom:0.25rem}
+.nfg .flex.gap-1\.5:not(.flex-col):not(.flex-wrap)>*+*,.nfg .inline-flex.gap-1\.5:not(.flex-col)>*+*{margin-left:0.375rem}
+.nfg .flex.flex-col.gap-1\.5>*+*{margin-top:0.375rem}
+.nfg .flex.flex-wrap.gap-1\.5>*{margin-right:0.375rem;margin-bottom:0.375rem}
+.nfg .flex.gap-2:not(.flex-col):not(.flex-wrap)>*+*,.nfg .inline-flex.gap-2:not(.flex-col)>*+*{margin-left:0.5rem}
+.nfg .flex.flex-col.gap-2>*+*{margin-top:0.5rem}
+.nfg .flex.flex-wrap.gap-2>*{margin-right:0.5rem;margin-bottom:0.5rem}
+.nfg .flex.gap-2\.5:not(.flex-col):not(.flex-wrap)>*+*,.nfg .inline-flex.gap-2\.5:not(.flex-col)>*+*{margin-left:0.625rem}
+.nfg .flex.flex-col.gap-2\.5>*+*{margin-top:0.625rem}
+.nfg .flex.flex-wrap.gap-2\.5>*{margin-right:0.625rem;margin-bottom:0.625rem}
+.nfg .flex.gap-3:not(.flex-col):not(.flex-wrap)>*+*,.nfg .inline-flex.gap-3:not(.flex-col)>*+*{margin-left:0.75rem}
+.nfg .flex.flex-col.gap-3>*+*{margin-top:0.75rem}
+.nfg .flex.flex-wrap.gap-3>*{margin-right:0.75rem;margin-bottom:0.75rem}
+.nfg .flex.gap-4:not(.flex-col):not(.flex-wrap)>*+*,.nfg .inline-flex.gap-4:not(.flex-col)>*+*{margin-left:1rem}
+.nfg .flex.flex-col.gap-4>*+*{margin-top:1rem}
+.nfg .flex.flex-wrap.gap-4>*{margin-right:1rem;margin-bottom:1rem}
+.nfg .flex.gap-5:not(.flex-col):not(.flex-wrap)>*+*,.nfg .inline-flex.gap-5:not(.flex-col)>*+*{margin-left:1.25rem}
+.nfg .flex.flex-col.gap-5>*+*{margin-top:1.25rem}
+.nfg .flex.flex-wrap.gap-5>*{margin-right:1.25rem;margin-bottom:1.25rem}
+.nfg .flex.gap-6:not(.flex-col):not(.flex-wrap)>*+*,.nfg .inline-flex.gap-6:not(.flex-col)>*+*{margin-left:1.5rem}
+.nfg .flex.flex-col.gap-6>*+*{margin-top:1.5rem}
+.nfg .flex.flex-wrap.gap-6>*{margin-right:1.5rem;margin-bottom:1.5rem}
+.nfg .flex.gap-8:not(.flex-col):not(.flex-wrap)>*+*,.nfg .inline-flex.gap-8:not(.flex-col)>*+*{margin-left:2rem}
+.nfg .flex.flex-col.gap-8>*+*{margin-top:2rem}
+.nfg .flex.flex-wrap.gap-8>*{margin-right:2rem;margin-bottom:2rem}

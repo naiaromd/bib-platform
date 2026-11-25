@@ -249,7 +249,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
 
   return (
     <main className="booth relative h-screen w-screen select-none overflow-hidden bg-[#2C2A28] text-[#FAF7F1]" style={{ touchAction: "manipulation" }}>
-      <style>{`html{font-size:min(1.6vw,0.9vh)}
+      <style>{`html{font-size:1.6vw;font-size:min(1.6vw,0.9vh)}
 .bfade{animation:bfade .4s cubic-bezier(.2,.8,.2,1) both}@keyframes bfade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .bsign{clip-path:inset(-45% 100% -45% -12%);animation:bsign 1.9s cubic-bezier(.55,.05,.35,1) .3s forwards}@keyframes bsign{to{clip-path:inset(-45% -12% -45% -12%)}}
 .bsignfade{animation:bsignfade .9s ease 2.4s forwards}@keyframes bsignfade{to{opacity:0;visibility:hidden}}

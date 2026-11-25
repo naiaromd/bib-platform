@@ -12,6 +12,12 @@ def(AP,'flatMap',function(f,t){return this.map(f,t).flat()});
 def(Object,'fromEntries',function(it){var o={};Array.from(it).forEach(function(p){o[p[0]]=p[1]});return o});
 if(typeof W.globalThis==='undefined')W.globalThis=W;
 if(typeof W.queueMicrotask!=='function')W.queueMicrotask=function(f){Promise.resolve().then(f)};
+def(AP,'at',function(n){n=Math.trunc(n)||0;if(n<0)n+=this.length;return this[n]});
+def(String.prototype,'at',function(n){n=Math.trunc(n)||0;if(n<0)n+=this.length;return this.charAt(n)});
+def(Object,'hasOwn',function(o,k){return Object.prototype.hasOwnProperty.call(o,k)});
+def(String.prototype,'replaceAll',function(a,b){return typeof a==='string'?this.split(a).join(b):this.replace(a,b)});
+def(Promise,'allSettled',function(ps){return Promise.all(Array.from(ps).map(function(p){return Promise.resolve(p).then(function(v){return{status:'fulfilled',value:v}},function(r){return{status:'rejected',reason:r}})}))});
+try{var g=document.createElement('div');g.style.cssText='display:flex;flex-direction:column;gap:1px;position:absolute';g.appendChild(document.createElement('div'));g.appendChild(document.createElement('div'));document.documentElement.appendChild(g);if(g.scrollHeight!==1)document.documentElement.className+=' nfg';g.parentNode.removeChild(g)}catch(e){}
 var force=/[?&]check=1/.test(location.search);
 function show(){
  var ok=!!W.__bmReady,m=navigator.userAgent.match(/Chrome\\/(\\d+)/),a=navigator.userAgent.match(/Android ([\\d.]+)/);
