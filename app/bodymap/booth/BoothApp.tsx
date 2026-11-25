@@ -216,7 +216,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
             <p className="m-0 font-display text-[1.25rem] uppercase tracking-[0.5em] text-[#6E4A3E]">Precision Beauty</p>
             <h1 className="m-0 mt-3 font-display text-[8.4rem] font-medium leading-[0.88] tracking-[0.01em]">
               Design your
-              <span key={hero} className="bsign -mt-[1.2rem] block pb-2 pl-2 text-[12.5rem] font-normal leading-[1.1] text-[#A8864E]" style={{ fontFamily: "var(--font-sig), cursive" }}>Signature</span>
+              <span key={hero} className="bsign mt-[1.6rem] block pb-1 pl-2 text-[11rem] font-normal leading-[0.95] text-[#A8864E]" style={{ fontFamily: "var(--font-sig), cursive" }}>Signature</span>
             </h1>
             <p className="m-0 mt-3 text-[1.9rem] leading-snug text-[#4A4641]">ออกแบบทรีตเมนต์ซิกเนเจอร์ของคลินิกคุณ<br />ใน 3 ขั้นตอน</p>
             <span className="mt-9 flex items-center justify-between rounded-full bg-[#2C2A28] py-5 pl-10 pr-5 text-[1.8rem] text-[#FAF7F1]">
@@ -226,7 +226,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
           </div>
           {/* วิดีโอหัวลูกกลิ้งบนผิวจริง (ไนน์ 25 พ.ย.) · ช่วงล่างของจอไม่ต้องกด */}
           <video src="/assets/booth/roller.mp4" autoPlay muted loop playsInline preload="auto" aria-hidden
-            className="absolute inset-x-[7%] bottom-[6%] w-[86%] rounded-3xl object-cover shadow-[0_20px_50px_-20px_rgba(44,42,40,.45)]" style={{ aspectRatio: "1600 / 520" }} />
+            className="absolute bottom-[5%] left-[10%] w-[80%] rounded-3xl object-contain shadow-[0_20px_50px_-20px_rgba(44,42,40,.45)]" style={{ aspectRatio: "1600 / 676" }} />
           <div className="absolute inset-x-[7%] bottom-[2%] flex items-end justify-between text-[0.95rem] text-[#6b655d]">
             <span>{count ? `วันนี้ออกแบบ Signature บนจอนี้แล้ว ${count} แบบ` : ""}</span>
             <span>Advertise to Healthcare Professional and Health Official</span>
