@@ -1,8 +1,8 @@
 // Service worker ของจอบูธ (/bodymap/booth) · ให้จอทำงานต่อได้เมื่อเน็ตหลุด หลังเปิดครั้งแรกแล้ว
 // หน้าและข้อมูล: ลองเน็ตก่อน ไม่ได้ค่อยใช้ของที่เก็บไว้ · ไฟล์ static/รูป: ใช้ของที่เก็บไว้ก่อน · ไม่แตะ POST (บันทึกการใช้งาน)
-const CACHE = "bm-booth-v2";
+const CACHE = "bm-booth-v3";
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/bodymap/booth", "/assets/brand/bib-logo-white.png", "/assets/brand/icoone-logo-gold.png", "/assets/brand/bib-logo.png", "/assets/booth/doctor-f.jpg", "/assets/booth/doctor-m.jpg"])).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/bodymap/booth", "/assets/brand/bib-logo-white.png", "/assets/brand/icoone-logo-gold.png", "/assets/brand/bib-logo.png", "/assets/booth/doctor-f.jpg", "/assets/booth/doctor-m.jpg", "/assets/brand/icoone-laser-med-gold.png"])).then(() => self.skipWaiting()));
 });
 self.addEventListener("activate", (e) => {
   e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k.startsWith("bm-booth-") && k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
@@ -10,6 +10,7 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const r = e.request;
   if (r.method !== "GET") return;
+  if (r.headers.has("range")) return; // วิดีโอขอเป็นช่วง ให้เบราว์เซอร์จัดการเอง (ไม่มีเน็ต = วิดีโอไม่เล่น หน้าอื่นใช้ได้ปกติ)
   const u = new URL(r.url);
   const isStatic = u.pathname.startsWith("/_next/static/") || u.pathname.startsWith("/assets/") || u.hostname.includes("fonts.g");
   if (isStatic) {

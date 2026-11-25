@@ -75,7 +75,7 @@ function Logos({ small }: { small?: boolean }) {
       <img src="/assets/brand/bib-logo-white.png" alt="BIB · Beauty Innovation & Beyond" className={small ? "h-[3rem] w-auto" : "h-[6rem] w-auto"} />
       <span aria-hidden className={`${small ? "h-[2rem]" : "h-[4rem]"} w-px bg-[#6b655d]`} />
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/assets/brand/icoone-logo-gold.png" alt="icoone" className={small ? "h-[1.7rem] w-auto" : "h-[3.2rem] w-auto"} />
+      <img src="/assets/brand/icoone-laser-med-gold.png" alt="icoone Laser Med" className={small ? "h-[2.4rem] w-auto" : "h-[4.4rem] w-auto"} />
     </div>
   );
 }
@@ -204,15 +204,15 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
             <img key={src} src={src} alt="" draggable={false} aria-hidden
               className={`bhero absolute inset-0 h-full w-full object-cover object-[82%_20%] transition-opacity duration-[1500ms] ease-in-out ${hero === i ? "opacity-100" : "opacity-0"}`} />
           ))}
-          <span aria-hidden className="absolute inset-x-0 bottom-0 h-[70%]" style={{ background: "linear-gradient(to bottom, rgba(236,226,215,0) 0%, rgba(236,226,215,.88) 26%, #ECE2D7 42%)" }} />
+          <span aria-hidden className="absolute inset-x-0 bottom-0 h-[72%]" style={{ background: "linear-gradient(to bottom, rgba(236,226,215,0) 0%, rgba(236,226,215,.82) 16%, #ECE2D7 30%)" }} />
           <div className="absolute left-[7%] top-[4.5%] flex items-center gap-5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/assets/brand/bib-logo.png" alt="BIB · Beauty Innovation & Beyond" className="h-[4.4rem] w-auto" />
             <span aria-hidden className="h-[3rem] w-px bg-[#8A7F70]" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/brand/icoone-logo-gold.png" alt="icoone" className="h-[2.3rem] w-auto" />
+            <img src="/assets/brand/icoone-laser-med-gold.png" alt="icoone Laser Med" className="h-[3.4rem] w-auto" />
           </div>
-          <div className="absolute inset-x-[7%] top-[44%] flex flex-col">
+          <div className="absolute inset-x-[7%] top-[36%] flex flex-col">
             <p className="m-0 font-display text-[1.25rem] uppercase tracking-[0.5em] text-[#6E4A3E]">Precision Beauty</p>
             <h1 className="m-0 mt-3 font-display text-[8.4rem] font-medium leading-[0.88] tracking-[0.01em]">
               Design your
@@ -224,7 +224,10 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
               <span className="flex h-[3.8rem] w-[3.8rem] items-center justify-center rounded-full bg-[#C9A96E] text-[1.8rem] text-[#2C2A28]">→</span>
             </span>
           </div>
-          <div className="absolute inset-x-[7%] bottom-[3%] flex items-end justify-between text-[0.95rem] text-[#6b655d]">
+          {/* วิดีโอหัวลูกกลิ้งบนผิวจริง (ไนน์ 25 พ.ย.) · ช่วงล่างของจอไม่ต้องกด */}
+          <video src="/assets/booth/roller.mp4" autoPlay muted loop playsInline preload="auto" aria-hidden
+            className="absolute inset-x-[7%] bottom-[6%] w-[86%] rounded-3xl object-cover shadow-[0_20px_50px_-20px_rgba(44,42,40,.45)]" style={{ aspectRatio: "1600 / 520" }} />
+          <div className="absolute inset-x-[7%] bottom-[2%] flex items-end justify-between text-[0.95rem] text-[#6b655d]">
             <span>{count ? `วันนี้ออกแบบ Signature บนจอนี้แล้ว ${count} แบบ` : ""}</span>
             <span>Advertise to Healthcare Professional and Health Official</span>
           </div>
