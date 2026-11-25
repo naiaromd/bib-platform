@@ -4,6 +4,7 @@
 // ปรับได้: แรงดูด (ผิวถูกยกสูงขึ้น) · LED / Laser (เฉพาะ RoboSolo) · เล่น/หยุด
 // เป็นภาพจำลองเพื่ออธิบายหลักการ ไม่ตามสัดส่วนจริง · ไม่ได้ระบุความลึกของแสงเป็นตัวเลข
 import { useEffect, useState } from "react";
+import { HEAD_SVG } from "@/lib/bodymap/handpieceArt";
 
 const W = 640, H = 440, SURFACE = 210;
 // [ชื่อชั้น, ระยะจากผิวถึงขอบล่างของชั้น, สีพื้น, สัดส่วนที่ชั้นนี้ถูกยกตามผิว]
@@ -85,20 +86,38 @@ export default function MechanismAnim({ suc, led, las, headName, headKey = "RS" 
             {las ? <path d={`M${headX - 2},${surfC} L${headX - 18},${SURFACE + 150} L${headX + 46},${SURFACE + 150} L${headX + 14},${surfC} Z`} fill="#C08A5A" opacity={0.3 + 0.1 * pulse} /> : null}
           </g>
         ) : null}
-        {/* หัวเครื่อง: ภาพจริง ลูกกลิ้งกดแนบผิว (ขอบล่างลูกกลิ้งต่ำกว่าผิว 3 หน่วย = กดเล็กน้อย) · โยกเบาๆ ตามจังหวะกลิ้ง */}
+        {/* หัวเครื่อง: ภาพจริง (ฝังในหน้า) ลูกกลิ้งกดแนบผิว · โยกเบาๆ ตามจังหวะกลิ้ง */}
         {(() => {
           const a = HEAD_ART[headKey] ?? HEAD_ART.RS;
           const k = (ART * (a.size ?? 1)) / 400;
           const x = headX - a.cx * k, y = SURFACE + 3 - a.bottom * k;
           const rock = Math.sin(t * 6) * 1.2;
+          const art = HEAD_SVG[headKey] ?? HEAD_SVG.RS;
           return (
             <g transform={`rotate(${rock} ${headX} ${SURFACE})`}>
               <g transform={`translate(${x} ${y}) scale(${k}) rotate(${a.rot} 200 200)`}>
-                <image href={`/assets/handpieces/${headKey}-anim.svg`} x={0} y={0} width={400} height={400} />
+                <svg x={0} y={0} width={400} height={400} viewBox="0 0 400 400" overflow="visible" dangerouslySetInnerHTML={{ __html: art }} />
               </g>
             </g>
           );
         })()}
+        {/* แสงที่ลูกกลิ้ง (เมื่อเปิด LED / Laser) · เรืองตามจังหวะ */}
+        {led || las ? (
+          <g style={{ mixBlendMode: "multiply" }}>
+            {led ? <ellipse cx={headX - 10} cy={SURFACE + 6} rx={46} ry={9} fill="#E06C5E" opacity={0.25 + 0.2 * pulse} /> : null}
+            {las ? <ellipse cx={headX + 10} cy={SURFACE + 8} rx={36} ry={7} fill="#C08A5A" opacity={0.3 + 0.2 * pulse} /> : null}
+          </g>
+        ) : null}
+        {/* แรงดูด: ลูกศรยกผิวขึ้น ยิ่งดูดแรงยิ่งเข้มและถี่ */}
+        {[0, 1, 2].map((i) => {
+          const span = 34, y0 = SURFACE + 34;
+          const yy = y0 - ((t * (30 + suc * 0.5) + i * (span / 3)) % span);
+          return <path key={i} d={`M${headX - 9},${yy} l9,-9 l9,9`} fill="none" stroke="#8A5A4A" strokeWidth={2.4} strokeLinecap="round" opacity={(0.15 + suc / 140) * (1 - (y0 - yy) / span)} />;
+        })}
+        <g>
+          <rect x={headX - 44} y={SURFACE + 46} width={88} height={20} rx={10} fill="#FFFFFF" opacity={0.85} />
+          <text x={headX} y={SURFACE + 60} textAnchor="middle" fontSize={11.5} fill="#4A4641">แรงดูด {suc < 34 ? "เบา" : suc < 67 ? "กลาง" : "แรง"}{led || las ? ` · ${[led ? "LED" : "", las ? "Laser" : ""].filter(Boolean).join("+")}` : ""}</text>
+        </g>
         {/* ป้ายชื่อชั้นผิว */}
         {LAYERS.map(([name, bottom], i) => {
           const top = i === 0 ? 0 : LAYERS[i - 1][1];
