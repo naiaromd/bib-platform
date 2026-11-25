@@ -35,7 +35,7 @@ export default function BodyMapApp({ data: initial }: { data: BodyMapData }) {
   // มาจาก QR ของจอบูธ: ?p=รหัสปัญหา&src=booth → เปิดบริเวณและปัญหาที่หมอเลือกไว้บนจอบูธ
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
-    const p = q.get("p");
+    const p = (q.get("p") ?? "").split(",")[0]; // จากบูธอาจมาหลายปัญหา คั่นด้วย , → เปิดปัญหาแรก
     const c = p ? initial.concerns.find((x) => x.id === p) : undefined;
     if (!c) return;
     setZoneId(c.zones[0] ?? null); setConcernId(c.id);
