@@ -334,9 +334,9 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
                 return (
                   <button key={k} type="button" aria-pressed={on} onClick={() => { setHp(k); track("เลือกหัวเครื่อง", { p: concern.id, note: `บูธ ${h.name}` }); }}
                     className={`relative flex min-w-0 flex-col overflow-hidden rounded-2xl text-left transition-[transform,box-shadow,filter] duration-300 ease-out ${on ? "-translate-y-1 ring-2 ring-[#C9A96E] ring-offset-4 ring-offset-[#2C2A28]" : "brightness-[0.78]"}`}>
-                    <span className="flex aspect-[16/10] items-center justify-center bg-white p-1.5">
+                    <span className="flex aspect-[16/10] items-center justify-center p-1" style={{ background: "radial-gradient(ellipse at 50% 45%, #FFFFFF 0%, #F4EFE5 55%, #E4DCCD 100%)" }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={`/assets/handpieces/${k}.jpg`} alt={h.name} className={`h-full w-full object-contain transition-transform duration-500 ease-out ${on ? "scale-105" : "scale-95"}`} draggable={false} />
+                      <img src={`/assets/handpieces/${k}-r01.svg`} alt={h.name} className={`h-full w-full object-contain transition-transform duration-500 ease-out ${on ? "scale-110" : "scale-100"}`} draggable={false} />
                     </span>
                     <span className="flex flex-1 flex-col bg-[#FAF7F1] px-3 pb-3 pt-2 text-[#2C2A28]">
                       <span className="font-display text-[1.35rem] leading-tight">{h.name}</span>

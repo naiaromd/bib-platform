@@ -32,11 +32,12 @@ export const TECH_POSTER = ext("7cce333f55d2739544e065fa8b4718ed", "jpg");
 export const DEVICE_PHOTO = ext("7d3654625308b2affb49d3814d04a8fe");
 
 // === Handpieces ===
+// ภาพหัวเครื่องแบบ vector (ไนน์ 25 พ.ย. · BIB/4_Media/handpiece_svg_r01) แทนภาพถ่าย 400 px
 export const HANDPIECE_IMG = {
-  RS: ext("da0b5700904ceb15e0fa21838b9e1d7f", "jpg"),
-  RT: ext("7c821f6776726fe019169ef4701e098f", "jpg"),
-  RM: ext("40ecab82bef6a299a535a212c7446e1c", "jpg"),
-  RC: ext("96011254f1bb8b0d40ec2cc3212b47e3", "jpg"),
+  RS: "/assets/handpieces/RS-r01.svg",
+  RT: "/assets/handpieces/RT-r01.svg",
+  RM: "/assets/handpieces/RM-r01.svg",
+  RC: "/assets/handpieces/RC-r01.svg",
 } as const;
 
 // === Program icons ===
