@@ -125,6 +125,7 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
     return () => { alive = false; };
   }, [initial.mode]);
   // ให้จอทำงานต่อได้แม้เน็ตหลุด หลังเปิดครั้งแรกแล้ว (เก็บหน้าและรูปไว้ในเครื่อง)
+  useEffect(() => { (window as unknown as { __bmReady?: boolean }).__bmReady = true; if (!/[?&]check=1/.test(location.search)) document.getElementById("bm-check")?.remove(); }, []);
   useEffect(() => { if ("serviceWorker" in navigator) navigator.serviceWorker.register("/booth-sw.js", { scope: "/bodymap/booth" }).catch(() => undefined); }, []);
 
   const [stage, setStage] = useState<Stage>("attract");

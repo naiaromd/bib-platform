@@ -1,6 +1,6 @@
 // Service worker ของจอบูธ (/bodymap/booth) · ให้จอทำงานต่อได้เมื่อเน็ตหลุด หลังเปิดครั้งแรกแล้ว
 // หน้าและข้อมูล: ลองเน็ตก่อน ไม่ได้ค่อยใช้ของที่เก็บไว้ · ไฟล์ static/รูป: ใช้ของที่เก็บไว้ก่อน · ไม่แตะ POST (บันทึกการใช้งาน)
-const CACHE = "bm-booth-v10";
+const CACHE = "bm-booth-v11";
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/bodymap/booth", "/assets/brand/bib-logo-white.png", "/assets/brand/icoone-logo-gold.png", "/assets/brand/bib-logo.png", "/assets/booth/doctor-f.jpg", "/assets/booth/doctor-m.jpg", "/assets/brand/icoone-laser-med-gold.png", "/assets/brand/icoone-laser-med-grey.png", "/assets/booth/roller-hd.mp4"])).then(() => self.skipWaiting()));
 });
