@@ -300,17 +300,33 @@ export default function BoothApp({ data: initial }: { data: BodyMapData }) {
           {/* 02 Machine */}
           <div className="bfade mt-6" style={{ animationDelay: "2700ms" }}>
             <Eyebrow>02 · Your Machine</Eyebrow>
-            <div className="mt-3 grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-5">
+            {/* หัวเครื่อง · ภาพจริงจากคลัง BIB (ลบลายน้ำมุมล่าง) วางแบบตู้โชว์ */}
+            <div className="mt-3 grid grid-cols-4 gap-3">
+              {HANDPIECE_ORDER.map((k) => {
+                const h = HANDPIECES[k], on = hp === k;
+                return (
+                  <button key={k} type="button" aria-pressed={on} onClick={() => { setHp(k); track("เลือกหัวเครื่อง", { p: concern.id, note: `บูธ ${h.name}` }); }}
+                    className={`relative flex min-w-0 flex-col overflow-hidden rounded-2xl text-left transition-[transform,box-shadow,filter] duration-300 ease-out ${on ? "-translate-y-1 ring-2 ring-[#C9A96E] ring-offset-4 ring-offset-[#2C2A28]" : "brightness-[0.78]"}`}>
+                    <span className="flex aspect-[4/3] items-center justify-center bg-white p-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={`/assets/handpieces/${k}.jpg`} alt={h.name} className={`h-full w-full object-contain transition-transform duration-500 ease-out ${on ? "scale-105" : "scale-95"}`} draggable={false} />
+                    </span>
+                    <span className="flex flex-1 flex-col bg-[#FAF7F1] px-3 pb-3 pt-2 text-[#2C2A28]">
+                      <span className="font-display text-[1.35rem] leading-tight">{h.name}</span>
+                      <span className="text-[0.85rem] text-[#8A7F70]">{h.line} · {h.ppm} ครั้ง/นาที</span>
+                      {h.hasLight ? <span className="mt-1 self-start rounded-full bg-[#2C2A28] px-2 py-0.5 text-[0.75rem] tracking-wide text-[#C9A96E]">Laser + LED</span> : null}
+                    </span>
+                    {on ? <span aria-hidden className="absolute left-0 right-0 top-0 h-[3px] bg-[#C9A96E]" /> : null}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-4 grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-5">
               <div className="rounded-2xl border border-[#C9A96E]/40 bg-[#F4EFE5] p-2 text-[#2C2A28]">
                 <MechanismAnim suc={suc} led={HANDPIECES[hp].hasLight && led} las={HANDPIECES[hp].hasLight && las} headName={HANDPIECES[hp].name} />
               </div>
-              <div className="flex min-w-0 flex-col gap-3">
-                <div className="grid grid-cols-2 gap-2">
-                  {HANDPIECE_ORDER.map((k) => (
-                    <button key={k} type="button" aria-pressed={hp === k} onClick={() => { setHp(k); track("เลือกหัวเครื่อง", { p: concern.id, note: `บูธ ${HANDPIECES[k].name}` }); }}
-                      className={`rounded-xl border px-2 py-4 text-[1.1rem] transition-colors ${hp === k ? "border-[#FAF7F1] bg-[#FAF7F1] text-[#2C2A28]" : "border-[#5a554e] text-[#E4DCCD]"}`}>{HANDPIECES[k].name}</button>
-                  ))}
-                </div>
+              <div className="flex min-w-0 flex-col justify-center gap-4">
+                <p className="m-0 text-[1.05rem] leading-snug text-[#E4DCCD]">{HANDPIECES[hp].desc}</p>
                 <label className="block text-[1.15rem]">
                   <span className="flex justify-between"><span>แรงดูด</span><span className="text-[#B9AE9E]">{suc < 34 ? "เบา" : suc < 67 ? "กลาง" : "แรง"}</span></span>
                   <input type="range" min={0} max={100} value={suc} onChange={(e) => setSuc(+e.target.value)} aria-label="แรงดูด" className="mt-2 h-10 w-full accent-[#C9A96E]" />
