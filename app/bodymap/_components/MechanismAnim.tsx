@@ -9,12 +9,13 @@ import { HEAD_SVG } from "@/lib/bodymap/handpieceArt";
 const W = 640, H = 440, SURFACE = 210;
 // [ชื่อชั้น, ระยะจากผิวถึงขอบล่างของชั้น, สีพื้น, สัดส่วนที่ชั้นนี้ถูกยกตามผิว]
 const LAYERS: [string, number, string, number][] = [
-  ["หนังกำพร้า", 14, "#EED9D0", 1],
-  ["หนังแท้", 58, "#E3BFB0", 0.85],
-  ["ไขมันใต้ผิว", 138, "#F3E3B8", 0.55],
-  ["พังผืด", 150, "#D9D2C2", 0.25],
-  ["กล้ามเนื้อ", 230, "#C98F84", 0.1],
+  ["หนังกำพร้า", 14, "url(#mlEpi)", 1],
+  ["หนังแท้", 58, "url(#mlDer)", 0.85],
+  ["ไขมันใต้ผิว", 138, "url(#mlFat)", 0.55],
+  ["พังผืด", 150, "#D8CDB9", 0.25],
+  ["กล้ามเนื้อ", 230, "url(#mlMus)", 0.1],
 ];
+const LAYER_EN = ["Epidermis", "Dermis", "Subcutaneous fat", "Fascia", "Muscle"];
 const N = 48;
 
 // ภาพหัวเครื่องจริงแบบ vector (ไนน์ 25 พ.ย. · BIB/4_Media/handpiece_svg_r01 · เอาเงาพื้นออก) วางให้ลูกกลิ้งแนบผิว
@@ -53,13 +54,23 @@ export default function MechanismAnim({ suc, led, las, headName, headKey = "RS" 
   const light = led || las;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-line bg-paper">
+    <div className="overflow-hidden rounded-xl border border-[#C9BBA4] bg-[#E3D6C3]">
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`ภาพจำลองหัว ${headName} ยกผิวด้วยแรงดูดและลูกกลิ้ง เห็นชั้นผิว 5 ชั้น`} className="block h-auto w-full">
-        <rect width={W} height={H} fill="#FAF7F1" />
+        {/* พื้นครีมเข้ม (ไนน์: ให้หัวเครื่องสีขาวเด่น) + เฉดชั้นผิวแบบพรีเมียม */}
+        <defs>
+          <linearGradient id="mlBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#E3D6C3" /><stop offset="1" stopColor="#D6C6AF" /></linearGradient>
+          <linearGradient id="mlEpi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#F6E4DA" /><stop offset="1" stopColor="#EBCFC2" /></linearGradient>
+          <linearGradient id="mlDer" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#E7C4B4" /><stop offset="1" stopColor="#D9AD9A" /></linearGradient>
+          <linearGradient id="mlFat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#F4E6C2" /><stop offset="1" stopColor="#EBD7A6" /></linearGradient>
+          <linearGradient id="mlMus" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#C58A7E" /><stop offset="1" stopColor="#A8685D" /></linearGradient>
+          <radialGradient id="mlSpot" cx=".5" cy=".3" r=".6"><stop offset="0" stopColor="#FFFFFF" stopOpacity=".35" /><stop offset="1" stopColor="#FFFFFF" stopOpacity="0" /></radialGradient>
+        </defs>
+        <rect width={W} height={H} fill="url(#mlBg)" />
+        <ellipse cx={W / 2} cy={SURFACE - 60} rx={W * 0.55} ry={120} fill="url(#mlSpot)" />
         {LAYERS.map(([name, bottom, fill, k], i) => {
           const top = i === 0 ? 0 : LAYERS[i - 1][1];
           const kTop = i === 0 ? 1 : LAYERS[i - 1][3];
-          return <path key={name} d={band(top, kTop, bottom, k)} fill={fill} stroke="#B9A999" strokeWidth={0.6} />;
+          return <path key={name} d={band(top, kTop, bottom, k)} fill={fill} stroke="#B8A58E" strokeWidth={0.5} />;
         })}
         {/* ก้อนไขมันและผนังกั้นในชั้นไขมันใต้ผิว */}
         {Array.from({ length: 15 }, (_, i) => {
@@ -118,13 +129,19 @@ export default function MechanismAnim({ suc, led, las, headName, headKey = "RS" 
           <rect x={headX - 44} y={SURFACE + 46} width={88} height={20} rx={10} fill="#FFFFFF" opacity={0.85} />
           <text x={headX} y={SURFACE + 60} textAnchor="middle" fontSize={11.5} fill="#4A4641">แรงดูด {suc < 34 ? "เบา" : suc < 67 ? "กลาง" : "แรง"}{led || las ? ` · ${[led ? "LED" : "", las ? "Laser" : ""].filter(Boolean).join("+")}` : ""}</text>
         </g>
-        {/* ป้ายชื่อชั้นผิว */}
+        {/* เส้นไฮไลต์ผิว */}
+        <path d={`M${line(0, 1).join(" L")}`} fill="none" stroke="#FFFFFF" strokeOpacity={0.7} strokeWidth={1.2} />
+        {/* ป้ายชื่อชั้นผิว · ไทย + อังกฤษ เส้นนำสีทอง */}
         {LAYERS.map(([name, bottom], i) => {
           const top = i === 0 ? 0 : LAYERS[i - 1][1];
+          const cy = SURFACE + (top + bottom) / 2 + (i === 0 ? 2 : 0);
+          const w = Math.max(name.length * 7.6, LAYER_EN[i].length * 5.4) + 22;
           return (
             <g key={name}>
-              <rect x={6} y={SURFACE + (top + bottom) / 2 - 9 + (i === 0 ? 2 : 0) + (i === 3 ? 0 : 0)} width={name.length * 8.4 + 12} height={18} rx={9} fill="#FFFFFF" opacity={0.86} />
-              <text x={12} y={SURFACE + (top + bottom) / 2 + 4 + (i === 0 ? 2 : 0)} fontSize={12} fill="#2C2A28">{name}</text>
+              <rect x={8} y={cy - 12} width={w} height={i === 0 || i === 3 ? 16 : 24} rx={4} fill="#2C2A28" opacity={0.72} />
+              <line x1={8 + w} y1={cy - 4} x2={8 + w + 14} y2={cy - 4} stroke="#C9A96E" strokeWidth={1} />
+              <text x={15} y={cy + (i === 0 || i === 3 ? 0 : -1)} fontSize={11} fill="#FAF7F1">{name}</text>
+              {i === 0 || i === 3 ? null : <text x={15} y={cy + 9} fontSize={8.5} letterSpacing={0.8} fill="#C9A96E">{LAYER_EN[i].toUpperCase()}</text>}
             </g>
           );
         })}
